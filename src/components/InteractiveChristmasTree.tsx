@@ -36,17 +36,20 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     "#3b82f6", "#d97706", "#8b5cf6", "#e11d48"
   ];
 
-  // Adjusted ornament positions to better align with the tree on all screen sizes
+  // Repositioned ornaments to match the tree structure - positioned on actual branches
   const ornamentPositions = [
-    // Top section - moved down
-    { x: 50, y: 25 }, { x: 60, y: 30 }, { x: 40, y: 30 },
-    // Upper middle section - moved down
-    { x: 35, y: 38 }, { x: 65, y: 38 }, { x: 50, y: 42 },
-    { x: 32, y: 46 }, { x: 68, y: 46 },
-    // Lower middle section - moved down
-    { x: 28, y: 54 }, { x: 72, y: 54 }, { x: 42, y: 58 }, { x: 58, y: 58 },
-    // Bottom section - moved down
-    { x: 25, y: 66 }, { x: 75, y: 66 }, { x: 38, y: 70 }, { x: 62, y: 70 }
+    // Top star area (just below the star)
+    { x: 50, y: 15 },
+    // Upper section branches
+    { x: 42, y: 22 }, { x: 58, y: 24 },
+    // Second tier branches
+    { x: 38, y: 30 }, { x: 50, y: 32 }, { x: 62, y: 31 },
+    // Third tier branches  
+    { x: 35, y: 38 }, { x: 48, y: 40 }, { x: 65, y: 39 },
+    // Fourth tier branches
+    { x: 32, y: 46 }, { x: 45, y: 48 }, { x: 55, y: 49 }, { x: 68, y: 47 },
+    // Fifth tier branches
+    { x: 30, y: 54 }, { x: 42, y: 56 }, { x: 58, y: 57 }, { x: 70, y: 55 }
   ];
 
   return (
