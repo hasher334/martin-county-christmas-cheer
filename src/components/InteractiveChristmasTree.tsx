@@ -36,223 +36,278 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     "#3b82f6", "#d97706", "#8b5cf6", "#e11d48"
   ];
 
-  // Better positioned ornaments for the wider, more realistic tree
+  // Better positioned ornaments for the realistic tree shape
   const ornamentPositions = [
     // Top section
-    { x: 500, y: 240 }, { x: 460, y: 270 }, { x: 540, y: 270 },
+    { x: 500, y: 200 }, { x: 480, y: 230 }, { x: 520, y: 230 },
     // Upper middle section
-    { x: 430, y: 320 }, { x: 570, y: 320 }, { x: 500, y: 350 },
-    { x: 400, y: 380 }, { x: 600, y: 380 },
+    { x: 460, y: 280 }, { x: 540, y: 280 }, { x: 500, y: 310 },
+    { x: 440, y: 340 }, { x: 560, y: 340 },
     // Lower middle section
-    { x: 370, y: 440 }, { x: 630, y: 440 }, { x: 460, y: 470 }, { x: 540, y: 470 },
+    { x: 420, y: 390 }, { x: 580, y: 390 }, { x: 480, y: 420 }, { x: 520, y: 420 },
     // Bottom section
-    { x: 340, y: 520 }, { x: 660, y: 520 }, { x: 420, y: 550 }, { x: 580, y: 550 }
+    { x: 400, y: 470 }, { x: 600, y: 470 }, { x: 460, y: 500 }, { x: 540, y: 500 }
   ];
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-christmas-brown-900 via-christmas-green-900 to-christmas-brown-800 overflow-hidden">
-      {/* Magical Background Effects */}
+    <div className="relative min-h-screen bg-gradient-to-b from-slate-300 via-slate-200 to-white overflow-hidden">
+      {/* Winter Wonderland Background */}
       <div className="absolute inset-0">
-        {/* Falling Snow */}
-        {[...Array(50)].map((_, i) => (
+        {/* Falling Snow Animation */}
+        {[...Array(100)].map((_, i) => (
           <div
             key={`snow-${i}`}
-            className="absolute w-2 h-2 bg-christmas-cream rounded-full opacity-70 animate-pulse"
+            className="absolute w-2 h-2 bg-white rounded-full opacity-80 animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${3 + Math.random() * 4}s`,
+              transform: `scale(${0.3 + Math.random() * 0.8})`,
+            }}
+          />
+        ))}
+
+        {/* Larger Snow Flakes */}
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={`snowflake-${i}`}
+            className="absolute text-white animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`,
+              animationDuration: `${4 + Math.random() * 3}s`,
+              fontSize: `${8 + Math.random() * 8}px`,
             }}
-          />
+          >
+            ❄
+          </div>
         ))}
+
+        {/* Ground Snow Drifts */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-slate-100 to-transparent"></div>
         
-        {/* Twinkling Stars */}
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={`star-${i}`}
-            className="absolute w-1 h-1 bg-yellow-200 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 50}%`,
-              animationDelay: `${Math.random() * 2}s`,
-            }}
-          />
-        ))}
+        {/* Snow Clouds in Background */}
+        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-slate-400 via-slate-300 to-transparent opacity-60"></div>
       </div>
 
       <div className="relative z-10 flex flex-col items-center justify-center py-12">
         <div className="relative">
           <svg 
             width="1000" 
-            height="800" 
-            viewBox="0 0 1000 800" 
+            height="650" 
+            viewBox="0 0 1000 650" 
             className="drop-shadow-2xl"
           >
-            {/* Ground Shadow */}
+            {/* Snow Ground */}
             <ellipse 
               cx="500" 
-              cy="780" 
-              rx="220" 
-              ry="25" 
-              fill="rgba(0,0,0,0.3)"
+              cy="620" 
+              rx="400" 
+              ry="30" 
+              fill="white"
+              opacity="0.9"
             />
             
-            {/* Tree Trunk - More prominent */}
+            {/* Tree Base/Stand - Red and White */}
             <rect 
-              x="480" 
-              y="650" 
-              width="40" 
-              height="100" 
-              fill="#5A3A1F"
-              rx="8"
+              x="485" 
+              y="580" 
+              width="30" 
+              height="40" 
+              fill="#8B4513"
+              rx="4"
+            />
+            <rect 
+              x="470" 
+              y="615" 
+              width="60" 
+              height="20" 
+              fill="#dc2626"
+              rx="10"
             />
             <rect 
               x="475" 
-              y="740" 
+              y="618" 
               width="50" 
-              height="25" 
-              fill="#4A2C15"
-              rx="12"
-            />
-            
-            {/* Tree Base/Pot */}
-            <path 
-              d="M 460 765 L 540 765 L 530 785 L 470 785 Z" 
-              fill="#6B4423"
-              stroke="#5A3A1F"
-              strokeWidth="2"
+              height="14" 
+              fill="white"
+              rx="7"
             />
 
-            {/* Tree Layers - Much wider and more realistic, bottom to top */}
+            {/* Tree Layers - More realistic conical shape like the reference */}
             
-            {/* Bottom Layer - Widest */}
+            {/* Bottom Layer - Largest */}
             <path 
-              d="M 500 520 L 320 650 L 680 650 Z" 
-              fill="#0F5132"
-              stroke="#0A3A2A"
-              strokeWidth="3"
+              d="M 500 450 L 350 580 L 650 580 Z" 
+              fill="#0d5016"
+              stroke="#0a3d12"
+              strokeWidth="2"
             />
             <path 
-              d="M 500 530 L 340 640 L 660 640 L 500 530" 
-              fill="#198754"
+              d="M 500 460 L 370 570 L 630 570 Z" 
+              fill="#165a1f"
               opacity="0.9"
             />
             
             {/* Second Layer */}
             <path 
-              d="M 500 450 L 340 580 L 660 580 Z" 
-              fill="#0F5132"
-              stroke="#0A3A2A"
-              strokeWidth="3"
+              d="M 500 370 L 380 500 L 620 500 Z" 
+              fill="#0d5016"
+              stroke="#0a3d12"
+              strokeWidth="2"
             />
             <path 
-              d="M 500 460 L 360 570 L 640 570 L 500 460" 
-              fill="#198754"
+              d="M 500 380 L 400 490 L 600 490 Z" 
+              fill="#165a1f"
               opacity="0.9"
             />
             
             {/* Third Layer */}
             <path 
-              d="M 500 380 L 360 510 L 640 510 Z" 
-              fill="#0F5132"
-              stroke="#0A3A2A"
-              strokeWidth="3"
+              d="M 500 300 L 410 420 L 590 420 Z" 
+              fill="#0d5016"
+              stroke="#0a3d12"
+              strokeWidth="2"
             />
             <path 
-              d="M 500 390 L 380 500 L 620 500 L 500 390" 
-              fill="#198754"
+              d="M 500 310 L 430 410 L 570 410 Z" 
+              fill="#165a1f"
               opacity="0.9"
             />
             
             {/* Fourth Layer */}
             <path 
-              d="M 500 310 L 380 440 L 620 440 Z" 
-              fill="#0F5132"
-              stroke="#0A3A2A"
-              strokeWidth="3"
+              d="M 500 240 L 440 350 L 560 350 Z" 
+              fill="#0d5016"
+              stroke="#0a3d12"
+              strokeWidth="2"
             />
             <path 
-              d="M 500 320 L 400 430 L 600 430 L 500 320" 
-              fill="#198754"
+              d="M 500 250 L 460 340 L 540 340 Z" 
+              fill="#165a1f"
               opacity="0.9"
             />
 
             {/* Top Layer */}
             <path 
-              d="M 500 240 L 400 370 L 600 370 Z" 
-              fill="#0F5132"
-              stroke="#0A3A2A"
-              strokeWidth="3"
+              d="M 500 180 L 470 280 L 530 280 Z" 
+              fill="#0d5016"
+              stroke="#0a3d12"
+              strokeWidth="2"
             />
             <path 
-              d="M 500 250 L 420 360 L 580 360 L 500 250" 
-              fill="#198754"
+              d="M 500 190 L 485 270 L 515 270 Z" 
+              fill="#165a1f"
               opacity="0.9"
             />
 
-            {/* Tree Star - Much larger and more prominent */}
-            <g transform="translate(500, 200)">
-              <path 
-                d="M 0 -30 L 9 -9 L 30 -9 L 15 3 L 24 24 L 0 12 L -24 24 L -15 3 L -30 -9 L -9 -9 Z"
-                fill="#FFD700"
-                stroke="#FFA500"
-                strokeWidth="3"
+            {/* Decorative Garland - Golden strings */}
+            <path 
+              d="M 380 560 Q 440 540 500 550 Q 560 540 620 560" 
+              stroke="#ffd700"
+              strokeWidth="3"
+              fill="none"
+              opacity="0.9"
+            />
+            <path 
+              d="M 400 480 Q 450 460 500 470 Q 550 460 600 480" 
+              stroke="#ffd700"
+              strokeWidth="3"
+              fill="none"
+              opacity="0.9"
+            />
+            <path 
+              d="M 420 400 Q 460 380 500 390 Q 540 380 580 400" 
+              stroke="#ffd700"
+              strokeWidth="3"
+              fill="none"
+              opacity="0.9"
+            />
+            <path 
+              d="M 450 330 Q 475 315 500 320 Q 525 315 550 330" 
+              stroke="#ffd700"
+              strokeWidth="3"
+              fill="none"
+              opacity="0.9"
+            />
+            <path 
+              d="M 475 260 Q 487.5 250 500 255 Q 512.5 250 525 260" 
+              stroke="#ffd700"
+              strokeWidth="3"
+              fill="none"
+              opacity="0.9"
+            />
+
+            {/* Tree Star - Large and radiant like in reference */}
+            <g transform="translate(500, 150)">
+              <defs>
+                <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#fff" stopOpacity="1" />
+                  <stop offset="50%" stopColor="#ffd700" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#ffa500" stopOpacity="0.6" />
+                </radialGradient>
+              </defs>
+              
+              {/* Star Glow Effect */}
+              <circle 
+                cx="0" 
+                cy="0" 
+                r="35" 
+                fill="url(#starGlow)" 
+                opacity="0.6"
                 className={cn(
-                  "transition-all duration-500 drop-shadow-2xl",
-                  twinkle % 2 === 0 ? "scale-110 drop-shadow-2xl filter brightness-125" : "scale-100"
+                  "transition-all duration-1000",
+                  twinkle % 2 === 0 ? "scale-125 opacity-80" : "scale-100 opacity-60"
                 )}
               />
-              <circle cx="0" cy="0" r="5" fill="#FFF" opacity="0.9" />
+              
+              {/* Main Star */}
+              <path 
+                d="M 0 -25 L 7.5 -7.5 L 25 -7.5 L 12.5 2.5 L 20 20 L 0 10 L -20 20 L -12.5 2.5 L -25 -7.5 L -7.5 -7.5 Z"
+                fill="#ffd700"
+                stroke="#ffa500"
+                strokeWidth="2"
+                className={cn(
+                  "transition-all duration-500 drop-shadow-2xl",
+                  twinkle % 2 === 0 ? "scale-110 brightness-125" : "scale-100"
+                )}
+              />
+              
+              {/* Inner Star Light */}
               <path 
                 d="M 0 -15 L 4.5 -4.5 L 15 -4.5 L 7.5 1.5 L 12 12 L 0 6 L -12 12 L -7.5 1.5 L -15 -4.5 L -4.5 -4.5 Z"
-                fill="#FFF"
-                opacity="0.6"
+                fill="#fff"
+                opacity="0.8"
               />
+              
+              {/* Center sparkle */}
+              <circle cx="0" cy="0" r="3" fill="#fff" opacity="0.9" />
             </g>
 
-            {/* Tree Texture and Branch Details - More realistic needles */}
-            {[...Array(25)].map((_, i) => {
-              const layer = Math.floor(i / 5);
-              const x = 350 + (i % 5) * 75 + Math.random() * 20;
-              const y = 280 + layer * 60 + Math.random() * 40;
-              return (
-                <g key={`texture-${i}`}>
-                  <path
-                    d={`M ${x - 15} ${y} Q ${x} ${y - 8} ${x + 15} ${y} Q ${x} ${y + 8} ${x - 15} ${y}`}
-                    fill="#198754"
-                    opacity="0.6"
-                  />
-                  <path
-                    d={`M ${x - 10} ${y + 5} Q ${x} ${y - 3} ${x + 10} ${y + 5} Q ${x} ${y + 13} ${x - 10} ${y + 5}`}
-                    fill="#0F5132"
-                    opacity="0.4"
-                  />
-                </g>
-              );
-            })}
-
-            {/* Pine Needle Details - More scattered and realistic */}
-            {[...Array(60)].map((_, i) => {
-              const x = 330 + Math.random() * 340;
-              const y = 280 + Math.random() * 350;
+            {/* Needle Texture - More detailed and realistic */}
+            {[...Array(80)].map((_, i) => {
+              const x = 350 + Math.random() * 300;
+              const y = 200 + Math.random() * 350;
               const angle = Math.random() * 360;
+              const length = 3 + Math.random() * 4;
               return (
                 <line
                   key={`needle-${i}`}
                   x1={x}
                   y1={y}
-                  x2={x + Math.cos(angle) * 4}
-                  y2={y + Math.sin(angle) * 4}
-                  stroke="#198754"
-                  strokeWidth="1"
-                  opacity="0.7"
+                  x2={x + Math.cos(angle) * length}
+                  y2={y + Math.sin(angle) * length}
+                  stroke="#165a1f"
+                  strokeWidth="0.8"
+                  opacity="0.6"
                 />
               );
             })}
           </svg>
 
-          {/* Interactive Ornaments positioned on the wider tree */}
+          {/* Interactive Ornaments positioned on the realistic tree */}
           {children.slice(0, 16).map((child, index) => {
             const position = ornamentPositions[index] || ornamentPositions[0];
             
@@ -261,37 +316,37 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                 key={child.id}
                 onClick={() => handleOrnamentClick(child)}
                 className={cn(
-                  "absolute w-12 h-12 rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer",
+                  "absolute w-10 h-10 rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer",
                   "hover:scale-150 hover:shadow-2xl transform-gpu hover:z-40",
                   (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
-                  "hover:animate-bounce border-3 border-white/60"
+                  "hover:animate-bounce border-2 border-white/80"
                 )}
                 style={{
-                  left: `${position.x - 24}px`,
-                  top: `${position.y - 24}px`,
+                  left: `${position.x - 20}px`,
+                  top: `${position.y - 20}px`,
                   backgroundColor: ornamentColors[index % ornamentColors.length],
-                  boxShadow: `0 8px 25px ${ornamentColors[index % ornamentColors.length]}60, 0 0 20px ${ornamentColors[index % ornamentColors.length]}40`
+                  boxShadow: `0 6px 20px ${ornamentColors[index % ornamentColors.length]}40, 0 0 15px ${ornamentColors[index % ornamentColors.length]}30`
                 }}
                 title={`Click to meet ${child.name}`}
               >
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/70 to-transparent"></div>
-                <div className="absolute top-1.5 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white/90 rounded-full"></div>
-                <div className="absolute inset-2 rounded-full border border-white/30"></div>
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/60 to-transparent"></div>
+                <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-white/90 rounded-full"></div>
+                <div className="absolute inset-1.5 rounded-full border border-white/20"></div>
               </button>
             );
           })}
         </div>
 
-        {/* Enhanced Instructions */}
+        {/* Enhanced Instructions with winter theme */}
         <div className="relative z-20 mt-12 text-center max-w-3xl px-6">
-          <div className="bg-christmas-cream/10 backdrop-blur-md rounded-2xl p-8 border border-christmas-cream/20">
+          <div className="bg-white/20 backdrop-blur-md rounded-2xl p-8 border border-white/30 shadow-xl">
             <p className={cn(
               "text-3xl font-bold transition-all duration-500 mb-6",
-              twinkle % 2 === 0 ? "text-yellow-300 scale-105 drop-shadow-lg" : "text-christmas-green-300 scale-100"
+              twinkle % 2 === 0 ? "text-yellow-400 scale-105 drop-shadow-lg" : "text-red-600 scale-100"
             )}>
               ✨ Click any ornament to meet a child ✨
             </p>
-            <p className="text-xl text-christmas-cream/90 leading-relaxed">
+            <p className="text-xl text-slate-700 leading-relaxed font-medium">
               Each sparkling ornament represents a child hoping for Christmas magic. 
               Discover their story and help make their holiday dreams come true!
             </p>
@@ -301,7 +356,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                   key={i}
                   className={cn(
                     "w-3 h-3 rounded-full transition-all duration-300",
-                    (twinkle + i) % 5 === 0 ? "bg-yellow-300 scale-125" : "bg-christmas-cream/50"
+                    (twinkle + i) % 5 === 0 ? "bg-yellow-400 scale-125" : "bg-red-500/70"
                   )}
                 />
               ))}
