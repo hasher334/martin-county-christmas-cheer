@@ -7,6 +7,11 @@ import { Hero } from "@/components/Hero";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ChristmasColorUtility } from "@/components/ChristmasColorUtility";
+import { Charity } from "@/components/Charity";
+import { Stats } from "@/components/Stats";
+import { Button } from "@/components/ui/button";
+import { Gift, Users, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -99,8 +104,49 @@ const Index = () => {
               user={user}
             />
           )}
+
+          {/* Navigation Buttons under Christmas Tree */}
+          <div className="mt-12 mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/wishlists">
+                <Button
+                  size="lg"
+                  className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  <Gift className="h-5 w-5 mr-2" />
+                  Browse Wishlists
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-christmas-green-700 border-christmas-green-300 hover:bg-christmas-green-50 hover:border-christmas-green-400 transition-all duration-200"
+                >
+                  <Users className="h-5 w-5 mr-2" />
+                  Register Child
+                </Button>
+              </Link>
+              <Link to="/about">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-christmas-brown-700 border-christmas-brown-300 hover:bg-christmas-brown-50 hover:border-christmas-brown-400 transition-all duration-200"
+                >
+                  <Heart className="h-5 w-5 mr-2" />
+                  About Our Mission
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* About Our Mission Section */}
+      <Charity />
+
+      {/* Stats Section */}
+      <Stats />
 
       <Footer />
 
