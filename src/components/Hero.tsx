@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Snowflake, Gift, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -57,7 +58,24 @@ export const Hero = () => {
   }, []);
 
   return (
-    <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
+    <section 
+      className="relative py-20 text-white overflow-hidden"
+      style={{
+        background: `
+          repeating-linear-gradient(
+            -45deg,
+            #dc2626 0px,
+            #dc2626 20px,
+            #ffffff 20px,
+            #ffffff 40px,
+            #fecaca 40px,
+            #fecaca 60px,
+            #ffffff 60px,
+            #ffffff 80px
+          )
+        `
+      }}
+    >
       {/* Floating Christmas Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {snowflakePositions.map((position, i) => (
@@ -71,16 +89,16 @@ export const Hero = () => {
               animationDuration: `${position.animationDuration}s`,
             }}
           >
-            <Snowflake className="h-4 w-4 text-white/30" />
+            <Snowflake className="h-4 w-4 text-white/40 drop-shadow-sm" />
           </div>
         ))}
       </div>
 
       <div className="container mx-auto px-4 text-center relative z-10">
-        <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
+        <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in text-white drop-shadow-lg">
           Make Christmas Magical
         </h1>
-        <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
+        <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-white drop-shadow-md">
           Help bring joy to children in Martin County by adopting them for Christmas. 
           Every child deserves to experience the wonder of the holiday season.
         </p>
@@ -89,38 +107,38 @@ export const Hero = () => {
           <Link to="/wishlists">
             <Button
               size="lg"
-              className="bg-white/90 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
+              className="bg-white/95 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
             >
               <Gift className="h-5 w-5 mr-2" />
               Browse Wishlists
             </Button>
           </Link>
           <div className="text-center">
-            <p className="text-sm opacity-75">No registration required to browse</p>
+            <p className="text-sm text-white/90 drop-shadow-sm">No registration required to browse</p>
           </div>
         </div>
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div className="text-center">
-            <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <Heart className="h-8 w-8" />
+            <div className="bg-white/25 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <Heart className="h-8 w-8 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Choose a Child</h3>
-            <p className="text-sm opacity-90">Browse profiles and find a child whose story touches your heart</p>
+            <h3 className="text-lg font-semibold mb-2 text-white drop-shadow-sm">Choose a Child</h3>
+            <p className="text-sm text-white/95 drop-shadow-sm">Browse profiles and find a child whose story touches your heart</p>
           </div>
           <div className="text-center">
-            <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <Gift className="h-8 w-8" />
+            <div className="bg-white/25 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <Gift className="h-8 w-8 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Fulfill Wishes</h3>
-            <p className="text-sm opacity-90">Purchase gifts from their wishlist and make their dreams come true</p>
+            <h3 className="text-lg font-semibold mb-2 text-white drop-shadow-sm">Fulfill Wishes</h3>
+            <p className="text-sm text-white/95 drop-shadow-sm">Purchase gifts from their wishlist and make their dreams come true</p>
           </div>
           <div className="text-center">
-            <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <Snowflake className="h-8 w-8" />
+            <div className="bg-white/25 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <Snowflake className="h-8 w-8 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Spread Joy</h3>
-            <p className="text-sm opacity-90">Experience the magic of giving and create lasting Christmas memories</p>
+            <h3 className="text-lg font-semibold mb-2 text-white drop-shadow-sm">Spread Joy</h3>
+            <p className="text-sm text-white/95 drop-shadow-sm">Experience the magic of giving and create lasting Christmas memories</p>
           </div>
         </div>
       </div>
