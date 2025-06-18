@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ChristmasTree } from "@/components/ChristmasTree";
-import { ChildCard } from "@/components/ChildCard";
+import { InteractiveChristmasTree } from "@/components/InteractiveChristmasTree";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
@@ -68,7 +67,7 @@ const Index = () => {
       setShowAuthDialog(true);
       return;
     }
-    // We'll implement the adoption flow in the ChildCard component
+    // We'll implement the adoption flow in the child profile
   };
 
   return (
@@ -78,54 +77,32 @@ const Index = () => {
       {/* Hero Section */}
       <Hero />
 
-      {/* Animated Christmas Tree */}
-      <section className="py-12 bg-gradient-to-b from-green-100 to-green-50">
+      {/* Main Interactive Christmas Tree Section */}
+      <section className="py-20 bg-gradient-to-b from-green-100 via-green-50 to-red-50 min-h-screen">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-green-800 mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-green-800 mb-6">
             Our Christmas Tree of Hope
           </h2>
-          <p className="text-lg text-green-700 mb-8 max-w-2xl mx-auto">
-            Each ornament represents a child waiting for Christmas magic. Help us light up their holidays!
+          <p className="text-xl text-green-700 mb-12 max-w-3xl mx-auto">
+            Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
-          <ChristmasTree />
+          
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600"></div>
+            </div>
+          ) : (
+            <InteractiveChristmasTree 
+              children={children} 
+              onAdopt={handleAdopt}
+              user={user}
+            />
+          )}
         </div>
       </section>
 
       {/* Stats Section */}
       <Stats />
-
-      {/* Children Profiles */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-green-800 mb-4">
-            Meet the Children
-          </h2>
-          <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-            These wonderful children are waiting for someone special to make their Christmas dreams come true.
-          </p>
-          
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 rounded-lg h-96"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {children.map((child) => (
-                <ChildCard
-                  key={child.id}
-                  child={child}
-                  onAdopt={handleAdopt}
-                  user={user}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
 
       <Footer />
 
