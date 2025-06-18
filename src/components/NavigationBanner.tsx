@@ -1,7 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { LucideIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface NavigationBannerProps {
   title: string;
