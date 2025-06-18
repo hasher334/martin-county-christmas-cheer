@@ -95,3 +95,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Force Tailwind to generate Christmas color classes */
+@layer utilities {
+  .christmas-colors-generator {
+    /* Christmas Red variants */
+    @apply bg-christmas-red-50 bg-christmas-red-100 bg-christmas-red-200 bg-christmas-red-300 bg-christmas-red-400 bg-christmas-red-500 bg-christmas-red-600 bg-christmas-red-700 bg-christmas-red-800 bg-christmas-red-900;
+    @apply text-christmas-red-50 text-christmas-red-100 text-christmas-red-200 text-christmas-red-300 text-christmas-red-400 text-christmas-red-500 text-christmas-red-600 text-christmas-red-700 text-christmas-red-800 text-christmas-red-900;
+    @apply border-christmas-red-50 border-christmas-red-100 border-christmas-red-200 border-christmas-red-300 border-christmas-red-400 border-christmas-red-500 border-christmas-red-600 border-christmas-red-700 border-christmas-red-800 border-christmas-red-900;
+    
+    /* Christmas Green variants */
+    @apply bg-christmas-green-50 bg-christmas-green-100 bg-christmas-green-200 bg-christmas-green-300 bg-christmas-green-400 bg-christmas-green-500 bg-christmas-green-600 bg-christmas-green-700 bg-christmas-green-800 bg-christmas-green-900;
+    @apply text-christmas-green-50 text-christmas-green-100 text-christmas-green-200 text-christmas-green-300 text-christmas-green-400 text-christmas-green-500 text-christmas-green-600 text-christmas-green-700 text-christmas-green-800 text-christmas-green-900;
+    @apply border-christmas-green-50 border-christmas-green-100 border-christmas-green-200 border-christmas-green-300 border-christmas-green-400 border-christmas-green-500 border-christmas-green-600 border-christmas-green-700 border-christmas-green-800 border-christmas-green-900;
+    
+    /* Christmas Brown variants */
+    @apply bg-christmas-brown-50 bg-christmas-brown-100 bg-christmas-brown-200 bg-christmas-brown-300 bg-christmas-brown-400 bg-christmas-brown-500 bg-christmas-brown-600 bg-christmas-brown-700 bg-christmas-brown-800 bg-christmas-brown-900;
+    @apply text-christmas-brown-50 text-christmas-brown-100 text-christmas-brown-200 text-christmas-brown-300 text-christmas-brown-400 text-christmas-brown-500 text-christmas-brown-600 text-christmas-brown-700 text-christmas-brown-800 text-christmas-brown-900;
+    @apply border-christmas-brown-50 border-christmas-brown-100 border-christmas-brown-200 border-christmas-brown-300 border-christmas-brown-400 border-christmas-brown-500 border-christmas-brown-600 border-christmas-brown-700 border-christmas-brown-800 border-christmas-brown-900;
+    
+    /* Christmas Cream */
+    @apply bg-christmas-cream text-christmas-cream border-christmas-cream;
+    
+    /* Gradients */
+    @apply bg-gradient-to-r from-christmas-red-600 via-christmas-red-500 to-christmas-green-600;
+    @apply bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50;
+  }
+}
+
+/* Hide the utility class so it doesn't affect layout */
+.christmas-colors-generator {
+  display: none !important;
+}

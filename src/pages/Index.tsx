@@ -7,6 +7,7 @@ import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
+import { ChristmasColorUtility } from "@/components/ChristmasColorUtility";
 import { useToast } from "@/components/ui/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -72,6 +73,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
+      <ChristmasColorUtility />
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
       {/* Hero Section */}
