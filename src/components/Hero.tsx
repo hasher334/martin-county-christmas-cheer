@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Star, Gift, Heart } from "lucide-react";
 
 export const Hero = () => {
-  const scrollToChildren = () => {
-    const element = document.querySelector('[data-section="children"]');
+  const scrollToWishlists = () => {
+    const element = document.querySelector('[data-section="wishlists"]');
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -46,11 +46,11 @@ export const Hero = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button
             size="lg"
-            onClick={scrollToChildren}
+            onClick={scrollToWishlists}
             className="bg-white/90 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             <Gift className="h-5 w-5 mr-2" />
-            Browse Children
+            Browse Wishlists
           </Button>
           <div className="text-center">
             <p className="text-sm opacity-75">No registration required to browse</p>

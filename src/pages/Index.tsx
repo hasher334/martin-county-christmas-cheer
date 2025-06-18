@@ -80,7 +80,7 @@ const Index = () => {
       <Hero />
 
       {/* Main Interactive Christmas Tree Section */}
-      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 min-h-screen">
+      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 min-h-screen" data-section="wishlists">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-christmas-green-800 mb-6">
             Our Christmas Tree of Hope
