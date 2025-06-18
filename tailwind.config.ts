@@ -20,7 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'sans': ['"Chopin Script"', 'cursive'],
+				'sans': ['"Sweet Home"', 'cursive'],
+				'sweet-home': ['"Sweet Home"', 'cursive'],
 				'chopin': ['"Chopin Script"', 'cursive'],
 			},
 			colors: {
