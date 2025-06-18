@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Star, Gift, Heart } from "lucide-react";
+import { Snowflake, Gift, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Hero = () => {
@@ -23,13 +23,7 @@ export const Hero = () => {
               animationDuration: `${2 + Math.random() * 2}s`,
             }}
           >
-            {i % 3 === 0 ? (
-              <Star className="h-4 w-4 text-yellow-300" />
-            ) : i % 3 === 1 ? (
-              <Gift className="h-4 w-4 text-white/80" />
-            ) : (
-              <Heart className="h-3 w-3 text-pink-200" />
-            )}
+            <Snowflake className="h-4 w-4 text-white/80" />
           </div>
         ))}
       </div>
@@ -75,7 +69,7 @@ export const Hero = () => {
           </div>
           <div className="text-center">
             <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <Star className="h-8 w-8" />
+              <Snowflake className="h-8 w-8" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Spread Joy</h3>
             <p className="text-sm opacity-90">Experience the magic of giving and create lasting Christmas memories</p>
