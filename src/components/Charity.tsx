@@ -8,10 +8,10 @@ export const Charity = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-christmas-green-800 mb-6">
-            About Candy Cane Kindness
+            About Martin County Christmas Cheer
           </h2>
           <p className="text-xl text-christmas-brown-700 mb-8 max-w-4xl mx-auto">
-            For over a decade, Candy Cane Kindness has been dedicated to ensuring that every child in our community experiences the magic and joy of Christmas, regardless of their family's financial circumstances.
+            For over a decade, Martin County Christmas Cheer has been dedicated to ensuring that every child in our community experiences the magic and joy of Christmas, regardless of their family's financial circumstances.
           </p>
         </div>
 

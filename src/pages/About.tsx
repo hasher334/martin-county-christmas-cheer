@@ -39,7 +39,7 @@ const About = () => {
             About Our Mission
           </h1>
           <p className="text-xl opacity-90 max-w-3xl mx-auto">
-            Learn more about Candy Cane Kindness and the impact we're making in our community
+            Learn more about Martin County Christmas Cheer and the impact we're making in our community
           </p>
         </div>
       </section>
