@@ -12,7 +12,7 @@ export const Hero = () => {
     <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
       {/* Floating Christmas Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(40)].map((_, i) => (
           <div
             key={i}
             className="absolute animate-pulse"
@@ -23,7 +23,7 @@ export const Hero = () => {
               animationDuration: `${2 + Math.random() * 2}s`,
             }}
           >
-            <Snowflake className="h-4 w-4 text-white/80" />
+            <Snowflake className="h-4 w-4 text-white/30" />
           </div>
         ))}
       </div>
