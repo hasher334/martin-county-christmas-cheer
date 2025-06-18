@@ -9,7 +9,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="relative py-20 bg-gradient-to-r from-red-600 via-red-500 to-green-600 text-white overflow-hidden">
+    <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
       {/* Floating Christmas Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(20)].map((_, i) => (
