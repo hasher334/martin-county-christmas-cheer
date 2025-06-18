@@ -59,7 +59,7 @@ export const Hero = () => {
   }, []);
 
   return (
-    <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden touch-optimized">
+    <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
       {/* Candy Cane Stripe Pattern Overlay */}
       <div 
         className="absolute inset-0 opacity-15"
@@ -96,7 +96,7 @@ export const Hero = () => {
         ))}
       </div>
 
-      <div className="container mx-auto px-4 text-center relative z-10 no-horizontal-scroll">
+      <div className="container mx-auto px-4 text-center relative z-10">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in">
           Make Christmas Magical
         </h1>
@@ -109,7 +109,7 @@ export const Hero = () => {
           <Link to="/wishlists">
             <Button
               size="lg"
-              className="bg-white/90 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 touch-optimized"
+              className="bg-white/90 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
             >
               <Gift className="h-5 w-5 mr-2" />
               Browse Wishlists

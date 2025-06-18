@@ -23,49 +23,6 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Enhanced mobile scroll debugging
-    console.log("Index page - Mobile scroll debug initialized");
-    console.log("Viewport details:", {
-      innerWidth: window.innerWidth,
-      innerHeight: window.innerHeight,
-      devicePixelRatio: window.devicePixelRatio,
-      userAgent: navigator.userAgent.substring(0, 100)
-    });
-    
-    console.log("Document scroll state:", {
-      documentElement: {
-        scrollHeight: document.documentElement.scrollHeight,
-        clientHeight: document.documentElement.clientHeight,
-        overflow: window.getComputedStyle(document.documentElement).overflow
-      },
-      body: {
-        scrollHeight: document.body.scrollHeight,
-        clientHeight: document.body.clientHeight,
-        overflow: window.getComputedStyle(document.body).overflow
-      }
-    });
-
-    // Test scroll capability
-    const testScroll = () => {
-      const canScroll = document.body.scrollHeight > window.innerHeight;
-      console.log("Can scroll?", canScroll, "ScrollHeight:", document.body.scrollHeight, "WindowHeight:", window.innerHeight);
-    };
-    
-    testScroll();
-    
-    // Monitor scroll events
-    const handleScroll = () => {
-      console.log("Scroll event detected at:", window.pageYOffset);
-    };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  useEffect(() => {
     // Check auth state
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -117,7 +74,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
       <ChristmasColorUtility />
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
@@ -125,8 +82,8 @@ const Index = () => {
       <Hero />
 
       {/* Main Interactive Christmas Tree Section */}
-      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 mobile-optimized" data-section="wishlists">
-        <div className="container mx-auto px-4 text-center mobile-optimized no-horizontal-scroll">
+      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50" data-section="wishlists">
+        <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-christmas-green-800 mb-6">
             Our Christmas Tree of Hope
           </h2>
@@ -147,8 +104,8 @@ const Index = () => {
           )}
 
           {/* Navigation Banners under Christmas Tree */}
-          <div className="mt-16 mb-16 mobile-optimized">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto px-4 no-horizontal-scroll">
+          <div className="mt-16 mb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto px-4">
               <NavigationBanner
                 title="Browse Wishlists"
                 description="Discover children's Christmas wishes and choose the perfect child to sponsor"

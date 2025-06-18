@@ -86,63 +86,25 @@
   }
 }
 
-/* CRITICAL: Mobile-First Scroll Architecture - FIXED */
+/* Simple scroll reset - remove all conflicts */
 @layer base {
   * {
     @apply border-border;
     box-sizing: border-box;
   }
 
-  /* Root-level scroll fixes - SIMPLIFIED */
   html {
-    height: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground;
-    height: auto;
-    min-height: 100%;
-    overflow-y: visible;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    position: relative;
     margin: 0;
     padding: 0;
   }
 
   #root {
     min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: visible;
-    position: relative;
-  }
-
-  /* Mobile-specific scroll fixes */
-  @media (max-width: 767px) {
-    html {
-      touch-action: pan-y;
-      -webkit-overflow-scrolling: touch;
-    }
-    
-    body {
-      touch-action: pan-y;
-      -webkit-overflow-scrolling: touch;
-    }
-  }
-
-  /* iOS Safari specific fixes */
-  @supports (-webkit-touch-callout: none) {
-    html, body {
-      min-height: -webkit-fill-available;
-    }
-    
-    #root {
-      min-height: -webkit-fill-available;
-    }
   }
 }
 
@@ -172,33 +134,16 @@
     @apply bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50;
   }
 
-  /* Mobile touch and scroll optimizations */
-  .mobile-optimized {
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-  }
-
-  /* Prevent horizontal scrolling */
-  .no-horizontal-scroll {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Touch-friendly interactive elements */
+  /* Simple utility classes without scroll conflicts */
   .touch-optimized {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
   }
 
-  /* Decorative elements that shouldn't interfere with interaction */
-  .decorative-only {
-    pointer-events: none !important;
-    touch-action: none !important;
-    position: absolute;
-    z-index: 0;
+  .no-horizontal-scroll {
+    overflow-x: hidden;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
 }
 

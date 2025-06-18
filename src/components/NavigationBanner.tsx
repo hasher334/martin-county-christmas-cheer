@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { LucideIcon } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -34,15 +35,15 @@ export const NavigationBanner = ({
   };
 
   return (
-    <Link to={href} className="group block touch-optimized mobile-optimized">
+    <Link to={href} className="group block">
       <div className={cn(
-        "relative overflow-hidden rounded-2xl p-6 md:p-8 no-horizontal-scroll",
+        "relative overflow-hidden rounded-2xl p-6 md:p-8",
         "md:transition-all md:duration-300 md:hover:shadow-2xl md:hover:scale-105",
         "min-h-[120px] sm:min-h-[140px] transform",
         getVariantStyles()
       )}>
-        {/* Background Pattern - decorative only */}
-        <div className="absolute inset-0 opacity-10 decorative-only">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
           <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/20"></div>
           <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-white/10"></div>
         </div>
