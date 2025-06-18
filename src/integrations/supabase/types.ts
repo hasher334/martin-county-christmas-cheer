@@ -9,7 +9,120 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      adoptions: {
+        Row: {
+          adopted_at: string | null
+          child_id: string | null
+          donor_id: string | null
+          gift_delivered: boolean | null
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          adopted_at?: string | null
+          child_id?: string | null
+          donor_id?: string | null
+          gift_delivered?: boolean | null
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          adopted_at?: string | null
+          child_id?: string | null
+          donor_id?: string | null
+          gift_delivered?: boolean | null
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "adoptions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "adoptions_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      children: {
+        Row: {
+          age: number
+          created_at: string | null
+          gender: string
+          id: string
+          location: string | null
+          name: string
+          photo_url: string | null
+          status: Database["public"]["Enums"]["adoption_status"] | null
+          story: string | null
+          updated_at: string | null
+          wishes: string[] | null
+        }
+        Insert: {
+          age: number
+          created_at?: string | null
+          gender: string
+          id?: string
+          location?: string | null
+          name: string
+          photo_url?: string | null
+          status?: Database["public"]["Enums"]["adoption_status"] | null
+          story?: string | null
+          updated_at?: string | null
+          wishes?: string[] | null
+        }
+        Update: {
+          age?: number
+          created_at?: string | null
+          gender?: string
+          id?: string
+          location?: string | null
+          name?: string
+          photo_url?: string | null
+          status?: Database["public"]["Enums"]["adoption_status"] | null
+          story?: string | null
+          updated_at?: string | null
+          wishes?: string[] | null
+        }
+        Relationships: []
+      }
+      donors: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +131,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      adoption_status: "available" | "adopted" | "fulfilled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +246,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      adoption_status: ["available", "adopted", "fulfilled"],
+    },
   },
 } as const
