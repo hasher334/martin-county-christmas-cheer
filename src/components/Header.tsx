@@ -33,12 +33,12 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
           <Link to="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
             <img 
               src="/lovable-uploads/5a57abc7-69b1-48e1-86bc-34547e214e3f.png" 
-              alt="Community Elf Logo" 
+              alt="Candy Cane Kindness Logo" 
               className="h-12 w-12"
             />
             <div>
               <h1 className="text-2xl font-bold text-christmas-green-800">
-                Community Elf
+                Candy Cane Kindness
               </h1>
               <p className="text-sm text-christmas-brown-600">Spreading joy, one child at a time</p>
             </div>
