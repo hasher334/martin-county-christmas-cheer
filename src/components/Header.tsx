@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, User, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   user: any;
@@ -28,7 +29,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
     <header className="bg-christmas-cream shadow-lg border-b-4 border-christmas-red-600">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <Heart className="h-8 w-8 text-christmas-red-600" />
             <div>
               <h1 className="text-2xl font-bold text-christmas-green-800">
@@ -36,7 +37,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
               </h1>
               <p className="text-sm text-christmas-brown-600">Spreading joy, one child at a time</p>
             </div>
-          </div>
+          </Link>
           
           <div className="flex items-center space-x-4">
             {user ? (

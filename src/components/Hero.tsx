@@ -1,6 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Star, Gift, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Hero = () => {
   const scrollToWishlists = () => {
@@ -44,14 +44,15 @@ export const Hero = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button
-            size="lg"
-            onClick={scrollToWishlists}
-            className="bg-white/90 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
-          >
-            <Gift className="h-5 w-5 mr-2" />
-            Browse Wishlists
-          </Button>
+          <Link to="/wishlists">
+            <Button
+              size="lg"
+              className="bg-white/90 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              <Gift className="h-5 w-5 mr-2" />
+              Browse Wishlists
+            </Button>
+          </Link>
           <div className="text-center">
             <p className="text-sm opacity-75">No registration required to browse</p>
           </div>

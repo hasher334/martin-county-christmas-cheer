@@ -80,9 +80,6 @@ const Index = () => {
       {/* Hero Section */}
       <Hero />
 
-      {/* Charity Section */}
-      <Charity />
-
       {/* Main Interactive Christmas Tree Section */}
       <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 min-h-screen" data-section="wishlists">
         <div className="container mx-auto px-4 text-center">
@@ -106,6 +103,9 @@ const Index = () => {
           )}
         </div>
       </section>
+
+      {/* Charity Section - Moved here between tree and stats */}
+      <Charity />
 
       {/* Stats Section */}
       <Stats />
