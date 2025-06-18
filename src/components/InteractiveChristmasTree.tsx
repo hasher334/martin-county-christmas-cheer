@@ -50,14 +50,14 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
   ];
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-blue-900 overflow-hidden">
+    <div className="relative min-h-screen bg-gradient-to-b from-christmas-brown-900 via-christmas-green-900 to-christmas-brown-800 overflow-hidden">
       {/* Magical Background Effects */}
       <div className="absolute inset-0">
         {/* Falling Snow */}
         {[...Array(50)].map((_, i) => (
           <div
             key={`snow-${i}`}
-            className="absolute w-2 h-2 bg-white rounded-full opacity-70 animate-pulse"
+            className="absolute w-2 h-2 bg-christmas-cream rounded-full opacity-70 animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -104,7 +104,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               y="650" 
               width="40" 
               height="100" 
-              fill="#6B4423"
+              fill="#5A3A1F"
               rx="8"
             />
             <rect 
@@ -112,15 +112,15 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               y="740" 
               width="50" 
               height="25" 
-              fill="#5A3A1F"
+              fill="#4A2C15"
               rx="12"
             />
             
             {/* Tree Base/Pot */}
             <path 
               d="M 460 765 L 540 765 L 530 785 L 470 785 Z" 
-              fill="#8B4513"
-              stroke="#654321"
+              fill="#6B4423"
+              stroke="#5A3A1F"
               strokeWidth="2"
             />
 
@@ -129,65 +129,65 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
             {/* Bottom Layer - Widest */}
             <path 
               d="M 500 520 L 320 650 L 680 650 Z" 
-              fill="#0F4C3A"
+              fill="#0F5132"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
               d="M 500 530 L 340 640 L 660 640 L 500 530" 
-              fill="#1B5E20"
+              fill="#198754"
               opacity="0.9"
             />
             
             {/* Second Layer */}
             <path 
               d="M 500 450 L 340 580 L 660 580 Z" 
-              fill="#0F4C3A"
+              fill="#0F5132"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
               d="M 500 460 L 360 570 L 640 570 L 500 460" 
-              fill="#1B5E20"
+              fill="#198754"
               opacity="0.9"
             />
             
             {/* Third Layer */}
             <path 
               d="M 500 380 L 360 510 L 640 510 Z" 
-              fill="#0F4C3A"
+              fill="#0F5132"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
               d="M 500 390 L 380 500 L 620 500 L 500 390" 
-              fill="#1B5E20"
+              fill="#198754"
               opacity="0.9"
             />
             
             {/* Fourth Layer */}
             <path 
               d="M 500 310 L 380 440 L 620 440 Z" 
-              fill="#0F4C3A"
+              fill="#0F5132"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
               d="M 500 320 L 400 430 L 600 430 L 500 320" 
-              fill="#1B5E20"
+              fill="#198754"
               opacity="0.9"
             />
 
             {/* Top Layer */}
             <path 
               d="M 500 240 L 400 370 L 600 370 Z" 
-              fill="#0F4C3A"
+              fill="#0F5132"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
               d="M 500 250 L 420 360 L 580 360 L 500 250" 
-              fill="#1B5E20"
+              fill="#198754"
               opacity="0.9"
             />
 
@@ -220,12 +220,12 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                 <g key={`texture-${i}`}>
                   <path
                     d={`M ${x - 15} ${y} Q ${x} ${y - 8} ${x + 15} ${y} Q ${x} ${y + 8} ${x - 15} ${y}`}
-                    fill="#1B5E20"
+                    fill="#198754"
                     opacity="0.6"
                   />
                   <path
                     d={`M ${x - 10} ${y + 5} Q ${x} ${y - 3} ${x + 10} ${y + 5} Q ${x} ${y + 13} ${x - 10} ${y + 5}`}
-                    fill="#0F4C3A"
+                    fill="#0F5132"
                     opacity="0.4"
                   />
                 </g>
@@ -244,7 +244,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                   y1={y}
                   x2={x + Math.cos(angle) * 4}
                   y2={y + Math.sin(angle) * 4}
-                  stroke="#1B5E20"
+                  stroke="#198754"
                   strokeWidth="1"
                   opacity="0.7"
                 />
@@ -284,14 +284,14 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
 
         {/* Enhanced Instructions */}
         <div className="relative z-20 mt-12 text-center max-w-3xl px-6">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+          <div className="bg-christmas-cream/10 backdrop-blur-md rounded-2xl p-8 border border-christmas-cream/20">
             <p className={cn(
               "text-3xl font-bold transition-all duration-500 mb-6",
-              twinkle % 2 === 0 ? "text-yellow-300 scale-105 drop-shadow-lg" : "text-green-300 scale-100"
+              twinkle % 2 === 0 ? "text-yellow-300 scale-105 drop-shadow-lg" : "text-christmas-green-300 scale-100"
             )}>
               ✨ Click any ornament to meet a child ✨
             </p>
-            <p className="text-xl text-white/90 leading-relaxed">
+            <p className="text-xl text-christmas-cream/90 leading-relaxed">
               Each sparkling ornament represents a child hoping for Christmas magic. 
               Discover their story and help make their holiday dreams come true!
             </p>
@@ -301,7 +301,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                   key={i}
                   className={cn(
                     "w-3 h-3 rounded-full transition-all duration-300",
-                    (twinkle + i) % 5 === 0 ? "bg-yellow-300 scale-125" : "bg-white/50"
+                    (twinkle + i) % 5 === 0 ? "bg-yellow-300 scale-125" : "bg-christmas-cream/50"
                   )}
                 />
               ))}

@@ -9,7 +9,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="relative py-20 bg-gradient-to-r from-red-600 via-red-500 to-green-600 text-white overflow-hidden">
+    <section className="relative py-20 bg-gradient-to-r from-christmas-red-600 via-christmas-red-500 to-christmas-green-600 text-white overflow-hidden">
       {/* Floating Christmas Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(20)].map((_, i) => (
@@ -26,9 +26,9 @@ export const Hero = () => {
             {i % 3 === 0 ? (
               <Star className="h-4 w-4 text-yellow-300" />
             ) : i % 3 === 1 ? (
-              <Gift className="h-4 w-4 text-green-200" />
+              <Gift className="h-4 w-4 text-christmas-cream" />
             ) : (
-              <Heart className="h-3 w-3 text-red-200" />
+              <Heart className="h-3 w-3 text-christmas-red-200" />
             )}
           </div>
         ))}
@@ -47,7 +47,7 @@ export const Hero = () => {
           <Button
             size="lg"
             onClick={scrollToChildren}
-            className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="bg-christmas-cream text-christmas-red-600 hover:bg-christmas-cream/90 text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             <Gift className="h-5 w-5 mr-2" />
             Browse Children

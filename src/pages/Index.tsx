@@ -71,25 +71,25 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-red-50">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
       {/* Hero Section */}
       <Hero />
 
       {/* Main Interactive Christmas Tree Section */}
-      <section className="py-20 bg-gradient-to-b from-green-100 via-green-50 to-red-50 min-h-screen">
+      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 min-h-screen">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-green-800 mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-christmas-green-800 mb-6">
             Our Christmas Tree of Hope
           </h2>
-          <p className="text-xl text-green-700 mb-12 max-w-3xl mx-auto">
+          <p className="text-xl text-christmas-brown-700 mb-12 max-w-3xl mx-auto">
             Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
           
           {loading ? (
             <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-christmas-green-600"></div>
             </div>
           ) : (
             <InteractiveChristmasTree 
