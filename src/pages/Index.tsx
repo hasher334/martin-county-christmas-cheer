@@ -23,6 +23,23 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Debug mobile scrolling issue
+    console.log("Mobile scroll debug - Page loaded");
+    console.log("Document body overflow:", window.getComputedStyle(document.body).overflow);
+    console.log("Document html overflow:", window.getComputedStyle(document.documentElement).overflow);
+    console.log("Is mobile:", window.innerWidth < 768);
+    console.log("User agent:", navigator.userAgent);
+    
+    // Force enable scrolling on mobile
+    if (window.innerWidth < 768) {
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+      document.body.style.touchAction = 'pan-y pinch-zoom';
+      console.log("Applied mobile scroll fixes");
+    }
+  }, []);
+
+  useEffect(() => {
     // Check auth state
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -74,7 +91,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background no-horizontal-scroll">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-scroll-fix">
       <ChristmasColorUtility />
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
@@ -83,7 +100,7 @@ const Index = () => {
 
       {/* Main Interactive Christmas Tree Section */}
       <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50" data-section="wishlists">
-        <div className="container mx-auto px-4 text-center no-horizontal-scroll">
+        <div className="container mx-auto px-4 text-center mobile-scroll-fix">
           <h2 className="text-4xl md:text-5xl font-bold text-christmas-green-800 mb-6">
             Our Christmas Tree of Hope
           </h2>

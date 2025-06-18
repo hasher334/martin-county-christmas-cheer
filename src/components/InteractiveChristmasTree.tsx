@@ -18,6 +18,8 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    console.log("InteractiveChristmasTree mounted");
+    
     const interval = setInterval(() => {
       setTwinkle(prev => (prev + 1) % 4);
     }, 1000);
@@ -26,6 +28,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
   }, []);
 
   const handleOrnamentClick = (child: Child) => {
+    console.log("Ornament clicked:", child.name);
     setSelectedChild(child);
     setShowModal(true);
   };
@@ -50,52 +53,30 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
   ];
 
   return (
-    <div className="relative bg-gradient-to-b from-slate-300 via-slate-200 to-white no-horizontal-scroll touch-optimized">
-      {/* Winter Wonderland Background - Reduced animation count for mobile performance */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Falling Snow Animation - Reduced count for mobile */}
-        {[...Array(window.innerWidth < 768 ? 50 : 100)].map((_, i) => (
+    <div className="relative bg-gradient-to-b from-slate-300 via-slate-200 to-white mobile-scroll-fix">
+      {/* Simplified Winter Background - Removed complex animations that could interfere with scrolling */}
+      <div className="absolute inset-0 overflow-hidden decorative-only">
+        {/* Static Snow Pattern */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-slate-100 to-transparent"></div>
+        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-slate-400 via-slate-300 to-transparent opacity-60"></div>
+        
+        {/* Simple static snowflakes - no animation on mobile */}
+        {window.innerWidth >= 768 && [...Array(30)].map((_, i) => (
           <div
             key={`snow-${i}`}
-            className="absolute w-2 h-2 bg-white rounded-full opacity-80 animate-pulse"
+            className="absolute w-2 h-2 bg-white rounded-full opacity-40"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
-              transform: `scale(${0.3 + Math.random() * 0.8})`,
             }}
           />
         ))}
-
-        {/* Larger Snow Flakes - Reduced count for mobile */}
-        {[...Array(window.innerWidth < 768 ? 15 : 30)].map((_, i) => (
-          <div
-            key={`snowflake-${i}`}
-            className="absolute text-white animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${4 + Math.random() * 3}s`,
-              fontSize: `${8 + Math.random() * 8}px`,
-            }}
-          >
-            ❄
-          </div>
-        ))}
-
-        {/* Ground Snow Drifts */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-slate-100 to-transparent"></div>
-        
-        {/* Snow Clouds in Background */}
-        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-slate-400 via-slate-300 to-transparent opacity-60"></div>
       </div>
 
       <div className="relative z-10 flex flex-col items-center justify-center py-12">
         <div className="relative w-full max-w-4xl mx-auto px-4">
           {/* Christmas Tree Image - Responsive Container */}
-          <div className="relative w-full no-horizontal-scroll">
+          <div className="relative w-full">
             <img 
               src="/lovable-uploads/9b7c78e5-e2e5-4e1d-9ff0-05333593d9f4.png"
               alt="Christmas Tree"
@@ -103,7 +84,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               loading="lazy"
             />
 
-            {/* Interactive Ornaments with responsive positioning */}
+            {/* Interactive Ornaments with simplified mobile interactions */}
             {children.slice(0, 16).map((child, index) => {
               const position = ornamentPositions[index] || ornamentPositions[0];
               
@@ -112,56 +93,42 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                   key={child.id}
                   onClick={() => handleOrnamentClick(child)}
                   className={cn(
-                    "absolute rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer touch-optimized",
-                    "hover:scale-150 hover:shadow-2xl transform-gpu hover:z-40",
-                    (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
+                    "absolute rounded-full shadow-xl z-30 cursor-pointer",
                     "border-2 border-white/80",
-                    // Responsive sizing with better mobile touch targets
-                    "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
+                    // Simplified animations and larger touch targets for mobile
+                    "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14",
+                    // Only animate on desktop to prevent mobile performance issues
+                    window.innerWidth >= 768 ? "transition-all duration-300 hover:scale-150 hover:shadow-2xl transform-gpu hover:z-40" : "",
+                    (twinkle + index) % 4 === 0 ? "opacity-90" : "opacity-80"
                   )}
                   style={{
                     left: `${position.x}%`,
                     top: `${position.y}%`,
                     transform: `translate(-50%, -50%)`,
                     backgroundColor: ornamentColors[index % ornamentColors.length],
-                    boxShadow: `0 6px 20px ${ornamentColors[index % ornamentColors.length]}40, 0 0 15px ${ornamentColors[index % ornamentColors.length]}30`
+                    touchAction: 'manipulation',
                   }}
                   title={`Click to meet ${child.name}`}
                   aria-label={`Meet ${child.name}`}
                 >
                   <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/60 to-transparent"></div>
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white/90 rounded-full"></div>
-                  <div className="absolute inset-1.5 rounded-full border border-white/20"></div>
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-white/90 rounded-full"></div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Enhanced Instructions with winter theme */}
+        {/* Enhanced Instructions with simplified animations */}
         <div className="relative z-20 mt-12 text-center max-w-3xl px-6">
           <div className="bg-white/20 backdrop-blur-md rounded-2xl p-8 border border-white/30 shadow-xl">
-            <p className={cn(
-              "text-2xl sm:text-3xl font-bold transition-all duration-500 mb-6",
-              twinkle % 2 === 0 ? "text-yellow-400 scale-105 drop-shadow-lg" : "text-red-600 scale-100"
-            )}>
+            <p className="text-2xl sm:text-3xl font-bold mb-6 text-red-600">
               ✨ Click any ornament to meet a child ✨
             </p>
             <p className="text-lg sm:text-xl text-slate-700 leading-relaxed font-medium">
               Each sparkling ornament represents a child hoping for Christmas magic. 
               Discover their story and help make their holiday dreams come true!
             </p>
-            <div className="mt-6 flex justify-center space-x-2">
-              {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    "w-3 h-3 rounded-full transition-all duration-300",
-                    (twinkle + i) % 5 === 0 ? "bg-yellow-400 scale-125" : "bg-red-500/70"
-                  )}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
