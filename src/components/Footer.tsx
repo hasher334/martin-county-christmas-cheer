@@ -3,13 +3,13 @@ import { Heart, Mail, Phone, MapPin } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="bg-christmas-green-800 text-white py-12">
+    <footer className="bg-christmas-green-800 text-white py-12 font-nunito">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Heart className="h-6 w-6 text-christmas-red-400" />
-              <h3 className="text-xl font-bold">Candy Cane Kindness</h3>
+              <h3 className="text-xl font-bold font-dancing">Candy Cane Kindness</h3>
             </div>
             <p className="text-christmas-green-100 mb-4">
               Bringing Christmas joy to children in need throughout Martin County, Florida. 
@@ -18,7 +18,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+            <h4 className="text-lg font-semibold mb-4 font-christmas">Contact Us</h4>
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-christmas-green-300" />
@@ -36,7 +36,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4">How It Works</h4>
+            <h4 className="text-lg font-semibold mb-4 font-christmas">How It Works</h4>
             <ul className="space-y-2 text-christmas-green-100">
               <li>• Browse available children</li>
               <li>• Choose a child to adopt for Christmas</li>

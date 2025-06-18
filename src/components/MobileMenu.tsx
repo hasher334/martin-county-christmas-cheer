@@ -42,9 +42,9 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
             <span className="sr-only">Open menu</span>
           </Button>
         </DrawerTrigger>
-        <DrawerContent className="bg-christmas-cream">
+        <DrawerContent className="bg-christmas-cream font-nunito">
           <DrawerHeader className="text-left">
-            <DrawerTitle className="text-christmas-green-800">Menu</DrawerTitle>
+            <DrawerTitle className="text-christmas-green-800 font-christmas">Menu</DrawerTitle>
             <DrawerClose className="absolute right-4 top-4">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>

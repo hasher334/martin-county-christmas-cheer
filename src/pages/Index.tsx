@@ -74,7 +74,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background font-nunito">
       <ChristmasColorUtility />
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
@@ -84,10 +84,10 @@ const Index = () => {
       {/* Main Interactive Christmas Tree Section */}
       <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50" data-section="wishlists">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-christmas-green-800 mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-christmas-green-800 mb-6 font-christmas">
             Our Christmas Tree of Hope
           </h2>
-          <p className="text-lg md:text-xl text-christmas-brown-700 mb-12 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-christmas-brown-700 mb-12 max-w-3xl mx-auto font-nunito">
             Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
           

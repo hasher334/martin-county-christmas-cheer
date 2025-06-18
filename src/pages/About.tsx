@@ -29,16 +29,16 @@ const About = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background font-nunito">
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
       {/* Page Title Section */}
       <section className="py-16 bg-gradient-to-b from-christmas-red-600 to-christmas-red-700 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-christmas">
             About Our Mission
           </h1>
-          <p className="text-xl opacity-90 max-w-3xl mx-auto">
+          <p className="text-xl opacity-90 max-w-3xl mx-auto font-nunito">
             Learn more about Candy Cane Kindness and the impact we're making in our community
           </p>
         </div>

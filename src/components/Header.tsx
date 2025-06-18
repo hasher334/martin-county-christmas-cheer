@@ -37,10 +37,10 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
               className="h-12 w-12"
             />
             <div>
-              <h1 className="text-2xl font-bold text-christmas-green-800">
+              <h1 className="text-2xl font-bold text-christmas-green-800 font-dancing">
                 Candy Cane Kindness
               </h1>
-              <p className="text-sm text-christmas-brown-600">Spreading joy, one child at a time</p>
+              <p className="text-sm text-christmas-brown-600 font-nunito">Spreading joy, one child at a time</p>
             </div>
           </Link>
           
@@ -50,19 +50,19 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
               <div className="flex items-center space-x-1 bg-white/50 rounded-full px-2 py-1 backdrop-blur-sm">
                 <Link 
                   to="/wishlists" 
-                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out"
+                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"
                 >
                   Browse Wishlists
                 </Link>
                 <Link 
                   to="/register" 
-                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out"
+                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"
                 >
                   Register Child
                 </Link>
                 <Link 
                   to="/about" 
-                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out"
+                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"
                 >
                   About Our Mission
                 </Link>
@@ -75,7 +75,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-full px-4 py-2">
                     <User className="h-4 w-4" />
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium font-nunito">
                       Welcome, {user.email?.split('@')[0]}!
                     </span>
                   </div>
@@ -83,7 +83,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                     variant="outline"
                     size="sm"
                     onClick={handleSignOut}
-                    className="text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400 transition-all duration-200"
+                    className="text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400 transition-all duration-200 font-nunito"
                   >
                     <LogOut className="h-4 w-4 mr-1" />
                     Sign Out
@@ -92,7 +92,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
               ) : (
                 <Button
                   onClick={onAuthClick}
-                  className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                  className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 font-nunito"
                 >
                   <User className="h-4 w-4 mr-2" />
                   Sign In to Adopt
