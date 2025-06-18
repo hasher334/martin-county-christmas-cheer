@@ -15,7 +15,7 @@ export const Hero = () => {
     const snowflakeSize = 16; // 4 * 4 (h-4 w-4 in pixels)
     const minDistance = snowflakeSize * 2; // Minimum distance between snowflakes
     const maxAttempts = 1000; // Prevent infinite loops
-    const targetCount = 60;
+    const targetCount = 300;
 
     // Helper function to check if a position overlaps with existing positions
     const isValidPosition = (x: number, y: number) => {
