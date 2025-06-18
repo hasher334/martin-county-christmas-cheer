@@ -60,6 +60,17 @@ export const Hero = () => {
 
   return (
     <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden touch-optimized">
+      {/* Candy Cane Pattern Overlay */}
+      <div 
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: `url('/lovable-uploads/0014c541-d3af-4b1b-aa10-28d9cb931211.png')`,
+          backgroundSize: '120px 120px',
+          backgroundRepeat: 'repeat',
+          backgroundPosition: '0 0, 60px 60px'
+        }}
+      ></div>
+
       {/* Floating Christmas Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {snowflakePositions.map((position, i) => (
