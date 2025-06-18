@@ -19,11 +19,6 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'sans': ['"Sweet Home"', 'cursive'],
-				'sweet-home': ['"Sweet Home"', 'cursive'],
-				'chopin': ['"Chopin Script"', 'cursive'],
-			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',

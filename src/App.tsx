@@ -6,37 +6,37 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Wishlists from "./pages/Wishlists";
-import Register from "./pages/Register";
 import About from "./pages/About";
+import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
-import { useScrollCleanup } from "./hooks/useScrollCleanup";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+    },
+  },
+});
 
-function AppContent() {
-  useScrollCleanup(); // Clean up scroll locks on route changes
-  
+function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/wishlists" element={<Wishlists />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/about" element={<About />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/wishlists" element={<Wishlists />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/register" element={<Register />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
 
 export default App;

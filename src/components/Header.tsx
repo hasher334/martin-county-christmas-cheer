@@ -37,7 +37,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
               className="h-12 w-12"
             />
             <div>
-              <h1 className="text-2xl font-bold text-christmas-green-800 font-chopin">
+              <h1 className="text-2xl font-bold text-christmas-green-800">
                 Candy Cane Kindness
               </h1>
               <p className="text-sm text-christmas-brown-600">Spreading joy, one child at a time</p>
