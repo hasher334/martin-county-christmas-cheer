@@ -8,7 +8,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Shield } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,9 +17,10 @@ import { useState, useEffect } from "react";
 interface MobileMenuProps {
   user: any;
   onAuthClick: () => void;
+  isAdmin?: boolean;
 }
 
-export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
+export const MobileMenu = ({ user, onAuthClick, isAdmin = false }: MobileMenuProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,6 +107,16 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
               >
                 About Our Mission
               </button>
+
+              {isAdmin && (
+                <button
+                  onClick={() => handleNavigation("/admin")}
+                  className="block w-full text-left py-3 px-4 text-christmas-red-700 hover:bg-white/50 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin Dashboard
+                </button>
+              )}
             </nav>
 
             <div className="mt-6 pt-6 border-t border-christmas-green-200">
@@ -116,6 +127,9 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
                     <span className="text-sm font-medium">
                       Welcome, {user.email?.split('@')[0]}!
                     </span>
+                    {isAdmin && (
+                      <Shield className="h-4 w-4 text-christmas-red-600" title="Admin User" />
+                    )}
                   </div>
                   <Button
                     variant="outline"

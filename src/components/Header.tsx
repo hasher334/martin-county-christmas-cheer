@@ -1,10 +1,11 @@
 
 import { Button } from "@/components/ui/button";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import { MobileMenu } from "./MobileMenu";
+import { useState, useEffect } from "react";
 
 interface HeaderProps {
   user: any;
@@ -13,10 +14,31 @@ interface HeaderProps {
 
 export const Header = ({ user, onAuthClick }: HeaderProps) => {
   const { toast } = useToast();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user) {
+        try {
+          const { data: adminCheck } = await supabase
+            .rpc('is_admin', { user_id: user.id });
+          setIsAdmin(adminCheck || false);
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user]);
 
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
+      setIsAdmin(false);
       toast({
         title: "Signed out successfully",
         description: "Thank you for spreading Christmas cheer!",
@@ -66,6 +88,15 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                 >
                   About Our Mission
                 </Link>
+                {isAdmin && (
+                  <Link 
+                    to="/admin" 
+                    className="px-4 py-2 rounded-full text-christmas-red-700 hover:text-christmas-red-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito flex items-center gap-1"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
               </div>
             </nav>
 
@@ -78,6 +109,9 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                     <span className="text-sm font-medium font-nunito">
                       Welcome, {user.email?.split('@')[0]}!
                     </span>
+                    {isAdmin && (
+                      <Shield className="h-4 w-4 text-christmas-red-600" title="Admin User" />
+                    )}
                   </div>
                   <Button
                     variant="outline"
@@ -101,7 +135,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
             </div>
 
             {/* Mobile Menu */}
-            <MobileMenu user={user} onAuthClick={onAuthClick} />
+            <MobileMenu user={user} onAuthClick={onAuthClick} isAdmin={isAdmin} />
           </div>
         </div>
       </div>
