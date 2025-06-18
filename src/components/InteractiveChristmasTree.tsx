@@ -36,17 +36,17 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     "#3b82f6", "#d97706", "#8b5cf6", "#e11d48"
   ];
 
-  // Better positioned ornaments for the scaled tree
+  // Better positioned ornaments for the wider, more realistic tree
   const ornamentPositions = [
     // Top section
-    { x: 500, y: 220 }, { x: 470, y: 250 }, { x: 530, y: 250 },
+    { x: 500, y: 240 }, { x: 460, y: 270 }, { x: 540, y: 270 },
     // Upper middle section
-    { x: 450, y: 300 }, { x: 550, y: 300 }, { x: 500, y: 330 },
-    { x: 420, y: 360 }, { x: 580, y: 360 },
+    { x: 430, y: 320 }, { x: 570, y: 320 }, { x: 500, y: 350 },
+    { x: 400, y: 380 }, { x: 600, y: 380 },
     // Lower middle section
-    { x: 400, y: 420 }, { x: 600, y: 420 }, { x: 480, y: 450 }, { x: 520, y: 450 },
+    { x: 370, y: 440 }, { x: 630, y: 440 }, { x: 460, y: 470 }, { x: 540, y: 470 },
     // Bottom section
-    { x: 380, y: 500 }, { x: 620, y: 500 }, { x: 450, y: 530 }, { x: 550, y: 530 }
+    { x: 340, y: 520 }, { x: 660, y: 520 }, { x: 420, y: 550 }, { x: 580, y: 550 }
   ];
 
   return (
@@ -93,8 +93,8 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
             <ellipse 
               cx="500" 
               cy="780" 
-              rx="180" 
-              ry="20" 
+              rx="220" 
+              ry="25" 
               fill="rgba(0,0,0,0.3)"
             />
             
@@ -124,69 +124,69 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               strokeWidth="2"
             />
 
-            {/* Tree Layers - Bottom to Top, much larger and more realistic */}
+            {/* Tree Layers - Much wider and more realistic, bottom to top */}
             
-            {/* Bottom Layer - Largest */}
+            {/* Bottom Layer - Widest */}
             <path 
-              d="M 500 520 L 350 650 L 650 650 Z" 
+              d="M 500 520 L 320 650 L 680 650 Z" 
               fill="#0F4C3A"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
-              d="M 500 530 L 370 640 L 630 640 L 500 530" 
+              d="M 500 530 L 340 640 L 660 640 L 500 530" 
               fill="#1B5E20"
               opacity="0.9"
             />
             
             {/* Second Layer */}
             <path 
-              d="M 500 450 L 370 580 L 630 580 Z" 
+              d="M 500 450 L 340 580 L 660 580 Z" 
               fill="#0F4C3A"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
-              d="M 500 460 L 390 570 L 610 570 L 500 460" 
+              d="M 500 460 L 360 570 L 640 570 L 500 460" 
               fill="#1B5E20"
               opacity="0.9"
             />
             
             {/* Third Layer */}
             <path 
-              d="M 500 380 L 390 510 L 610 510 Z" 
+              d="M 500 380 L 360 510 L 640 510 Z" 
               fill="#0F4C3A"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
-              d="M 500 390 L 410 500 L 590 500 L 500 390" 
+              d="M 500 390 L 380 500 L 620 500 L 500 390" 
               fill="#1B5E20"
               opacity="0.9"
             />
             
             {/* Fourth Layer */}
             <path 
-              d="M 500 310 L 410 440 L 590 440 Z" 
+              d="M 500 310 L 380 440 L 620 440 Z" 
               fill="#0F4C3A"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
-              d="M 500 320 L 430 430 L 570 430 L 500 320" 
+              d="M 500 320 L 400 430 L 600 430 L 500 320" 
               fill="#1B5E20"
               opacity="0.9"
             />
 
             {/* Top Layer */}
             <path 
-              d="M 500 240 L 430 370 L 570 370 Z" 
+              d="M 500 240 L 400 370 L 600 370 Z" 
               fill="#0F4C3A"
               stroke="#0A3A2A"
               strokeWidth="3"
             />
             <path 
-              d="M 500 250 L 450 360 L 550 360 L 500 250" 
+              d="M 500 250 L 420 360 L 580 360 L 500 250" 
               fill="#1B5E20"
               opacity="0.9"
             />
@@ -211,86 +211,48 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               />
             </g>
 
-            {/* Garland - Swirling decoration around the tree */}
-            {[...Array(6)].map((_, layer) => {
-              const y = 300 + layer * 60;
-              const width = 120 + layer * 40;
+            {/* Tree Texture and Branch Details - More realistic needles */}
+            {[...Array(25)].map((_, i) => {
+              const layer = Math.floor(i / 5);
+              const x = 350 + (i % 5) * 75 + Math.random() * 20;
+              const y = 280 + layer * 60 + Math.random() * 40;
               return (
-                <path
-                  key={`garland-${layer}`}
-                  d={`M ${500 - width} ${y} Q ${500} ${y + 20} ${500 + width} ${y}`}
-                  stroke="#FFD700"
-                  strokeWidth="4"
-                  fill="none"
-                  opacity="0.8"
-                  className="animate-pulse"
-                />
-              );
-            })}
-
-            {/* Enhanced String Lights - More realistic placement */}
-            {[...Array(40)].map((_, i) => {
-              const layer = Math.floor(i / 8);
-              const angle = (i % 8) / 8 * Math.PI * 2;
-              const radius = 60 + layer * 35;
-              const x = 500 + Math.cos(angle) * radius;
-              const y = 280 + layer * 70 + Math.sin(angle) * 15;
-              
-              return (
-                <g key={`light-${i}`}>
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r="6"
-                    fill={i % 4 === 0 ? "#FFD700" : i % 4 === 1 ? "#FF4444" : i % 4 === 2 ? "#4444FF" : "#44FF44"}
-                    className={cn(
-                      "transition-all duration-300",
-                      (twinkle + i) % 4 === 0 ? "animate-pulse opacity-100 filter brightness-125" : "opacity-80"
-                    )}
-                  />
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r="3"
-                    fill="white"
+                <g key={`texture-${i}`}>
+                  <path
+                    d={`M ${x - 15} ${y} Q ${x} ${y - 8} ${x + 15} ${y} Q ${x} ${y + 8} ${x - 15} ${y}`}
+                    fill="#1B5E20"
                     opacity="0.6"
+                  />
+                  <path
+                    d={`M ${x - 10} ${y + 5} Q ${x} ${y - 3} ${x + 10} ${y + 5} Q ${x} ${y + 13} ${x - 10} ${y + 5}`}
+                    fill="#0F4C3A"
+                    opacity="0.4"
                   />
                 </g>
               );
             })}
 
-            {/* Tree Texture and Branch Details */}
-            {[...Array(12)].map((_, i) => (
-              <path
-                key={`texture-${i}`}
-                d={`M ${420 + i * 12} ${280 + i * 35} Q ${500} ${260 + i * 35} ${580 - i * 12} ${280 + i * 35}`}
-                stroke="#0A3A2A"
-                strokeWidth="2"
-                fill="none"
-                opacity="0.4"
-              />
-            ))}
-
-            {/* Pine Needle Details */}
-            {[...Array(20)].map((_, i) => {
-              const x = 400 + Math.random() * 200;
+            {/* Pine Needle Details - More scattered and realistic */}
+            {[...Array(60)].map((_, i) => {
+              const x = 330 + Math.random() * 340;
               const y = 280 + Math.random() * 350;
+              const angle = Math.random() * 360;
               return (
                 <line
                   key={`needle-${i}`}
                   x1={x}
                   y1={y}
-                  x2={x + 3}
-                  y2={y + 6}
+                  x2={x + Math.cos(angle) * 4}
+                  y2={y + Math.sin(angle) * 4}
                   stroke="#1B5E20"
                   strokeWidth="1"
-                  opacity="0.6"
+                  opacity="0.7"
                 />
               );
             })}
           </svg>
 
-          {/* Interactive Ornaments positioned on the scaled tree */}
+          {/* Interactive Ornaments positioned on the wider tree */}
           {children.slice(0, 16).map((child, index) => {
             const position = ornamentPositions[index] || ornamentPositions[0];
             
@@ -299,21 +261,21 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                 key={child.id}
                 onClick={() => handleOrnamentClick(child)}
                 className={cn(
-                  "absolute w-10 h-10 rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer",
+                  "absolute w-12 h-12 rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer",
                   "hover:scale-150 hover:shadow-2xl transform-gpu hover:z-40",
                   (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
                   "hover:animate-bounce border-3 border-white/60"
                 )}
                 style={{
-                  left: `${position.x - 20}px`,
-                  top: `${position.y - 20}px`,
+                  left: `${position.x - 24}px`,
+                  top: `${position.y - 24}px`,
                   backgroundColor: ornamentColors[index % ornamentColors.length],
-                  boxShadow: `0 6px 20px ${ornamentColors[index % ornamentColors.length]}60, 0 0 15px ${ornamentColors[index % ornamentColors.length]}40`
+                  boxShadow: `0 8px 25px ${ornamentColors[index % ornamentColors.length]}60, 0 0 20px ${ornamentColors[index % ornamentColors.length]}40`
                 }}
                 title={`Click to meet ${child.name}`}
               >
                 <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/70 to-transparent"></div>
-                <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-white/90 rounded-full"></div>
+                <div className="absolute top-1.5 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white/90 rounded-full"></div>
                 <div className="absolute inset-2 rounded-full border border-white/30"></div>
               </button>
             );
