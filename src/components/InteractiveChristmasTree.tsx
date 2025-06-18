@@ -31,97 +31,191 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
   };
 
   const ornamentColors = [
-    "bg-red-500", "bg-gold-400", "bg-blue-500", "bg-purple-500", 
-    "bg-pink-500", "bg-green-400", "bg-orange-500", "bg-red-400",
-    "bg-blue-400", "bg-yellow-400", "bg-purple-400", "bg-pink-400"
+    "#ef4444", "#f59e0b", "#3b82f6", "#8b5cf6", 
+    "#ec4899", "#10b981", "#f97316", "#dc2626",
+    "#60a5fa", "#fbbf24", "#a78bfa", "#f472b6"
+  ];
+
+  // Position ornaments naturally on the tree branches
+  const ornamentPositions = [
+    { x: 400, y: 180 }, // Top section
+    { x: 370, y: 210 }, { x: 430, y: 210 },
+    { x: 350, y: 250 }, { x: 450, y: 250 }, { x: 400, y: 270 },
+    { x: 330, y: 300 }, { x: 470, y: 300 }, { x: 380, y: 320 }, { x: 420, y: 320 },
+    { x: 310, y: 360 }, { x: 490, y: 360 }
   ];
 
   return (
     <div className="flex flex-col items-center justify-center py-8">
-      <div className="relative scale-150 md:scale-200">
-        {/* Tree Star */}
-        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-20">
-          <div className={cn(
-            "w-12 h-12 bg-yellow-400 rotate-12 transform transition-all duration-500",
-            twinkle % 2 === 0 ? "scale-125 shadow-2xl shadow-yellow-400/60" : "scale-110"
-          )} 
-          style={{ clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)" }} />
-        </div>
+      <div className="relative">
+        <svg 
+          width="800" 
+          height="600" 
+          viewBox="0 0 800 600" 
+          className="drop-shadow-2xl"
+        >
+          {/* Tree Shadow */}
+          <ellipse 
+            cx="400" 
+            cy="580" 
+            rx="120" 
+            ry="15" 
+            fill="rgba(0,0,0,0.2)"
+          />
+          
+          {/* Tree Trunk */}
+          <rect 
+            x="380" 
+            y="480" 
+            width="40" 
+            height="80" 
+            fill="#8B4513"
+            rx="5"
+          />
+          <rect 
+            x="375" 
+            y="560" 
+            width="50" 
+            height="20" 
+            fill="#654321"
+            rx="10"
+          />
+          
+          {/* Tree Layers - Bottom to Top for proper layering */}
+          
+          {/* Bottom Layer */}
+          <path 
+            d="M 400 380 L 300 480 L 500 480 Z" 
+            fill="#0F5132"
+            stroke="#0A4026"
+            strokeWidth="2"
+          />
+          <path 
+            d="M 400 390 L 320 470 L 480 470 L 400 390" 
+            fill="#198754"
+            opacity="0.8"
+          />
+          
+          {/* Middle Layer */}
+          <path 
+            d="M 400 300 L 320 420 L 480 420 Z" 
+            fill="#0F5132"
+            stroke="#0A4026"
+            strokeWidth="2"
+          />
+          <path 
+            d="M 400 310 L 340 410 L 460 410 L 400 310" 
+            fill="#198754"
+            opacity="0.8"
+          />
+          
+          {/* Upper Layer */}
+          <path 
+            d="M 400 220 L 340 360 L 460 360 Z" 
+            fill="#0F5132"
+            stroke="#0A4026"
+            strokeWidth="2"
+          />
+          <path 
+            d="M 400 230 L 360 350 L 440 350 L 400 230" 
+            fill="#198754"
+            opacity="0.8"
+          />
+          
+          {/* Top Layer */}
+          <path 
+            d="M 400 140 L 360 280 L 440 280 Z" 
+            fill="#0F5132"
+            stroke="#0A4026"
+            strokeWidth="2"
+          />
+          <path 
+            d="M 400 150 L 380 270 L 420 270 L 400 150" 
+            fill="#198754"
+            opacity="0.8"
+          />
 
-        {/* Tree Layers */}
-        <div className="relative">
-          {/* Top layer */}
-          <div className="w-0 h-0 border-l-20 border-r-20 border-b-24 border-l-transparent border-r-transparent border-b-green-600 mx-auto relative z-10" />
-          
-          {/* Second layer */}
-          <div className="w-0 h-0 border-l-28 border-r-28 border-b-32 border-l-transparent border-r-transparent border-b-green-700 mx-auto -mt-3 relative z-10" />
-          
-          {/* Third layer */}
-          <div className="w-0 h-0 border-l-36 border-r-36 border-b-40 border-l-transparent border-r-transparent border-b-green-600 mx-auto -mt-4 relative z-10" />
-          
-          {/* Fourth layer */}
-          <div className="w-0 h-0 border-l-44 border-r-44 border-b-48 border-l-transparent border-r-transparent border-b-green-700 mx-auto -mt-5 relative z-10" />
-          
-          {/* Fifth layer */}
-          <div className="w-0 h-0 border-l-52 border-r-52 border-b-56 border-l-transparent border-r-transparent border-b-green-600 mx-auto -mt-6 relative z-10" />
-          
-          {/* Sixth layer */}
-          <div className="w-0 h-0 border-l-60 border-r-60 border-b-64 border-l-transparent border-r-transparent border-b-green-700 mx-auto -mt-7 relative z-10" />
+          {/* Tree Star */}
+          <g transform="translate(400, 120)">
+            <path 
+              d="M 0 -20 L 6 -6 L 20 -6 L 10 2 L 16 16 L 0 8 L -16 16 L -10 2 L -20 -6 L -6 -6 Z"
+              fill="#FFD700"
+              stroke="#FFA500"
+              strokeWidth="2"
+              className={cn(
+                "transition-all duration-500 drop-shadow-lg",
+                twinkle % 2 === 0 ? "scale-110 drop-shadow-2xl" : "scale-100"
+              )}
+            />
+            <circle cx="0" cy="0" r="3" fill="#FFF" opacity="0.8" />
+          </g>
 
-          {/* Interactive Ornaments with Children */}
-          {children.slice(0, 12).map((child, index) => {
-            const positions = [
-              "top-16 left-1/2 transform -translate-x-1/2",
-              "top-24 left-1/3", "top-24 right-1/3",
-              "top-32 left-1/4", "top-32 right-1/4",
-              "top-40 left-1/3", "top-40 right-1/3",
-              "top-48 left-1/5", "top-48 right-1/5",
-              "top-56 left-1/4", "top-56 right-1/4",
-              "top-64 left-1/3", "top-64 right-1/3"
-            ];
-
+          {/* Decorative String Lights */}
+          {[...Array(24)].map((_, i) => {
+            const angle = (i / 24) * Math.PI * 2;
+            const radius = 80 + (i % 3) * 20;
+            const x = 400 + Math.cos(angle) * (radius - Math.abs(Math.sin(angle * 3)) * 30);
+            const y = 200 + Math.sin(angle) * 20 + (i % 4) * 60;
+            
             return (
-              <button
-                key={child.id}
-                onClick={() => handleOrnamentClick(child)}
+              <circle
+                key={`light-${i}`}
+                cx={x}
+                cy={y}
+                r="4"
+                fill={i % 3 === 0 ? "#FFD700" : i % 3 === 1 ? "#FF4444" : "#4444FF"}
                 className={cn(
-                  "absolute w-6 h-6 rounded-full shadow-lg transition-all duration-300 z-30 cursor-pointer hover:scale-125 hover:shadow-xl",
-                  ornamentColors[index % ornamentColors.length],
-                  positions[index] || "top-32 left-1/2",
-                  (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
-                  "hover:animate-bounce"
+                  "transition-all duration-300",
+                  (twinkle + i) % 4 === 0 ? "animate-pulse opacity-100" : "opacity-70"
                 )}
-                title={`Click to meet ${child.name}`}
-              >
-                <div className="absolute inset-0 rounded-full bg-white/30 animate-pulse"></div>
-              </button>
+              />
             );
           })}
 
-          {/* Decorative Lights */}
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={`light-${i}`}
-              className={cn(
-                "absolute w-2 h-2 rounded-full z-15",
-                i % 3 === 0 ? "bg-yellow-300" : i % 3 === 1 ? "bg-red-300" : "bg-blue-300",
-                (twinkle + i) % 3 === 0 ? "animate-pulse" : "",
-              )}
-              style={{
-                top: `${32 + (i * 4)}px`,
-                left: `${60 + (i % 2 === 0 ? -25 : 25) + Math.sin(i) * 15}px`,
-              }}
+          {/* Tree Texture Lines */}
+          {[...Array(8)].map((_, i) => (
+            <path
+              key={`texture-${i}`}
+              d={`M ${350 + i * 10} ${200 + i * 40} Q ${400} ${180 + i * 40} ${450 - i * 10} ${200 + i * 40}`}
+              stroke="#0A4026"
+              strokeWidth="1"
+              fill="none"
+              opacity="0.3"
             />
           ))}
-        </div>
+        </svg>
 
-        {/* Tree Trunk */}
-        <div className="w-16 h-20 bg-amber-800 mx-auto relative z-10" />
-        <div className="w-20 h-6 bg-amber-900 mx-auto relative z-10" />
+        {/* Interactive Ornaments positioned on the SVG tree */}
+        {children.slice(0, 12).map((child, index) => {
+          const position = ornamentPositions[index] || ornamentPositions[0];
+          
+          return (
+            <button
+              key={child.id}
+              onClick={() => handleOrnamentClick(child)}
+              className={cn(
+                "absolute w-8 h-8 rounded-full shadow-lg transition-all duration-300 z-30 cursor-pointer",
+                "hover:scale-125 hover:shadow-xl transform-gpu",
+                (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
+                "hover:animate-bounce border-2 border-white/50"
+              )}
+              style={{
+                left: `${position.x - 16}px`,
+                top: `${position.y - 16}px`,
+                backgroundColor: ornamentColors[index % ornamentColors.length],
+                boxShadow: `0 4px 12px ${ornamentColors[index % ornamentColors.length]}40`
+              }}
+              title={`Click to meet ${child.name}`}
+            >
+              <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/60 to-transparent"></div>
+              <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white/80 rounded-full"></div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Instructions */}
-      <div className="mt-16 text-center max-w-2xl">
+      <div className="mt-8 text-center max-w-2xl">
         <p className={cn(
           "text-2xl font-bold transition-all duration-500 mb-4",
           twinkle % 2 === 0 ? "text-green-600 scale-105" : "text-red-600 scale-100"
