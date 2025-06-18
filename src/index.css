@@ -3,86 +3,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/* Christmas themed design system based on traditional Christmas colors */
 
 @layer base {
   :root {
-    --background: 45 15% 95%;
-    --foreground: 25 35% 15%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 15%;
 
-    --card: 45 15% 95%;
-    --card-foreground: 25 35% 15%;
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 15%;
 
-    --popover: 45 15% 95%;
-    --popover-foreground: 25 35% 15%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 15%;
 
-    --primary: 140 60% 25%;
-    --primary-foreground: 45 15% 95%;
+    --primary: 140 85% 20%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 25 35% 55%;
-    --secondary-foreground: 45 15% 95%;
+    --secondary: 0 70% 45%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 45 15% 88%;
-    --muted-foreground: 25 35% 35%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 0 70% 55%;
-    --accent-foreground: 45 15% 95%;
+    --accent: 45 95% 60%;
+    --accent-foreground: 0 0% 15%;
 
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 45 15% 95%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 45 15% 85%;
-    --input: 45 15% 85%;
-    --ring: 140 60% 25%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 140 85% 20%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 45 15% 92%;
-    --sidebar-foreground: 25 35% 25%;
-    --sidebar-primary: 140 60% 25%;
-    --sidebar-primary-foreground: 45 15% 95%;
-    --sidebar-accent: 45 15% 88%;
-    --sidebar-accent-foreground: 25 35% 25%;
-    --sidebar-border: 45 15% 80%;
-    --sidebar-ring: 140 60% 35%;
+    --sidebar-background: 0 0% 95%;
+    --sidebar-foreground: 0 0% 25%;
+    --sidebar-primary: 140 85% 20%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 88%;
+    --sidebar-accent-foreground: 0 0% 25%;
+    --sidebar-border: 0 0% 80%;
+    --sidebar-ring: 140 85% 25%;
   }
 
   .dark {
-    --background: 25 35% 8%;
-    --foreground: 45 15% 95%;
+    --background: 140 30% 8%;
+    --foreground: 0 0% 95%;
 
-    --card: 25 35% 8%;
-    --card-foreground: 45 15% 95%;
+    --card: 140 30% 8%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 25 35% 8%;
-    --popover-foreground: 45 15% 95%;
+    --popover: 140 30% 8%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 140 45% 35%;
-    --primary-foreground: 25 35% 8%;
+    --primary: 140 60% 35%;
+    --primary-foreground: 140 30% 8%;
 
-    --secondary: 25 35% 15%;
-    --secondary-foreground: 45 15% 95%;
+    --secondary: 140 30% 15%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 25 35% 15%;
-    --muted-foreground: 45 15% 70%;
+    --muted: 140 30% 15%;
+    --muted-foreground: 0 0% 70%;
 
     --accent: 0 60% 45%;
-    --accent-foreground: 45 15% 95%;
+    --accent-foreground: 0 0% 95%;
 
     --destructive: 0 60% 45%;
-    --destructive-foreground: 45 15% 95%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 25 35% 15%;
-    --input: 25 35% 15%;
-    --ring: 140 45% 35%;
-    --sidebar-background: 25 35% 5%;
-    --sidebar-foreground: 45 15% 85%;
-    --sidebar-primary: 140 45% 40%;
-    --sidebar-primary-foreground: 25 35% 5%;
-    --sidebar-accent: 25 35% 12%;
-    --sidebar-accent-foreground: 45 15% 85%;
-    --sidebar-border: 25 35% 12%;
-    --sidebar-ring: 140 45% 40%;
+    --border: 140 30% 15%;
+    --input: 140 30% 15%;
+    --ring: 140 60% 35%;
+    --sidebar-background: 140 30% 5%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 140 60% 40%;
+    --sidebar-primary-foreground: 140 30% 5%;
+    --sidebar-accent: 140 30% 12%;
+    --sidebar-accent-foreground: 0 0% 85%;
+    --sidebar-border: 140 30% 12%;
+    --sidebar-ring: 140 60% 40%;
   }
 }
 
@@ -92,6 +92,84 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-to-br from-red-50 via-green-50 to-red-100 text-foreground min-h-screen;
+    background-attachment: fixed;
   }
+}
+
+/* Christmas snow animation */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-100vh) translateX(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(100px);
+    opacity: 0;
+  }
+}
+
+.snow {
+  position: fixed;
+  top: -10px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.snow::before,
+.snow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle, white 1px, transparent 1px),
+    radial-gradient(circle, white 1px, transparent 1px),
+    radial-gradient(circle, white 2px, transparent 2px);
+  background-size: 100px 100px, 80px 80px, 120px 120px;
+  animation: snowfall 10s linear infinite;
+}
+
+.snow::after {
+  animation-delay: -5s;
+  animation-duration: 15s;
+  background-size: 120px 120px, 100px 100px, 140px 140px;
+}
+
+/* Christmas sparkle effect */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+.sparkle {
+  animation: sparkle 2s infinite;
+}
+
+/* Twinkling lights effect */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.twinkle {
+  animation: twinkle 1.5s infinite;
+}
+
+/* Christmas glow effect */
+.christmas-glow {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.4);
+}
+
+.christmas-glow-red {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), 0 0 40px rgba(220, 38, 38, 0.4);
+}
+
+.christmas-glow-green {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), 0 0 40px rgba(34, 197, 94, 0.4);
 }
