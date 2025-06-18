@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ChildCard } from "@/components/ChildCard";
-import { Gift, Heart, Star } from "lucide-react";
+import { Snowflake } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -92,13 +92,7 @@ const Wishlists = () => {
                 animationDuration: `${2 + Math.random() * 2}s`,
               }}
             >
-              {i % 3 === 0 ? (
-                <Star className="h-4 w-4 text-yellow-300" />
-              ) : i % 3 === 1 ? (
-                <Gift className="h-4 w-4 text-white/80" />
-              ) : (
-                <Heart className="h-3 w-3 text-pink-200" />
-              )}
+              <Snowflake className="h-4 w-4 text-white/80" />
             </div>
           ))}
         </div>
@@ -145,7 +139,7 @@ const Wishlists = () => {
 
           {!loading && children.length === 0 && (
             <div className="text-center py-20">
-              <Gift className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
+              <Snowflake className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
               <h3 className="text-xl md:text-2xl font-semibold text-christmas-green-800 mb-2">
                 No Wishlists Available
               </h3>
