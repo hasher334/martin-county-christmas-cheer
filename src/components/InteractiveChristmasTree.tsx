@@ -36,17 +36,17 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     "#3b82f6", "#d97706", "#8b5cf6", "#e11d48"
   ];
 
-  // Responsive ornament positions using percentages relative to tree container
+  // Adjusted ornament positions to better align with the tree on all screen sizes
   const ornamentPositions = [
-    // Top section
-    { x: 50, y: 18 }, { x: 60, y: 22 }, { x: 40, y: 22 },
-    // Upper middle section
-    { x: 35, y: 28 }, { x: 65, y: 28 }, { x: 50, y: 32 },
-    { x: 32, y: 36 }, { x: 68, y: 36 },
-    // Lower middle section
-    { x: 28, y: 44 }, { x: 72, y: 44 }, { x: 42, y: 48 }, { x: 58, y: 48 },
-    // Bottom section
-    { x: 25, y: 56 }, { x: 75, y: 56 }, { x: 38, y: 60 }, { x: 62, y: 60 }
+    // Top section - moved down
+    { x: 50, y: 25 }, { x: 60, y: 30 }, { x: 40, y: 30 },
+    // Upper middle section - moved down
+    { x: 35, y: 38 }, { x: 65, y: 38 }, { x: 50, y: 42 },
+    { x: 32, y: 46 }, { x: 68, y: 46 },
+    // Lower middle section - moved down
+    { x: 28, y: 54 }, { x: 72, y: 54 }, { x: 42, y: 58 }, { x: 58, y: 58 },
+    // Bottom section - moved down
+    { x: 25, y: 66 }, { x: 75, y: 66 }, { x: 38, y: 70 }, { x: 62, y: 70 }
   ];
 
   return (
