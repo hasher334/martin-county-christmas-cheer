@@ -23,20 +23,46 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Debug mobile scrolling issue
-    console.log("Mobile scroll debug - Page loaded");
-    console.log("Document body overflow:", window.getComputedStyle(document.body).overflow);
-    console.log("Document html overflow:", window.getComputedStyle(document.documentElement).overflow);
-    console.log("Is mobile:", window.innerWidth < 768);
-    console.log("User agent:", navigator.userAgent);
+    // Enhanced mobile scroll debugging
+    console.log("Index page - Mobile scroll debug initialized");
+    console.log("Viewport details:", {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      devicePixelRatio: window.devicePixelRatio,
+      userAgent: navigator.userAgent.substring(0, 100)
+    });
     
-    // Force enable scrolling on mobile
-    if (window.innerWidth < 768) {
-      document.body.style.overflow = 'auto';
-      document.documentElement.style.overflow = 'auto';
-      document.body.style.touchAction = 'pan-y pinch-zoom';
-      console.log("Applied mobile scroll fixes");
-    }
+    console.log("Document scroll state:", {
+      documentElement: {
+        scrollHeight: document.documentElement.scrollHeight,
+        clientHeight: document.documentElement.clientHeight,
+        overflow: window.getComputedStyle(document.documentElement).overflow
+      },
+      body: {
+        scrollHeight: document.body.scrollHeight,
+        clientHeight: document.body.clientHeight,
+        overflow: window.getComputedStyle(document.body).overflow
+      }
+    });
+
+    // Test scroll capability
+    const testScroll = () => {
+      const canScroll = document.body.scrollHeight > window.innerHeight;
+      console.log("Can scroll?", canScroll, "ScrollHeight:", document.body.scrollHeight, "WindowHeight:", window.innerHeight);
+    };
+    
+    testScroll();
+    
+    // Monitor scroll events
+    const handleScroll = () => {
+      console.log("Scroll event detected at:", window.pageYOffset);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -91,7 +117,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-scroll-fix">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
       <ChristmasColorUtility />
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
@@ -99,12 +125,12 @@ const Index = () => {
       <Hero />
 
       {/* Main Interactive Christmas Tree Section */}
-      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50" data-section="wishlists">
-        <div className="container mx-auto px-4 text-center mobile-scroll-fix">
-          <h2 className="text-4xl md:text-5xl font-bold text-christmas-green-800 mb-6">
+      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 mobile-optimized" data-section="wishlists">
+        <div className="container mx-auto px-4 text-center mobile-optimized no-horizontal-scroll">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-christmas-green-800 mb-6">
             Our Christmas Tree of Hope
           </h2>
-          <p className="text-xl text-christmas-brown-700 mb-12 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-christmas-brown-700 mb-12 max-w-3xl mx-auto">
             Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
           
@@ -121,8 +147,8 @@ const Index = () => {
           )}
 
           {/* Navigation Banners under Christmas Tree */}
-          <div className="mt-16 mb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+          <div className="mt-16 mb-16 mobile-optimized">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto px-4 no-horizontal-scroll">
               <NavigationBanner
                 title="Browse Wishlists"
                 description="Discover children's Christmas wishes and choose the perfect child to sponsor"

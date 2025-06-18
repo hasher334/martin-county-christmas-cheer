@@ -19,6 +19,11 @@ const Wishlists = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log("Wishlists page - Mobile scroll test");
+    console.log("Page can scroll:", document.body.scrollHeight > window.innerHeight);
+  }, []);
+
+  useEffect(() => {
     // Check auth state
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -70,16 +75,16 @@ const Wishlists = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-b from-christmas-red-600 to-christmas-red-800 text-white">
-        <div className="absolute inset-0 overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-b from-christmas-red-600 to-christmas-red-800 text-white mobile-optimized">
+        <div className="absolute inset-0 overflow-hidden decorative-only mobile-no-animation">
           {[...Array(15)].map((_, i) => (
             <div
               key={i}
-              className="absolute animate-pulse"
+              className="absolute md:animate-pulse decorative-only"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -98,11 +103,11 @@ const Wishlists = () => {
           ))}
         </div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+        <div className="container mx-auto px-4 text-center relative z-10 mobile-optimized">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
             Christmas Wishlists
           </h1>
-          <p className="text-xl mb-8 max-w-3xl mx-auto opacity-90">
+          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90">
             Browse through the Christmas wishlists of children in our community. 
             Each child has shared their holiday dreams - help make them come true!
           </p>
@@ -110,13 +115,13 @@ const Wishlists = () => {
       </section>
 
       {/* Wishlists Section */}
-      <section className="py-20" data-section="wishlists">
-        <div className="container mx-auto px-4">
+      <section className="py-20 mobile-optimized" data-section="wishlists">
+        <div className="container mx-auto px-4 mobile-optimized no-horizontal-scroll">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-christmas-green-800 mb-4">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-christmas-green-800 mb-4">
               Children's Wishlists
             </h2>
-            <p className="text-lg text-christmas-brown-700 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-christmas-brown-700 max-w-2xl mx-auto">
               Each child below has created a special wishlist for Christmas. Click on their profile to see what would make their holiday magical.
             </p>
           </div>
@@ -126,7 +131,7 @@ const Wishlists = () => {
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-christmas-green-600"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mobile-optimized">
               {children.map((child) => (
                 <ChildCard
                   key={child.id}
@@ -141,7 +146,7 @@ const Wishlists = () => {
           {!loading && children.length === 0 && (
             <div className="text-center py-20">
               <Gift className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-semibold text-christmas-green-800 mb-2">
+              <h3 className="text-xl md:text-2xl font-semibold text-christmas-green-800 mb-2">
                 No Wishlists Available
               </h3>
               <p className="text-christmas-brown-600">
