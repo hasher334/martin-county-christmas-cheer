@@ -25,23 +25,23 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-christmas-red-700 to-christmas-red-800 shadow-xl border-b-4 border-christmas-red-900">
+    <header className="bg-christmas-cream shadow-lg border-b-4 border-christmas-red-600">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Heart className="h-8 w-8 text-christmas-cream fill-christmas-cream" />
+            <Heart className="h-8 w-8 text-christmas-red-600" />
             <div>
-              <h1 className="text-2xl font-bold text-christmas-cream">
+              <h1 className="text-2xl font-bold text-christmas-green-800">
                 Martin County Christmas Cheer
               </h1>
-              <p className="text-sm text-christmas-red-100">Spreading joy, one child at a time</p>
+              <p className="text-sm text-christmas-brown-600">Spreading joy, one child at a time</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 text-christmas-cream">
+                <div className="flex items-center space-x-2 text-christmas-green-700">
                   <User className="h-4 w-4" />
                   <span className="text-sm font-medium">
                     Welcome, {user.email?.split('@')[0]}!
@@ -51,7 +51,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                   variant="outline"
                   size="sm"
                   onClick={handleSignOut}
-                  className="text-christmas-cream border-christmas-cream hover:bg-christmas-cream hover:text-christmas-red-700 transition-all duration-200"
+                  className="text-christmas-red-600 border-christmas-red-200 hover:bg-christmas-red-50"
                 >
                   <LogOut className="h-4 w-4 mr-1" />
                   Sign Out
@@ -60,7 +60,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
             ) : (
               <Button
                 onClick={onAuthClick}
-                className="bg-christmas-green-700 hover:bg-christmas-green-800 text-christmas-cream border-2 border-christmas-green-600 shadow-lg transition-all duration-200 hover:shadow-xl"
+                className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white"
               >
                 <User className="h-4 w-4 mr-2" />
                 Sign In to Adopt
