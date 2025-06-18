@@ -60,14 +60,21 @@ export const Hero = () => {
 
   return (
     <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden touch-optimized">
-      {/* Candy Cane Pattern Overlay */}
+      {/* Candy Cane Stripe Pattern Overlay */}
       <div 
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-15"
         style={{
-          backgroundImage: `url('/lovable-uploads/0014c541-d3af-4b1b-aa10-28d9cb931211.png')`,
-          backgroundSize: '120px 120px',
-          backgroundRepeat: 'repeat',
-          backgroundPosition: '0 0, 60px 60px'
+          backgroundImage: `repeating-linear-gradient(
+            45deg,
+            transparent 0px,
+            transparent 10px,
+            rgba(255, 255, 255, 0.8) 10px,
+            rgba(255, 255, 255, 0.8) 20px,
+            transparent 20px,
+            transparent 30px,
+            #dc2626 30px,
+            #dc2626 40px
+          )`
         }}
       ></div>
 
