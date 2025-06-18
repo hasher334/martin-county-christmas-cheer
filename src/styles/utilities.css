@@ -1,0 +1,85 @@
+
+/* Mobile-optimized utility classes */
+@layer utilities {
+  /* Mobile optimization classes */
+  .mobile-optimized {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .touch-optimized {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .no-horizontal-scroll {
+    overflow-x: hidden;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+
+  /* Use dynamic viewport height instead of 100vh */
+  .min-h-screen {
+    min-height: 100dvh;
+  }
+
+  .h-screen {
+    height: 100dvh;
+  }
+
+  /* Performance-optimized animations */
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out forwards;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-pulse,
+    .animate-spin {
+      animation: none;
+    }
+    
+    .transition-all,
+    .transition-opacity,
+    .transition-transform {
+      transition: none;
+    }
+  }
+
+  /* Christmas colors optimization - simplified for mobile */
+  .christmas-colors-generator {
+    /* Essential Christmas Red variants */
+    @apply bg-christmas-red-500 bg-christmas-red-600 bg-christmas-red-700;
+    @apply text-christmas-red-500 text-christmas-red-600 text-christmas-red-700;
+    
+    /* Essential Christmas Green variants */
+    @apply bg-christmas-green-500 bg-christmas-green-600 bg-christmas-green-700 bg-christmas-green-800;
+    @apply text-christmas-green-500 text-christmas-green-600 text-christmas-green-700 text-christmas-green-800;
+    
+    /* Essential Christmas Brown variants */
+    @apply bg-christmas-brown-600 bg-christmas-brown-700;
+    @apply text-christmas-brown-600 text-christmas-brown-700;
+    
+    /* Christmas Cream */
+    @apply bg-christmas-cream text-christmas-cream;
+  }
+}
+
+/* Hide utility class */
+.christmas-colors-generator {
+  display: none !important;
+}

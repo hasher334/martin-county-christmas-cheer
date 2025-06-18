@@ -1,0 +1,52 @@
+
+/* Mobile-specific performance improvements */
+@media (max-width: 768px) {
+  /* Reduce complexity on mobile */
+  .backdrop-blur-md {
+    backdrop-filter: blur(4px);
+  }
+  
+  .drop-shadow-2xl {
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+  }
+  
+  /* Optimize text rendering on mobile */
+  .font-christmas,
+  .font-dancing {
+    text-rendering: optimizeSpeed;
+  }
+
+  /* Ensure proper mobile scroll behavior */
+  body {
+    position: relative;
+    overflow-x: hidden;
+  }
+}
+
+/* Optimize for very small screens */
+@media (max-width: 480px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Further reduce effects on very small screens */
+  .shadow-xl {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Force proper scrolling on small screens */
+  html, body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Force cleanup any lingering modal classes */
+@media (max-width: 1024px) {
+  body:not(.modal-open) {
+    overflow-y: auto !important;
+    position: static !important;
+    inset: auto !important;
+  }
+}
