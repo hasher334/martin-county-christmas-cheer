@@ -50,11 +50,11 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
   ];
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-slate-300 via-slate-200 to-white overflow-hidden">
-      {/* Winter Wonderland Background */}
-      <div className="absolute inset-0">
-        {/* Falling Snow Animation */}
-        {[...Array(100)].map((_, i) => (
+    <div className="relative bg-gradient-to-b from-slate-300 via-slate-200 to-white no-horizontal-scroll touch-optimized">
+      {/* Winter Wonderland Background - Reduced animation count for mobile performance */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Falling Snow Animation - Reduced count for mobile */}
+        {[...Array(window.innerWidth < 768 ? 50 : 100)].map((_, i) => (
           <div
             key={`snow-${i}`}
             className="absolute w-2 h-2 bg-white rounded-full opacity-80 animate-pulse"
@@ -68,8 +68,8 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
           />
         ))}
 
-        {/* Larger Snow Flakes */}
-        {[...Array(30)].map((_, i) => (
+        {/* Larger Snow Flakes - Reduced count for mobile */}
+        {[...Array(window.innerWidth < 768 ? 15 : 30)].map((_, i) => (
           <div
             key={`snowflake-${i}`}
             className="absolute text-white animate-pulse"
@@ -95,11 +95,12 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
       <div className="relative z-10 flex flex-col items-center justify-center py-12">
         <div className="relative w-full max-w-4xl mx-auto px-4">
           {/* Christmas Tree Image - Responsive Container */}
-          <div className="relative w-full">
+          <div className="relative w-full no-horizontal-scroll">
             <img 
               src="/lovable-uploads/9b7c78e5-e2e5-4e1d-9ff0-05333593d9f4.png"
               alt="Christmas Tree"
               className="w-full h-auto max-w-[800px] mx-auto drop-shadow-2xl"
+              loading="lazy"
             />
 
             {/* Interactive Ornaments with responsive positioning */}
@@ -111,12 +112,12 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                   key={child.id}
                   onClick={() => handleOrnamentClick(child)}
                   className={cn(
-                    "absolute rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer",
+                    "absolute rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer touch-optimized",
                     "hover:scale-150 hover:shadow-2xl transform-gpu hover:z-40",
                     (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
                     "border-2 border-white/80",
-                    // Responsive sizing
-                    "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10"
+                    // Responsive sizing with better mobile touch targets
+                    "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
                   )}
                   style={{
                     left: `${position.x}%`,
@@ -126,6 +127,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                     boxShadow: `0 6px 20px ${ornamentColors[index % ornamentColors.length]}40, 0 0 15px ${ornamentColors[index % ornamentColors.length]}30`
                   }}
                   title={`Click to meet ${child.name}`}
+                  aria-label={`Meet ${child.name}`}
                 >
                   <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/60 to-transparent"></div>
                   <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white/90 rounded-full"></div>

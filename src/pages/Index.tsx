@@ -74,7 +74,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
+    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background no-horizontal-scroll">
       <ChristmasColorUtility />
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
@@ -82,8 +82,8 @@ const Index = () => {
       <Hero />
 
       {/* Main Interactive Christmas Tree Section */}
-      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 min-h-screen" data-section="wishlists">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50" data-section="wishlists">
+        <div className="container mx-auto px-4 text-center no-horizontal-scroll">
           <h2 className="text-4xl md:text-5xl font-bold text-christmas-green-800 mb-6">
             Our Christmas Tree of Hope
           </h2>
@@ -105,7 +105,7 @@ const Index = () => {
 
           {/* Navigation Banners under Christmas Tree */}
           <div className="mt-16 mb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
               <NavigationBanner
                 title="Browse Wishlists"
                 description="Discover children's Christmas wishes and choose the perfect child to sponsor"

@@ -34,10 +34,11 @@ export const NavigationBanner = ({
   };
 
   return (
-    <Link to={href} className="group block">
+    <Link to={href} className="group block touch-optimized">
       <div className={`
-        relative overflow-hidden rounded-2xl p-8 transition-all duration-300 
+        relative overflow-hidden rounded-2xl p-6 md:p-8 transition-all duration-300 
         hover:shadow-2xl hover:scale-105 transform ${getVariantStyles()}
+        min-h-[120px] sm:min-h-[140px] no-horizontal-scroll
       `}>
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
@@ -46,19 +47,19 @@ export const NavigationBanner = ({
         </div>
         
         {/* Content */}
-        <div className="relative z-10 flex items-center space-x-4">
-          <div className="bg-white/20 rounded-full p-4 group-hover:bg-white/30 transition-colors">
-            <Icon className="h-8 w-8" />
+        <div className="relative z-10 flex items-center space-x-3 md:space-x-4 h-full">
+          <div className="bg-white/20 rounded-full p-3 md:p-4 group-hover:bg-white/30 transition-colors flex-shrink-0">
+            <Icon className="h-6 w-6 md:h-8 md:w-8" />
           </div>
           
-          <div className="flex-1">
-            <h3 className="text-2xl font-bold mb-2">{title}</h3>
-            <p className="text-white/90 text-lg leading-relaxed">{description}</p>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 leading-tight">{title}</h3>
+            <p className="text-white/90 text-sm md:text-lg leading-relaxed line-clamp-2">{description}</p>
           </div>
           
-          <div className="opacity-50 group-hover:opacity-100 transition-opacity">
+          <div className="opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0">
             <svg 
-              className="w-6 h-6" 
+              className="w-5 h-5 md:w-6 md:h-6" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
