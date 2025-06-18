@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -123,6 +122,32 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
     }
   };
 
+  const sendNotificationEmail = async (data: FormData) => {
+    try {
+      console.log("Sending notification email for child registration");
+      
+      const { error } = await supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'child_registration',
+          data: data,
+          recipientEmail: 'admin@candycanekindness.org', // Replace with actual admin email
+          parentName: data.parentName,
+          childName: data.childName,
+        }
+      });
+
+      if (error) {
+        console.error("Error sending notification email:", error);
+        // Don't throw error here - we don't want to block the registration if email fails
+      } else {
+        console.log("Notification email sent successfully");
+      }
+    } catch (error) {
+      console.error("Error in sendNotificationEmail:", error);
+      // Don't throw error here - we don't want to block the registration if email fails
+    }
+  };
+
   const onSubmit = async (data: FormData, saveAsDraft = false) => {
     if (!user) {
       onAuthRequired();
@@ -160,11 +185,16 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
 
       if (error) throw error;
 
+      // Send notification email for submitted registrations (not drafts)
+      if (!saveAsDraft) {
+        await sendNotificationEmail(data);
+      }
+
       toast({
         title: saveAsDraft ? "Draft saved!" : "Registration submitted!",
         description: saveAsDraft 
           ? "You can continue editing later."
-          : "Your child's profile has been submitted for review.",
+          : "Your child's profile has been submitted for review and our team has been notified.",
       });
 
       if (!saveAsDraft) {
