@@ -1,12 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import { Star, Gift, Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
-  const navigate = useNavigate();
-
-  const scrollToWishlists = () => {
-    navigate('/wishlists');
+  const scrollToChildren = () => {
+    const element = document.querySelector('[data-section="children"]');
+    element?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -47,11 +46,11 @@ export const Hero = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button
             size="lg"
-            onClick={scrollToWishlists}
+            onClick={scrollToChildren}
             className="bg-white/90 text-red-600 hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             <Gift className="h-5 w-5 mr-2" />
-            Browse Wishlists
+            Browse Children
           </Button>
           <div className="text-center">
             <p className="text-sm opacity-75">No registration required to browse</p>
