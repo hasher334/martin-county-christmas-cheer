@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { InteractiveChristmasTree } from "@/components/InteractiveChristmasTree";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { Charity } from "@/components/Charity";
 import { Stats } from "@/components/Stats";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
@@ -78,6 +79,9 @@ const Index = () => {
       
       {/* Hero Section */}
       <Hero />
+
+      {/* Charity Section */}
+      <Charity />
 
       {/* Main Interactive Christmas Tree Section */}
       <section className="py-20 bg-gradient-to-b from-christmas-cream via-background to-christmas-green-50 min-h-screen" data-section="wishlists">

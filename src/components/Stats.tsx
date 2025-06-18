@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Gift, Star, Users } from "lucide-react";
+import { StatsModal } from "@/components/StatsModal";
 
 export const Stats = () => {
   const [stats, setStats] = useState({
@@ -11,6 +11,8 @@ export const Stats = () => {
     totalDonors: 0,
     deliveredGifts: 0,
   });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedStat, setSelectedStat] = useState<"children" | "adopted" | "donors" | "gifts" | null>(null);
 
   useEffect(() => {
     fetchStats();
@@ -51,6 +53,11 @@ export const Stats = () => {
     }
   };
 
+  const handleStatClick = (statType: "children" | "adopted" | "donors" | "gifts") => {
+    setSelectedStat(statType);
+    setModalOpen(true);
+  };
+
   const statItems = [
     {
       icon: Users,
@@ -58,6 +65,7 @@ export const Stats = () => {
       value: stats.totalChildren,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
+      type: "children" as const,
     },
     {
       icon: Heart,
@@ -65,6 +73,7 @@ export const Stats = () => {
       value: stats.adoptedChildren,
       color: "text-red-600",
       bgColor: "bg-red-50",
+      type: "adopted" as const,
     },
     {
       icon: Star,
@@ -72,6 +81,7 @@ export const Stats = () => {
       value: stats.totalDonors,
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
+      type: "donors" as const,
     },
     {
       icon: Gift,
@@ -79,33 +89,49 @@ export const Stats = () => {
       value: stats.deliveredGifts,
       color: "text-green-600",
       bgColor: "bg-green-50",
+      type: "gifts" as const,
     },
   ];
 
   return (
-    <section className="py-12 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-green-800 mb-8">
-          Our Christmas Impact
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {statItems.map((item, index) => (
-            <Card key={index} className={`${item.bgColor} border-none shadow-lg hover:shadow-xl transition-shadow duration-300`}>
-              <CardContent className="p-6 text-center">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${item.color} bg-white mb-4`}>
-                  <item.icon className="h-6 w-6" />
-                </div>
-                <div className={`text-3xl font-bold ${item.color} mb-2`}>
-                  {item.value}
-                </div>
-                <div className="text-gray-700 font-medium">
-                  {item.label}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <>
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-green-800 mb-8">
+            Our Christmas Impact
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {statItems.map((item, index) => (
+              <Card 
+                key={index} 
+                className={`${item.bgColor} border-none shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105`}
+                onClick={() => handleStatClick(item.type)}
+              >
+                <CardContent className="p-6 text-center">
+                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${item.color} bg-white mb-4`}>
+                    <item.icon className="h-6 w-6" />
+                  </div>
+                  <div className={`text-3xl font-bold ${item.color} mb-2`}>
+                    {item.value}
+                  </div>
+                  <div className="text-gray-700 font-medium">
+                    {item.label}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-2">
+                    Click to learn more
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <StatsModal 
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        statType={selectedStat}
+      />
+    </>
   );
 };
