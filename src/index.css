@@ -86,27 +86,28 @@
   }
 }
 
-/* CRITICAL: Mobile-First Scroll Architecture */
+/* CRITICAL: Mobile-First Scroll Architecture - FIXED */
 @layer base {
   * {
     @apply border-border;
     box-sizing: border-box;
   }
 
-  /* Root-level scroll fixes */
+  /* Root-level scroll fixes - SIMPLIFIED */
   html {
     height: 100%;
+    overflow-y: scroll;
     overflow-x: hidden;
-    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground;
-    height: 100%;
+    height: auto;
+    min-height: 100%;
+    overflow-y: visible;
     overflow-x: hidden;
-    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     position: relative;
     margin: 0;
@@ -122,20 +123,14 @@
 
   /* Mobile-specific scroll fixes */
   @media (max-width: 767px) {
-    html, body {
-      touch-action: pan-y pinch-zoom;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
+    html {
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
     }
     
-    /* Ensure no element blocks scrolling on mobile */
-    * {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+    body {
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
     }
   }
 
@@ -180,9 +175,7 @@
   /* Mobile touch and scroll optimizations */
   .mobile-optimized {
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y pinch-zoom;
-    overflow-x: hidden;
-    overflow-y: auto;
+    touch-action: pan-y;
   }
 
   /* Prevent horizontal scrolling */
@@ -206,15 +199,6 @@
     touch-action: none !important;
     position: absolute;
     z-index: 0;
-  }
-
-  /* Disable animations on mobile for performance */
-  @media (max-width: 767px) {
-    .mobile-no-animation * {
-      animation-duration: 0s !important;
-      animation-delay: 0s !important;
-      transition-duration: 0s !important;
-    }
   }
 }
 
