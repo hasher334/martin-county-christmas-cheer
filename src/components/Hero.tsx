@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Snowflake, Gift, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
 
 export const Hero = () => {
   const scrollToWishlists = () => {
@@ -8,19 +9,66 @@ export const Hero = () => {
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Generate non-overlapping snowflake positions
+  const snowflakePositions = useMemo(() => {
+    const positions = [];
+    const snowflakeSize = 16; // 4 * 4 (h-4 w-4 in pixels)
+    const minDistance = snowflakeSize * 2; // Minimum distance between snowflakes
+    const maxAttempts = 1000; // Prevent infinite loops
+    const targetCount = 60;
+
+    // Helper function to check if a position overlaps with existing positions
+    const isValidPosition = (x: number, y: number) => {
+      return positions.every(pos => {
+        const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+        return distance >= minDistance;
+      });
+    };
+
+    // Generate positions
+    for (let i = 0; i < targetCount; i++) {
+      let attempts = 0;
+      let validPosition = false;
+      let x, y;
+
+      while (!validPosition && attempts < maxAttempts) {
+        x = Math.random() * 100;
+        y = Math.random() * 100;
+        
+        if (isValidPosition(x, y)) {
+          validPosition = true;
+          positions.push({
+            x,
+            y,
+            animationDelay: Math.random() * 2,
+            animationDuration: 2 + Math.random() * 2,
+          });
+        }
+        attempts++;
+      }
+
+      // If we can't find a valid position after max attempts, stop adding more
+      if (!validPosition) {
+        break;
+      }
+    }
+
+    return positions;
+  }, []);
+
   return (
     <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
       {/* Floating Christmas Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(40)].map((_, i) => (
+        {snowflakePositions.map((position, i) => (
           <div
             key={i}
             className="absolute animate-pulse"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
+              left: `${position.x}%`,
+              top: `${position.y}%`,
+              animationDelay: `${position.animationDelay}s`,
+              animationDuration: `${position.animationDuration}s`,
             }}
           >
             <Snowflake className="h-4 w-4 text-white/30" />
