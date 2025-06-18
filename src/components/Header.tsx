@@ -4,6 +4,7 @@ import { User, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
+import { MobileMenu } from "./MobileMenu";
 
 interface HeaderProps {
   user: any;
@@ -44,7 +45,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
           </Link>
           
           <div className="flex items-center space-x-8">
-            {/* Navigation Links */}
+            {/* Desktop Navigation Links */}
             <nav className="hidden md:flex items-center">
               <div className="flex items-center space-x-1 bg-white/50 rounded-full px-2 py-1 backdrop-blur-sm">
                 <Link 
@@ -68,33 +69,39 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
               </div>
             </nav>
 
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-full px-4 py-2">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm font-medium">
-                    Welcome, {user.email?.split('@')[0]}!
-                  </span>
+            {/* Desktop Auth Section */}
+            <div className="hidden md:flex items-center space-x-4">
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-full px-4 py-2">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm font-medium">
+                      Welcome, {user.email?.split('@')[0]}!
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSignOut}
+                    className="text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400 transition-all duration-200"
+                  >
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Sign Out
+                  </Button>
                 </div>
+              ) : (
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400 transition-all duration-200"
+                  onClick={onAuthClick}
+                  className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                 >
-                  <LogOut className="h-4 w-4 mr-1" />
-                  Sign Out
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In to Adopt
                 </Button>
-              </div>
-            ) : (
-              <Button
-                onClick={onAuthClick}
-                className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-              >
-                <User className="h-4 w-4 mr-2" />
-                Sign In to Adopt
-              </Button>
-            )}
+              )}
+            </div>
+
+            {/* Mobile Menu */}
+            <MobileMenu user={user} onAuthClick={onAuthClick} />
           </div>
         </div>
       </div>
