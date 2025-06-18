@@ -32,7 +32,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
             <img 
-              src="/lovable-uploads/5a57abc7-69b1-48e1-86bc-34547e214e3f.png" 
+              src="/lovable-uploads/c7f04c93-4d0b-4c6b-8363-f9c2f59a1093.png" 
               alt="Candy Cane Kindness Logo" 
               className="h-12 w-12"
             />
