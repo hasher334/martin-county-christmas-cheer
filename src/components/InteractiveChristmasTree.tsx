@@ -114,7 +114,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                     "absolute rounded-full shadow-xl transition-all duration-300 z-30 cursor-pointer",
                     "hover:scale-150 hover:shadow-2xl transform-gpu hover:z-40",
                     (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
-                    "hover:animate-bounce border-2 border-white/80",
+                    "border-2 border-white/80",
                     // Responsive sizing
                     "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10"
                   )}
