@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Heart, User, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
@@ -29,42 +29,48 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
     <header className="bg-christmas-cream shadow-lg border-b-4 border-christmas-red-600">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <Heart className="h-8 w-8 text-christmas-red-600" />
+          <Link to="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
+            <img 
+              src="/lovable-uploads/5a57abc7-69b1-48e1-86bc-34547e214e3f.png" 
+              alt="Community Elf Logo" 
+              className="h-12 w-12"
+            />
             <div>
               <h1 className="text-2xl font-bold text-christmas-green-800">
-                Martin County Christmas Cheer
+                Community Elf
               </h1>
               <p className="text-sm text-christmas-brown-600">Spreading joy, one child at a time</p>
             </div>
           </Link>
           
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-8">
             {/* Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link 
-                to="/wishlists" 
-                className="text-christmas-green-700 hover:text-christmas-green-800 font-medium transition-colors"
-              >
-                Browse Wishlists
-              </Link>
-              <Link 
-                to="/register" 
-                className="text-christmas-green-700 hover:text-christmas-green-800 font-medium transition-colors"
-              >
-                Register Child
-              </Link>
-              <Link 
-                to="/about" 
-                className="text-christmas-green-700 hover:text-christmas-green-800 font-medium transition-colors"
-              >
-                About Our Mission
-              </Link>
+            <nav className="hidden md:flex items-center">
+              <div className="flex items-center space-x-1 bg-white/50 rounded-full px-2 py-1 backdrop-blur-sm">
+                <Link 
+                  to="/wishlists" 
+                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out"
+                >
+                  Browse Wishlists
+                </Link>
+                <Link 
+                  to="/register" 
+                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out"
+                >
+                  Register Child
+                </Link>
+                <Link 
+                  to="/about" 
+                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out"
+                >
+                  About Our Mission
+                </Link>
+              </div>
             </nav>
 
             {user ? (
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 text-christmas-green-700">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-full px-4 py-2">
                   <User className="h-4 w-4" />
                   <span className="text-sm font-medium">
                     Welcome, {user.email?.split('@')[0]}!
@@ -74,7 +80,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                   variant="outline"
                   size="sm"
                   onClick={handleSignOut}
-                  className="text-christmas-red-600 border-christmas-red-200 hover:bg-christmas-red-50"
+                  className="text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400 transition-all duration-200"
                 >
                   <LogOut className="h-4 w-4 mr-1" />
                   Sign Out
@@ -83,7 +89,7 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
             ) : (
               <Button
                 onClick={onAuthClick}
-                className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white"
+                className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               >
                 <User className="h-4 w-4 mr-2" />
                 Sign In to Adopt
