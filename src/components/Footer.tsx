@@ -9,7 +9,7 @@ export const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Heart className="h-6 w-6 text-christmas-red-400" />
-              <h3 className="text-xl font-bold">Martin County Christmas Cheer</h3>
+              <h3 className="text-xl font-bold">Community Elf</h3>
             </div>
             <p className="text-christmas-green-100 mb-4">
               Bringing Christmas joy to children in need throughout Martin County, Florida. 
@@ -48,7 +48,7 @@ export const Footer = () => {
 
         <div className="border-t border-christmas-green-700 mt-8 pt-8 text-center">
           <p className="text-christmas-green-200">
-            © 2024 Martin County Christmas Cheer. Made with ❤️ for the children of Martin County.
+            © 2025 Community Elf. Made with ❤️ for the children of Martin County.
           </p>
         </div>
       </div>
