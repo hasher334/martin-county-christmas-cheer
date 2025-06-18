@@ -115,6 +115,21 @@
     min-height: 100dvh; /* Use dynamic viewport height instead of vh */
     font-family: "Sweet Home", cursive;
   }
+
+  /* Apply Sweet Home font to all elements by default */
+  * {
+    font-family: "Sweet Home", cursive;
+  }
+
+  /* Specific overrides for buttons, inputs, and other elements */
+  button, input, textarea, select, label, p, span, div, h1, h2, h3, h4, h5, h6 {
+    font-family: "Sweet Home", cursive;
+  }
+
+  /* Only the logo should use Chopin Script - this will be applied via the font-chopin class */
+  .font-chopin {
+    font-family: "Chopin Script", cursive !important;
+  }
 }
 
 /* Force Tailwind to generate Christmas color classes */
