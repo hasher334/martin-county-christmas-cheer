@@ -36,34 +36,17 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     "#3b82f6", "#d97706", "#8b5cf6", "#e11d48"
   ];
 
-  // Evenly distributed ornament positions - no clumping, equal spacing
+  // Responsive ornament positions using percentages relative to the tree image
   const ornamentPositions = [
-    // Row 1 - Top (1 ornament)
-    { x: 50, y: 18 },
-    
-    // Row 2 - Upper tier (2 ornaments, evenly spaced)
-    { x: 45, y: 23 }, { x: 55, y: 23 },
-    
-    // Row 3 - Upper-middle tier (3 ornaments, evenly spaced)
-    { x: 41, y: 28 }, { x: 50, y: 28 }, { x: 59, y: 28 },
-    
-    // Row 4 - Middle-upper tier (4 ornaments, evenly spaced)
-    { x: 37, y: 33 }, { x: 46, y: 33 }, { x: 54, y: 33 }, { x: 63, y: 33 },
-    
-    // Row 5 - Middle tier (5 ornaments, evenly spaced)
-    { x: 34, y: 38 }, { x: 42, y: 38 }, { x: 50, y: 38 }, { x: 58, y: 38 }, { x: 66, y: 38 },
-    
-    // Row 6 - Middle-lower tier (6 ornaments, evenly spaced)
-    { x: 31, y: 43 }, { x: 39, y: 43 }, { x: 47, y: 43 }, { x: 53, y: 43 }, { x: 61, y: 43 }, { x: 69, y: 43 },
-    
-    // Row 7 - Lower tier (7 ornaments, evenly spaced)
-    { x: 28, y: 48 }, { x: 35, y: 48 }, { x: 42, y: 48 }, { x: 50, y: 48 }, { x: 58, y: 48 }, { x: 65, y: 48 }, { x: 72, y: 48 },
-    
-    // Row 8 - Bottom tier (8 ornaments, evenly spaced)
-    { x: 25, y: 53 }, { x: 32, y: 53 }, { x: 39, y: 53 }, { x: 46, y: 53 }, { x: 54, y: 53 }, { x: 61, y: 53 }, { x: 68, y: 53 }, { x: 75, y: 53 },
-    
-    // Additional positions for more children (9 ornaments, evenly spaced)
-    { x: 23, y: 58 }, { x: 29, y: 58 }, { x: 36, y: 58 }, { x: 43, y: 58 }, { x: 50, y: 58 }, { x: 57, y: 58 }, { x: 64, y: 58 }, { x: 71, y: 58 }, { x: 77, y: 58 }
+    // Top section
+    { x: 50, y: 19 }, { x: 56, y: 23 }, { x: 44, y: 23 },
+    // Upper middle section
+    { x: 40, y: 28 }, { x: 60, y: 28 }, { x: 50, y: 32 },
+    { x: 37, y: 36 }, { x: 63, y: 36 },
+    // Lower middle section
+    { x: 35, y: 43 }, { x: 65, y: 43 }, { x: 45, y: 47 }, { x: 55, y: 47 },
+    // Bottom section
+    { x: 32, y: 54 }, { x: 68, y: 54 }, { x: 42, y: 58 }, { x: 58, y: 58 }
   ];
 
   return (
@@ -119,10 +102,9 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               className="w-full h-auto max-w-[800px] mx-auto drop-shadow-2xl"
             />
 
-            {/* Interactive Ornaments with perfect equal spacing */}
-            {children.map((child, index) => {
-              // Use modulo to cycle through positions if we have more children than positions
-              const position = ornamentPositions[index % ornamentPositions.length];
+            {/* Interactive Ornaments with responsive positioning */}
+            {children.slice(0, 16).map((child, index) => {
+              const position = ornamentPositions[index] || ornamentPositions[0];
               
               return (
                 <button
