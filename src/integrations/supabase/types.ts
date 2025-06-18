@@ -59,6 +59,7 @@ export type Database = {
           id: string
           location: string | null
           name: string
+          parent_info: Json | null
           photo_url: string | null
           status: Database["public"]["Enums"]["adoption_status"] | null
           story: string | null
@@ -72,6 +73,7 @@ export type Database = {
           id?: string
           location?: string | null
           name: string
+          parent_info?: Json | null
           photo_url?: string | null
           status?: Database["public"]["Enums"]["adoption_status"] | null
           story?: string | null
@@ -85,6 +87,7 @@ export type Database = {
           id?: string
           location?: string | null
           name?: string
+          parent_info?: Json | null
           photo_url?: string | null
           status?: Database["public"]["Enums"]["adoption_status"] | null
           story?: string | null
@@ -131,7 +134,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      adoption_status: "available" | "adopted" | "fulfilled"
+      adoption_status:
+        | "available"
+        | "adopted"
+        | "fulfilled"
+        | "draft"
+        | "pending_review"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -247,7 +255,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      adoption_status: ["available", "adopted", "fulfilled"],
+      adoption_status: [
+        "available",
+        "adopted",
+        "fulfilled",
+        "draft",
+        "pending_review",
+      ],
     },
   },
 } as const

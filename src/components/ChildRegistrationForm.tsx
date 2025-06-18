@@ -13,6 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, X, Upload, Save, Send } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
+
+type AdoptionStatus = Database["public"]["Enums"]["adoption_status"];
 
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
@@ -138,8 +141,7 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
         story: data.story,
         wishes: data.wishes,
         photo_url: data.photoUrl,
-        status: saveAsDraft ? 'draft' : 'pending_review',
-        // Store parent info in a JSON field for now
+        status: (saveAsDraft ? 'draft' : 'pending_review') as AdoptionStatus,
         parent_info: {
           name: data.parentName,
           email: data.parentEmail,
