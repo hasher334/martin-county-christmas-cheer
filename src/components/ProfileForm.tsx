@@ -1,249 +1,190 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
-const profileSchema = z.object({
-  user_id: z.string().uuid("Please enter a valid user ID"),
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.string().email("Please enter a valid email"),
-  bio: z.string().optional(),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-});
-
-interface ProfileFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+export interface Profile {
+  id?: string;
+  user_id: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  bio?: string;
 }
 
-export const ProfileForm = ({ open, onOpenChange, onSuccess }: ProfileFormProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+interface ProfileFormProps {
+  profile?: Profile;
+  onSave: (profile: Profile) => void;
+  onCancel: () => void;
+}
+
+export const ProfileForm = ({ profile, onSave, onCancel }: ProfileFormProps) => {
+  const [formData, setFormData] = useState<Profile>({
+    user_id: profile?.user_id || '',
+    first_name: profile?.first_name || '',
+    last_name: profile?.last_name || '',
+    email: profile?.email || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+    bio: profile?.bio || '',
+  });
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof profileSchema>>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      user_id: "",
-      first_name: "",
-      last_name: "",
-      email: "",
-      bio: "",
-      phone: "",
-      address: "",
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const onSubmit = async (values: z.infer<typeof profileSchema>) => {
-    setIsSubmitting(true);
-    
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .insert([values]);
+      // Ensure user_id is provided
+      if (!formData.user_id) {
+        throw new Error("User ID is required");
+      }
 
-      if (error) throw error;
+      const profileData = {
+        user_id: formData.user_id,
+        first_name: formData.first_name || null,
+        last_name: formData.last_name || null,
+        email: formData.email || null,
+        phone: formData.phone || null,
+        address: formData.address || null,
+        bio: formData.bio || null,
+      };
+
+      if (profile?.id) {
+        // Update existing profile
+        const { error } = await supabase
+          .from("profiles")
+          .update(profileData)
+          .eq("id", profile.id);
+
+        if (error) throw error;
+      } else {
+        // Create new profile
+        const { error } = await supabase
+          .from("profiles")
+          .insert([profileData]);
+
+        if (error) throw error;
+      }
 
       toast({
         title: "Success",
-        description: "Profile created successfully",
+        description: profile?.id ? "Profile updated successfully" : "Profile created successfully",
       });
 
-      form.reset();
-      onSuccess();
+      onSave(formData);
     } catch (error) {
-      console.error("Error creating profile:", error);
+      console.error("Profile save error:", error);
       toast({
         title: "Error",
-        description: "Failed to create profile",
+        description: "Failed to save profile",
         variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
+  const handleChange = (field: keyof Profile, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-christmas-green-800">Create New Profile</DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="user_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-christmas-green-700">User ID</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter user UUID from auth.users table"
-                      {...field}
-                      className="border-christmas-green-300 focus:border-christmas-green-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="first_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-christmas-green-700">First Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="First name"
-                        {...field}
-                        className="border-christmas-green-300 focus:border-christmas-green-500"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="last_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-christmas-green-700">Last Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Last name"
-                        {...field}
-                        className="border-christmas-green-300 focus:border-christmas-green-500"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>{profile?.id ? 'Edit Profile' : 'Create Profile'}</CardTitle>
+        <CardDescription>
+          {profile?.id ? 'Update the user profile information' : 'Create a new user profile'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first_name">First Name</Label>
+              <Input
+                id="first_name"
+                value={formData.first_name || ''}
+                onChange={(e) => handleChange('first_name', e.target.value)}
+                placeholder="Enter first name"
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-christmas-green-700">Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="email@example.com"
-                      {...field}
-                      className="border-christmas-green-300 focus:border-christmas-green-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-christmas-green-700">Phone (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Phone number"
-                      {...field}
-                      className="border-christmas-green-300 focus:border-christmas-green-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-christmas-green-700">Address (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Full address"
-                      {...field}
-                      className="border-christmas-green-300 focus:border-christmas-green-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="bio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-christmas-green-700">Bio (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Brief bio or description"
-                      {...field}
-                      className="border-christmas-green-300 focus:border-christmas-green-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="border-christmas-green-300 text-christmas-green-700"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-christmas-green-600 hover:bg-christmas-green-700 text-white"
-              >
-                {isSubmitting ? "Creating..." : "Create Profile"}
-              </Button>
+            
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Last Name</Label>
+              <Input
+                id="last_name"
+                value={formData.last_name || ''}
+                onChange={(e) => handleChange('last_name', e.target.value)}
+                placeholder="Enter last name"
+              />
             </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email || ''}
+              onChange={(e) => handleChange('email', e.target.value)}
+              placeholder="Enter email address"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              value={formData.phone || ''}
+              onChange={(e) => handleChange('phone', e.target.value)}
+              placeholder="Enter phone number"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Address</Label>
+            <Textarea
+              id="address"
+              value={formData.address || ''}
+              onChange={(e) => handleChange('address', e.target.value)}
+              placeholder="Enter address"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bio">Bio</Label>
+            <Textarea
+              id="bio"
+              value={formData.bio || ''}
+              onChange={(e) => handleChange('bio', e.target.value)}
+              placeholder="Enter bio"
+              rows={4}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Saving...' : (profile?.id ? 'Update Profile' : 'Create Profile')}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };

@@ -1,85 +1,63 @@
 
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Shield, UserX } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 
-const roleSchema = z.object({
-  user_id: z.string().uuid("Please enter a valid user ID"),
-  role: z.enum(["admin", "user"], {
-    required_error: "Please select a role",
-  }),
-});
-
-interface RoleManagementProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+interface UserRole {
+  id: string;
+  user_id: string;
+  role: 'admin' | 'user';
 }
 
-export const RoleManagement = ({ open, onOpenChange, onSuccess }: RoleManagementProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userRoles, setUserRoles] = useState([]);
-  const [loading, setLoading] = useState(false);
+interface UserWithRoles {
+  id: string;
+  email: string;
+  roles: UserRole[];
+}
+
+export const RoleManagement = () => {
+  const [users, setUsers] = useState<UserWithRoles[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'user'>('user');
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof roleSchema>>({
-    resolver: zodResolver(roleSchema),
-    defaultValues: {
-      user_id: "",
-      role: "user",
-    },
-  });
-
   useEffect(() => {
-    if (open) {
-      fetchUserRoles();
-    }
-  }, [open]);
+    fetchUsersWithRoles();
+  }, []);
 
-  const fetchUserRoles = async () => {
-    setLoading(true);
+  const fetchUsersWithRoles = async () => {
     try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("*")
-        .order("created_at", { ascending: false });
+      // First get all users from auth.users (this requires admin privileges)
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) throw authError;
 
-      if (error) throw error;
-      setUserRoles(data || []);
+      // Then get all user roles
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+
+      if (rolesError) throw rolesError;
+
+      // Combine the data
+      const usersWithRoles = authUsers.users.map(user => ({
+        id: user.id,
+        email: user.email || 'No email',
+        roles: roles?.filter(role => role.user_id === user.id) || []
+      }));
+
+      setUsers(usersWithRoles);
     } catch (error) {
-      console.error("Error fetching user roles:", error);
+      console.error('Error fetching users:', error);
       toast({
         title: "Error",
-        description: "Failed to load user roles",
+        description: "Failed to fetch users and roles",
         variant: "destructive",
       });
     } finally {
@@ -87,42 +65,55 @@ export const RoleManagement = ({ open, onOpenChange, onSuccess }: RoleManagement
     }
   };
 
-  const onSubmit = async (values: z.infer<typeof roleSchema>) => {
-    setIsSubmitting(true);
-    
+  const addRole = async () => {
+    if (!selectedUserId || !selectedRole) {
+      toast({
+        title: "Error",
+        description: "Please select both a user and a role",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      const roleData = {
+        user_id: selectedUserId,
+        role: selectedRole
+      };
+
       const { error } = await supabase
-        .from("user_roles")
-        .insert([values]);
+        .from('user_roles')
+        .insert([roleData]);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Role assigned successfully",
+        description: "Role added successfully",
       });
 
-      form.reset();
-      fetchUserRoles();
-      onSuccess();
+      // Reset selections
+      setSelectedUserId('');
+      setSelectedRole('user');
+      
+      // Refresh data
+      fetchUsersWithRoles();
     } catch (error) {
-      console.error("Error assigning role:", error);
+      console.error('Error adding role:', error);
       toast({
         title: "Error",
-        description: "Failed to assign role. User may already have this role.",
+        description: "Failed to add role",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-  const handleRemoveRole = async (roleId: string) => {
+  const removeRole = async (roleId: string) => {
     try {
       const { error } = await supabase
-        .from("user_roles")
+        .from('user_roles')
         .delete()
-        .eq("id", roleId);
+        .eq('id', roleId);
 
       if (error) throw error;
 
@@ -131,10 +122,10 @@ export const RoleManagement = ({ open, onOpenChange, onSuccess }: RoleManagement
         description: "Role removed successfully",
       });
 
-      fetchUserRoles();
-      onSuccess();
+      // Refresh data
+      fetchUsersWithRoles();
     } catch (error) {
-      console.error("Error removing role:", error);
+      console.error('Error removing role:', error);
       toast({
         title: "Error",
         description: "Failed to remove role",
@@ -143,138 +134,106 @@ export const RoleManagement = ({ open, onOpenChange, onSuccess }: RoleManagement
     }
   };
 
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-christmas-green-800">Role Management</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-christmas-green-700 flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Assign New Role
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="user_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-christmas-green-700">User ID</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter user UUID from auth.users table"
-                            {...field}
-                            className="border-christmas-green-300 focus:border-christmas-green-500"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-christmas-green-700">Role</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="border-christmas-green-300 focus:border-christmas-green-500">
-                              <SelectValue placeholder="Select a role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="user">User</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-christmas-green-600 hover:bg-christmas-green-700 text-white"
-                  >
-                    {isSubmitting ? "Assigning..." : "Assign Role"}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-christmas-green-700">Current Role Assignments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex justify-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-christmas-green-600"></div>
-                </div>
-              ) : userRoles.length === 0 ? (
-                <div className="text-center py-8">
-                  <Shield className="h-12 w-12 text-christmas-green-400 mx-auto mb-4" />
-                  <p className="text-christmas-brown-600">No role assignments found</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {userRoles.map((userRole) => (
-                    <div
-                      key={userRole.id}
-                      className="flex items-center justify-between p-3 border border-christmas-green-200 rounded-lg bg-white/50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="font-medium text-christmas-green-800">
-                            User ID: {userRole.user_id}
-                          </p>
-                          <Badge
-                            variant={userRole.role === 'admin' ? 'destructive' : 'secondary'}
-                            className="mt-1"
-                          >
-                            {userRole.role}
-                          </Badge>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => handleRemoveRole(userRole.id)}
-                        variant="outline"
-                        size="sm"
-                        className="border-christmas-red-300 text-christmas-red-600 hover:bg-christmas-red-50"
-                      >
-                        <UserX className="h-4 w-4 mr-1" />
-                        Remove
-                      </Button>
-                    </div>
+    <div className="space-y-6">
+      {/* Add Role Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Add User Role</CardTitle>
+          <CardDescription>
+            Assign roles to users in the system
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Select User</label>
+              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a user" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.email}
+                    </SelectItem>
                   ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="border-christmas-green-300 text-christmas-green-700"
-            >
-              Close
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Select Role</label>
+              <Select value={selectedRole} onValueChange={(value: 'admin' | 'user') => setSelectedRole(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button onClick={addRole} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Add Role
             </Button>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </CardContent>
+      </Card>
+
+      {/* Users and Roles List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>User Roles</CardTitle>
+          <CardDescription>
+            Manage existing user roles
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {users.map((user) => (
+              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <p className="font-medium">{user.email}</p>
+                  <div className="flex gap-2 mt-2">
+                    {user.roles.length > 0 ? (
+                      user.roles.map((role) => (
+                        <div key={role.id} className="flex items-center gap-2">
+                          <Badge variant={role.role === 'admin' ? 'default' : 'secondary'}>
+                            {role.role}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeRole(role.id)}
+                            className="text-red-600 hover:text-red-700 p-1"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <Badge variant="outline">No roles assigned</Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

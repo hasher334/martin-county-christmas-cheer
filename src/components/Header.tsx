@@ -1,11 +1,10 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Shield } from "lucide-react";
+import { Menu, User, UserPlus, LogOut, Settings } from "lucide-react";
+import { MobileMenu } from "./MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Link } from "react-router-dom";
-import { MobileMenu } from "./MobileMenu";
-import { useState, useEffect } from "react";
 
 interface HeaderProps {
   user: any;
@@ -13,132 +12,144 @@ interface HeaderProps {
 }
 
 export const Header = ({ user, onAuthClick }: HeaderProps) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (user) {
-        try {
-          const { data: adminCheck } = await supabase
-            .rpc('is_admin', { user_id: user.id });
-          setIsAdmin(adminCheck || false);
-        } catch (error) {
-          console.error("Error checking admin status:", error);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
-    };
-
-    checkAdminStatus();
-  }, [user]);
-
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      setIsAdmin(false);
       toast({
-        title: "Signed out successfully",
-        description: "Thank you for spreading Christmas cheer!",
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
       });
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
+  const handleAdminAccess = () => {
+    window.location.href = '/admin';
+  };
+
   return (
-    <header className="bg-christmas-cream shadow-lg border-b-4 border-christmas-red-600">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
-            <img 
-              src="/lovable-uploads/c7f04c93-4d0b-4c6b-8363-f9c2f59a1093.png" 
-              alt="Candy Cane Kindness Logo" 
-              className="h-12 w-12"
-            />
-            <div>
-              <h1 className="text-2xl font-bold text-christmas-green-800 font-dancing">
-                Candy Cane Kindness
-              </h1>
-              <p className="text-sm text-christmas-brown-600 font-nunito">Spreading joy, one child at a time</p>
+    <>
+      <header className="bg-white shadow-lg border-b-4 border-christmas-red-500 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="text-2xl">🎄</div>
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold text-christmas-green-800 font-christmas">
+                  Candy Cane Kindness
+                </h1>
+                <p className="text-sm text-christmas-brown-600 font-nunito hidden md:block">
+                  Spreading Christmas joy throughout our community
+                </p>
+              </div>
             </div>
-          </Link>
-          
-          <div className="flex items-center space-x-8">
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center">
-              <div className="flex items-center space-x-1 bg-white/50 rounded-full px-2 py-1 backdrop-blur-sm">
-                <Link 
-                  to="/wishlists" 
-                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"
-                >
-                  Browse Wishlists
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"
-                >
-                  Register Child
-                </Link>
-                <Link 
-                  to="/about" 
-                  className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"
-                >
-                  About Our Mission
-                </Link>
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    className="px-4 py-2 rounded-full text-christmas-red-700 hover:text-christmas-red-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito flex items-center gap-1"
-                  >
-                    <Shield className="h-4 w-4" />
-                    Admin
-                  </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <a 
+                href="/" 
+                className="text-christmas-green-700 hover:text-christmas-red-600 font-medium transition-colors font-nunito"
+              >
+                Home
+              </a>
+              <a 
+                href="/wishlists" 
+                className="text-christmas-green-700 hover:text-christmas-red-600 font-medium transition-colors font-nunito"
+              >
+                Wishlists
+              </a>
+              <a 
+                href="/register" 
+                className="text-christmas-green-700 hover:text-christmas-red-600 font-medium transition-colors font-nunito"
+              >
+                Register Child
+              </a>
+              <a 
+                href="/about" 
+                className="text-christmas-green-700 hover:text-christmas-red-600 font-medium transition-colors font-nunito"
+              >
+                About
+              </a>
+              
+              {/* Auth Buttons */}
+              <div className="flex items-center space-x-3">
+                {user ? (
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      onClick={handleAdminAccess}
+                      variant="outline"
+                      size="sm"
+                      className="border-christmas-green-600 text-christmas-green-700 hover:bg-christmas-green-50"
+                    >
+                      <Settings className="h-4 w-4 mr-1" />
+                      Admin
+                    </Button>
+                    <Button
+                      onClick={handleLogout}
+                      variant="outline" 
+                      size="sm"
+                      className="border-christmas-red-600 text-christmas-red-700 hover:bg-christmas-red-50"
+                    >
+                      <LogOut className="h-4 w-4 mr-1" />
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      onClick={onAuthClick}
+                      variant="outline"
+                      size="sm"
+                      className="border-christmas-green-600 text-christmas-green-700 hover:bg-christmas-green-50"
+                    >
+                      <User className="h-4 w-4 mr-1" />
+                      Login
+                    </Button>
+                    <Button
+                      onClick={onAuthClick}
+                      size="sm"
+                      className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white"
+                    >
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      Sign Up
+                    </Button>
+                  </div>
                 )}
               </div>
             </nav>
 
-            {/* Desktop Auth Section */}
-            <div className="hidden md:flex items-center space-x-4">
-              {user ? (
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-full px-4 py-2">
-                    <User className="h-4 w-4" />
-                    <span className="text-sm font-medium font-nunito">
-                      Welcome, {user.email?.split('@')[0]}!
-                    </span>
-                    {isAdmin && (
-                      <Shield className="h-4 w-4 text-christmas-red-600" title="Admin User" />
-                    )}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSignOut}
-                    className="text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400 transition-all duration-200 font-nunito"
-                  >
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  onClick={onAuthClick}
-                  className="bg-christmas-red-600 hover:bg-christmas-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 font-nunito"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In to Adopt
-                </Button>
-              )}
-            </div>
-
-            {/* Mobile Menu */}
-            <MobileMenu user={user} onAuthClick={onAuthClick} isAdmin={isAdmin} />
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden text-christmas-green-700"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Mobile Menu */}
+      <MobileMenu 
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        user={user}
+        onAuthClick={onAuthClick}
+        onLogout={handleLogout}
+        onAdminAccess={handleAdminAccess}
+      />
+    </>
   );
 };
