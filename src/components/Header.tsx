@@ -49,6 +49,12 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                 Browse Wishlists
               </Link>
               <Link 
+                to="/register" 
+                className="text-christmas-green-700 hover:text-christmas-green-800 font-medium transition-colors"
+              >
+                Register Child
+              </Link>
+              <Link 
                 to="/about" 
                 className="text-christmas-green-700 hover:text-christmas-green-800 font-medium transition-colors"
               >
