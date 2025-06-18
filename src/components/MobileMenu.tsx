@@ -9,9 +9,10 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Menu, X, User, LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 interface MobileMenuProps {
   user: any;
@@ -20,6 +21,8 @@ interface MobileMenuProps {
 
 export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -28,14 +31,27 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
         title: "Signed out successfully",
         description: "Thank you for spreading Christmas cheer!",
       });
+      setIsOpen(false);
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
 
+  const handleNavigation = (href: string) => {
+    setIsOpen(false); // Close drawer first
+    setTimeout(() => {
+      navigate(href);
+    }, 100); // Small delay to ensure drawer closes properly
+  };
+
+  const handleAuthClick = () => {
+    setIsOpen(false);
+    onAuthClick();
+  };
+
   return (
     <div className="md:hidden">
-      <Drawer>
+      <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerTrigger asChild>
           <Button variant="ghost" size="icon" className="text-christmas-green-700">
             <Menu className="h-6 w-6" />
@@ -53,32 +69,26 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
           
           <div className="px-4 pb-8">
             <nav className="space-y-4">
-              <DrawerClose asChild>
-                <Link 
-                  to="/wishlists" 
-                  className="block py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
-                >
-                  Browse Wishlists
-                </Link>
-              </DrawerClose>
+              <button 
+                onClick={() => handleNavigation("/wishlists")}
+                className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                Browse Wishlists
+              </button>
               
-              <DrawerClose asChild>
-                <Link 
-                  to="/register" 
-                  className="block py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
-                >
-                  Register Child
-                </Link>
-              </DrawerClose>
+              <button 
+                onClick={() => handleNavigation("/register")}
+                className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                Register Child
+              </button>
               
-              <DrawerClose asChild>
-                <Link 
-                  to="/about" 
-                  className="block py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
-                >
-                  About Our Mission
-                </Link>
-              </DrawerClose>
+              <button 
+                onClick={() => handleNavigation("/about")}
+                className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                About Our Mission
+              </button>
             </nav>
 
             <div className="mt-6 pt-6 border-t border-christmas-green-200">
@@ -90,27 +100,23 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
                       Welcome, {user.email?.split('@')[0]}!
                     </span>
                   </div>
-                  <DrawerClose asChild>
-                    <Button
-                      variant="outline"
-                      onClick={handleSignOut}
-                      className="w-full text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400"
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
-                    </Button>
-                  </DrawerClose>
+                  <Button
+                    variant="outline"
+                    onClick={handleSignOut}
+                    className="w-full text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
                 </div>
               ) : (
-                <DrawerClose asChild>
-                  <Button
-                    onClick={onAuthClick}
-                    className="w-full bg-christmas-red-600 hover:bg-christmas-red-700 text-white"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    Sign In to Adopt
-                  </Button>
-                </DrawerClose>
+                <Button
+                  onClick={handleAuthClick}
+                  className="w-full bg-christmas-red-600 hover:bg-christmas-red-700 text-white"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In to Adopt
+                </Button>
               )}
             </div>
           </div>
