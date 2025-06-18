@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { InteractiveChristmasTree } from "@/components/InteractiveChristmasTree";
@@ -7,8 +6,6 @@ import { Hero } from "@/components/Hero";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ChristmasColorUtility } from "@/components/ChristmasColorUtility";
-import { Charity } from "@/components/Charity";
-import { Stats } from "@/components/Stats";
 import { Button } from "@/components/ui/button";
 import { Gift, Users, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -141,12 +138,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* About Our Mission Section */}
-      <Charity />
-
-      {/* Stats Section */}
-      <Stats />
 
       <Footer />
 
