@@ -30,44 +30,48 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     setShowModal(true);
   };
 
-  const ornamentColors = [
-    "#dc2626", "#f59e0b", "#2563eb", "#7c3aed", 
-    "#db2777", "#059669", "#ea580c", "#b91c1c",
-    "#3b82f6", "#d97706", "#8b5cf6", "#e11d48",
-    "#16a34a", "#c2410c", "#be123c", "#9333ea",
-    "#0284c7", "#dc2626", "#ca8a04", "#7c2d12"
-  ];
+  const ornamentColors = {
+    circle: ["#f59e0b", "#f59e0b", "#f59e0b", "#f59e0b", "#f59e0b", "#f59e0b", "#f59e0b", "#f59e0b"],
+    star: ["#dc2626", "#dc2626", "#dc2626", "#dc2626", "#dc2626", "#dc2626", "#dc2626", "#dc2626"]
+  };
 
-  // Much wider tree with many more ornament positions
+  // Ornament positions for the simplified tree
   const ornamentPositions = [
-    // Top section (narrow)
-    { x: 600, y: 180 }, { x: 580, y: 210 }, { x: 620, y: 210 },
-    { x: 560, y: 240 }, { x: 640, y: 240 }, { x: 600, y: 260 },
+    // Top section
+    { x: 600, y: 200, type: "star" },
     
-    // Upper-middle section
-    { x: 540, y: 300 }, { x: 660, y: 300 }, { x: 580, y: 320 }, { x: 620, y: 320 },
-    { x: 520, y: 340 }, { x: 680, y: 340 }, { x: 560, y: 360 }, { x: 640, y: 360 },
-    { x: 500, y: 380 }, { x: 700, y: 380 }, { x: 540, y: 400 }, { x: 660, y: 400 },
+    // Layer 1
+    { x: 560, y: 240, type: "circle" },
+    { x: 620, y: 280, type: "star" },
     
-    // Middle section
-    { x: 480, y: 440 }, { x: 720, y: 440 }, { x: 520, y: 460 }, { x: 680, y: 460 },
-    { x: 460, y: 480 }, { x: 740, y: 480 }, { x: 500, y: 500 }, { x: 700, y: 500 },
-    { x: 440, y: 520 }, { x: 760, y: 520 }, { x: 480, y: 540 }, { x: 720, y: 540 },
+    // Layer 2
+    { x: 520, y: 320, type: "circle" },
+    { x: 580, y: 350, type: "star" },
+    { x: 640, y: 380, type: "circle" },
     
-    // Lower-middle section
-    { x: 420, y: 580 }, { x: 780, y: 580 }, { x: 460, y: 600 }, { x: 740, y: 600 },
-    { x: 400, y: 620 }, { x: 800, y: 620 }, { x: 440, y: 640 }, { x: 760, y: 640 },
-    { x: 380, y: 660 }, { x: 820, y: 660 }, { x: 420, y: 680 }, { x: 780, y: 680 },
+    // Layer 3
+    { x: 500, y: 420, type: "circle" },
+    { x: 550, y: 450, type: "star" },
+    { x: 600, y: 480, type: "circle" },
+    { x: 650, y: 510, type: "star" },
     
-    // Bottom section (widest)
-    { x: 360, y: 720 }, { x: 840, y: 720 }, { x: 400, y: 740 }, { x: 800, y: 740 },
-    { x: 340, y: 760 }, { x: 860, y: 760 }, { x: 380, y: 780 }, { x: 820, y: 780 },
-    { x: 320, y: 800 }, { x: 880, y: 800 }, { x: 360, y: 820 }, { x: 840, y: 820 }
+    // Layer 4
+    { x: 480, y: 540, type: "star" },
+    { x: 530, y: 570, type: "circle" },
+    { x: 580, y: 600, type: "star" },
+    { x: 630, y: 630, type: "circle" },
+    
+    // Bottom layer
+    { x: 460, y: 660, type: "circle" },
+    { x: 510, y: 690, type: "star" },
+    { x: 560, y: 720, type: "circle" },
+    { x: 610, y: 690, type: "star" },
+    { x: 660, y: 660, type: "circle" },
   ];
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-slate-800 via-slate-600 to-slate-400 overflow-hidden">
-      {/* Enhanced Winter Wonderland Background */}
+      {/* Winter Wonderland Background - Kept from previous design */}
       <div className="absolute inset-0">
         {/* Heavy Snow Animation */}
         {[...Array(200)].map((_, i) => (
@@ -121,462 +125,170 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
 
       <div className="relative z-10 flex flex-col items-center justify-center py-12">
         <div className="relative">
+          {/* Simple Stylized Tree SVG */}
           <svg 
             width="1200" 
             height="900" 
             viewBox="0 0 1200 900" 
-            className="drop-shadow-2xl"
+            className="drop-shadow-xl"
           >
-            {/* Enhanced Snow Ground with Shadows */}
-            <defs>
-              <radialGradient id="groundGradient" cx="50%" cy="50%" r="60%">
-                <stop offset="0%" stopColor="white" stopOpacity="1" />
-                <stop offset="70%" stopColor="#f1f5f9" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.8" />
-              </radialGradient>
-              
-              <radialGradient id="treeGradient" cx="30%" cy="30%" r="70%">
-                <stop offset="0%" stopColor="#166534" stopOpacity="1" />
-                <stop offset="50%" stopColor="#15803d" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#0f172a" stopOpacity="0.8" />
-              </radialGradient>
-              
-              <filter id="treeShadow">
-                <feDropShadow dx="3" dy="6" stdDeviation="4" floodColor="#000" floodOpacity="0.3"/>
-              </filter>
-            </defs>
-
-            {/* Ground with realistic snow texture */}
+            {/* Ground with snow texture - kept from previous design */}
             <ellipse 
               cx="600" 
               cy="850" 
               rx="500" 
               ry="50" 
-              fill="url(#groundGradient)"
-            />
-            
-            {/* Tree shadow on ground */}
-            <ellipse 
-              cx="600" 
-              cy="850" 
-              rx="300" 
-              ry="30" 
-              fill="#cbd5e1"
-              opacity="0.4"
-            />
-            
-            {/* Realistic Tree Trunk with Bark Texture */}
-            <rect 
-              x="580" 
-              y="750" 
-              width="40" 
-              height="100" 
-              fill="#8b4513"
-              rx="6"
-              filter="url(#treeShadow)"
-            />
-            
-            {/* Bark texture lines */}
-            {[...Array(15)].map((_, i) => (
-              <line
-                key={`bark-${i}`}
-                x1="585"
-                y1={760 + i * 6}
-                x2="615"
-                y2={760 + i * 6}
-                stroke="#654321"
-                strokeWidth="1"
-                opacity="0.6"
-              />
-            ))}
-            
-            {/* Tree base with snow */}
-            <rect 
-              x="560" 
-              y="840" 
-              width="80" 
-              height="25" 
-              fill="#8b4513"
-              rx="12"
-            />
-            <ellipse 
-              cx="600" 
-              cy="845" 
-              rx="45" 
-              ry="8" 
               fill="white"
-              opacity="0.9"
-            />
-
-            {/* Hyper-realistic Christmas Tree Layers - Much Wider */}
-            
-            {/* Bottom Layer - Very Wide and Detailed */}
-            <path 
-              d="M 600 650 L 300 750 L 900 750 Z" 
-              fill="url(#treeGradient)"
-              stroke="#0f172a"
-              strokeWidth="1"
-              filter="url(#treeShadow)"
+              opacity="0.8"
             />
             
-            {/* Individual needle clusters for bottom layer */}
-            {[...Array(80)].map((_, i) => {
-              const x = 320 + (i * 7.25);
-              const y = 740 - (Math.abs(x - 600) * 0.15);
-              return (
-                <path
-                  key={`needle-bottom-${i}`}
-                  d={`M ${x} ${y} L ${x + 2} ${y - 3} L ${x + 4} ${y} L ${x + 6} ${y - 2} L ${x + 8} ${y}`}
-                  stroke="#15803d"
-                  strokeWidth="0.8"
-                  fill="none"
-                  opacity="0.8"
-                />
-              );
-            })}
-            
-            {/* Second Layer */}
-            <path 
-              d="M 600 550 L 350 680 L 850 680 Z" 
-              fill="url(#treeGradient)"
-              stroke="#0f172a"
-              strokeWidth="1"
-              filter="url(#treeShadow)"
+            {/* Tree trunk */}
+            <rect 
+              x="585" 
+              y="750" 
+              width="30" 
+              height="80" 
+              fill="#8B4513"
+              rx="2"
+              ry="2"
             />
             
-            {/* Individual needle clusters for second layer */}
-            {[...Array(70)].map((_, i) => {
-              const x = 360 + (i * 7);
-              const y = 670 - (Math.abs(x - 600) * 0.12);
-              return (
-                <path
-                  key={`needle-second-${i}`}
-                  d={`M ${x} ${y} L ${x + 2} ${y - 3} L ${x + 4} ${y} L ${x + 6} ${y - 2} L ${x + 8} ${y}`}
-                  stroke="#15803d"
-                  strokeWidth="0.8"
-                  fill="none"
-                  opacity="0.8"
-                />
-              );
-            })}
-            
-            {/* Third Layer */}
+            {/* Stylized Tree Layers (triangular sections) */}
+            {/* Bottom section */}
             <path 
-              d="M 600 450 L 400 610 L 800 610 Z" 
-              fill="url(#treeGradient)"
-              stroke="#0f172a"
-              strokeWidth="1"
-              filter="url(#treeShadow)"
+              d="M 450 750 L 600 550 L 750 750 Z" 
+              fill="#0F5733"
+              stroke="none"
+            />
+            {/* Middle section */}
+            <path 
+              d="M 475 580 L 600 400 L 725 580 Z" 
+              fill="#0F5733"
+              stroke="none"
+            />
+            {/* Top section */}
+            <path 
+              d="M 500 430 L 600 280 L 700 430 Z" 
+              fill="#0F5733"
+              stroke="none"
             />
             
-            {/* Individual needle clusters for third layer */}
-            {[...Array(56)].map((_, i) => {
-              const x = 410 + (i * 7);
-              const y = 600 - (Math.abs(x - 600) * 0.1);
-              return (
-                <path
-                  key={`needle-third-${i}`}
-                  d={`M ${x} ${y} L ${x + 2} ${y - 3} L ${x + 4} ${y} L ${x + 6} ${y - 2} L ${x + 8} ${y}`}
-                  stroke="#15803d"
-                  strokeWidth="0.8"
-                  fill="none"
-                  opacity="0.8"
-                />
-              );
-            })}
-            
-            {/* Fourth Layer */}
+            {/* White garland stripes across the tree */}
+            {/* Bottom garland */}
             <path 
-              d="M 600 350 L 450 540 L 750 540 Z" 
-              fill="url(#treeGradient)"
-              stroke="#0f172a"
-              strokeWidth="1"
-              filter="url(#treeShadow)"
-            />
-            
-            {/* Individual needle clusters for fourth layer */}
-            {[...Array(42)].map((_, i) => {
-              const x = 460 + (i * 7);
-              const y = 530 - (Math.abs(x - 600) * 0.08);
-              return (
-                <path
-                  key={`needle-fourth-${i}`}
-                  d={`M ${x} ${y} L ${x + 2} ${y - 3} L ${x + 4} ${y} L ${x + 6} ${y - 2} L ${x + 8} ${y}`}
-                  stroke="#15803d"
-                  strokeWidth="0.8"
-                  fill="none"
-                  opacity="0.8"
-                />
-              );
-            })}
-
-            {/* Fifth Layer */}
-            <path 
-              d="M 600 250 L 500 470 L 700 470 Z" 
-              fill="url(#treeGradient)"
-              stroke="#0f172a"
-              strokeWidth="1"
-              filter="url(#treeShadow)"
-            />
-            
-            {/* Individual needle clusters for fifth layer */}
-            {[...Array(28)].map((_, i) => {
-              const x = 510 + (i * 7);
-              const y = 460 - (Math.abs(x - 600) * 0.06);
-              return (
-                <path
-                  key={`needle-fifth-${i}`}
-                  d={`M ${x} ${y} L ${x + 2} ${y - 3} L ${x + 4} ${y} L ${x + 6} ${y - 2} L ${x + 8} ${y}`}
-                  stroke="#15803d"
-                  strokeWidth="0.8"
-                  fill="none"
-                  opacity="0.8"
-                />
-              );
-            })}
-
-            {/* Top Layer */}
-            <path 
-              d="M 600 150 L 550 400 L 650 400 Z" 
-              fill="url(#treeGradient)"
-              stroke="#0f172a"
-              strokeWidth="1"
-              filter="url(#treeShadow)"
-            />
-            
-            {/* Individual needle clusters for top layer */}
-            {[...Array(14)].map((_, i) => {
-              const x = 560 + (i * 7);
-              const y = 390 - (Math.abs(x - 600) * 0.04);
-              return (
-                <path
-                  key={`needle-top-${i}`}
-                  d={`M ${x} ${y} L ${x + 2} ${y - 3} L ${x + 4} ${y} L ${x + 6} ${y - 2} L ${x + 8} ${y}`}
-                  stroke="#15803d"
-                  strokeWidth="0.8"
-                  fill="none"
-                  opacity="0.8"
-                />
-              );
-            })}
-
-            {/* Realistic Garland with Depth */}
-            <path 
-              d="M 320 740 Q 460 720 600 730 Q 740 720 880 740" 
-              stroke="#ffd700"
-              strokeWidth="4"
+              d="M 470 710 C 530 690, 670 690, 730 710" 
+              stroke="white"
+              strokeWidth="8"
               fill="none"
-              opacity="0.9"
-              filter="url(#treeShadow)"
+              strokeLinecap="round"
             />
+            
+            {/* Second garland */}
             <path 
-              d="M 370 670 Q 485 650 600 660 Q 715 650 830 670" 
-              stroke="#ffd700"
-              strokeWidth="4"
+              d="M 490 650 C 540 630, 660 630, 710 650" 
+              stroke="white"
+              strokeWidth="8"
               fill="none"
-              opacity="0.9"
-              filter="url(#treeShadow)"
+              strokeLinecap="round"
             />
+            
+            {/* Third garland */}
             <path 
-              d="M 420 600 Q 510 580 600 590 Q 690 580 780 600" 
-              stroke="#ffd700"
-              strokeWidth="4"
+              d="M 510 590 C 550 570, 650 570, 690 590" 
+              stroke="white"
+              strokeWidth="8"
               fill="none"
-              opacity="0.9"
-              filter="url(#treeShadow)"
+              strokeLinecap="round"
             />
+            
+            {/* Fourth garland */}
             <path 
-              d="M 470 530 Q 535 510 600 520 Q 665 510 730 530" 
-              stroke="#ffd700"
-              strokeWidth="4"
+              d="M 520 510 C 550 490, 650 490, 680 510" 
+              stroke="white"
+              strokeWidth="8"
               fill="none"
-              opacity="0.9"
-              filter="url(#treeShadow)"
+              strokeLinecap="round"
             />
+            
+            {/* Fifth garland */}
             <path 
-              d="M 520 460 Q 560 440 600 450 Q 640 440 680 460" 
-              stroke="#ffd700"
-              strokeWidth="4"
+              d="M 540 440 C 560 420, 640 420, 660 440" 
+              stroke="white"
+              strokeWidth="8"
               fill="none"
-              opacity="0.9"
-              filter="url(#treeShadow)"
+              strokeLinecap="round"
             />
-
-            {/* Hyper-realistic Tree Star */}
-            <g transform="translate(600, 120)">
-              <defs>
-                <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#fff" stopOpacity="1" />
-                  <stop offset="30%" stopColor="#ffd700" stopOpacity="0.9" />
-                  <stop offset="70%" stopColor="#ffa500" stopOpacity="0.7" />
-                  <stop offset="100%" stopColor="#ff8c00" stopOpacity="0.5" />
-                </radialGradient>
-                
-                <filter id="starFilter">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge> 
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-              
-              {/* Star Glow Effect */}
-              <circle 
-                cx="0" 
-                cy="0" 
-                r="50" 
-                fill="url(#starGlow)" 
-                opacity="0.8"
-                filter="url(#starFilter)"
-                className={cn(
-                  "transition-all duration-1000",
-                  twinkle % 2 === 0 ? "scale-150 opacity-90" : "scale-120 opacity-70"
-                )}
-              />
-              
-              {/* Main Star with 3D Effect */}
-              <path 
-                d="M 0 -35 L 10.5 -10.5 L 35 -10.5 L 17.5 3.5 L 28 28 L 0 14 L -28 28 L -17.5 3.5 L -35 -10.5 L -10.5 -10.5 Z"
-                fill="url(#starGlow)"
-                stroke="#ffa500"
-                strokeWidth="3"
-                filter="url(#starFilter)"
-                className={cn(
-                  "transition-all duration-500 drop-shadow-xl",
-                  twinkle % 2 === 0 ? "scale-115 brightness-125" : "scale-105 brightness-100"
-                )}
-              />
-              
-              {/* Inner Star Highlights */}
-              <path 
-                d="M 0 -21 L 6.3 -6.3 L 21 -6.3 L 10.5 2.1 L 16.8 16.8 L 0 8.4 L -16.8 16.8 L -10.5 2.1 L -21 -6.3 L -6.3 -6.3 Z"
-                fill="#fff"
-                opacity="0.9"
-              />
-              
-              {/* Center sparkle */}
-              <circle cx="0" cy="0" r="4" fill="#fff" opacity="0.95" />
-              
-              {/* Star rays */}
-              {[...Array(8)].map((_, i) => {
-                const angle = (i * 45) * Math.PI / 180;
-                const x = Math.cos(angle) * 60;
-                const y = Math.sin(angle) * 60;
-                return (
-                  <line
-                    key={`ray-${i}`}
-                    x1="0"
-                    y1="0"
-                    x2={x}
-                    y2={y}
-                    stroke="#fff"
-                    strokeWidth="2"
-                    opacity="0.6"
-                    className={cn(
-                      "transition-opacity duration-300",
-                      (twinkle + i) % 4 === 0 ? "opacity-80" : "opacity-40"
-                    )}
-                  />
-                );
-              })}
-            </g>
-
-            {/* Detailed Branch Texture */}
-            {[...Array(150)].map((_, i) => {
-              const layer = Math.floor(i / 30);
-              const baseWidth = 300 + (5 - layer) * 100;
-              const baseY = 150 + layer * 100;
-              const x = 600 - baseWidth/2 + Math.random() * baseWidth;
-              const y = baseY + Math.random() * 80;
-              const angle = Math.random() * 360;
-              const length = 4 + Math.random() * 6;
-              
-              return (
-                <line
-                  key={`branch-${i}`}
-                  x1={x}
-                  y1={y}
-                  x2={x + Math.cos(angle) * length}
-                  y2={y + Math.sin(angle) * length}
-                  stroke="#0f5132"
-                  strokeWidth="1.2"
-                  opacity="0.7"
-                />
-              );
-            })}
-
-            {/* Snow on Branches */}
-            {[...Array(100)].map((_, i) => {
-              const layer = Math.floor(i / 20);
-              const baseWidth = 280 + (5 - layer) * 95;
-              const baseY = 160 + layer * 100;
-              const x = 600 - baseWidth/2 + Math.random() * baseWidth;
-              const y = baseY + Math.random() * 70;
-              
-              return (
-                <circle
-                  key={`snow-branch-${i}`}
-                  cx={x}
-                  cy={y}
-                  r={1 + Math.random() * 2}
-                  fill="white"
-                  opacity="0.8"
-                />
-              );
-            })}
+            
+            {/* Tree shadow */}
+            <ellipse 
+              cx="600" 
+              cy="830" 
+              rx="200" 
+              ry="20" 
+              fill="#1e293b"
+              opacity="0.2"
+            />
+            
+            {/* Star on top */}
+            <path 
+              d="M 600 230 L 615 270 L 655 270 L 625 295 L 635 335 L 600 315 L 565 335 L 575 295 L 545 270 L 585 270 Z" 
+              fill="#F59E0B"
+              stroke="none"
+              className={cn(
+                "transition-all duration-1000",
+                twinkle % 2 === 0 ? "opacity-100" : "opacity-85 scale-95"
+              )}
+            />
           </svg>
 
-          {/* Interactive Ornaments positioned on the wide realistic tree */}
+          {/* Interactive Ornaments - children mapping */}
           {children.slice(0, ornamentPositions.length).map((child, index) => {
             const position = ornamentPositions[index];
-            const ornamentSize = 12 + Math.random() * 6; // Varied sizes
+            const isStarOrnament = position.type === "star";
+            const colorIndex = index % (isStarOrnament ? ornamentColors.star.length : ornamentColors.circle.length);
+            const color = isStarOrnament ? ornamentColors.star[colorIndex] : ornamentColors.circle[colorIndex];
             
+            // Return either a star or circle ornament
             return (
               <button
                 key={child.id}
                 onClick={() => handleOrnamentClick(child)}
                 className={cn(
-                  "absolute rounded-full shadow-2xl transition-all duration-300 z-30 cursor-pointer",
+                  "absolute rounded-full shadow-lg transition-all duration-300 z-30 cursor-pointer",
                   "hover:scale-150 hover:shadow-2xl transform-gpu hover:z-40",
-                  (twinkle + index) % 4 === 0 ? "animate-pulse scale-110" : "",
-                  "hover:animate-bounce border-3 border-white/90"
+                  (twinkle + index) % 4 === 0 ? "animate-pulse" : ""
                 )}
                 style={{
-                  left: `${position.x - ornamentSize/2}px`,
-                  top: `${position.y - ornamentSize/2}px`,
-                  width: `${ornamentSize}px`,
-                  height: `${ornamentSize}px`,
-                  backgroundColor: ornamentColors[index % ornamentColors.length],
-                  boxShadow: `0 8px 25px ${ornamentColors[index % ornamentColors.length]}50, 0 0 20px ${ornamentColors[index % ornamentColors.length]}40, inset 0 2px 4px rgba(255,255,255,0.3)`
+                  left: `${position.x - (isStarOrnament ? 15 : 12)}px`,
+                  top: `${position.y - (isStarOrnament ? 15 : 12)}px`,
+                  width: isStarOrnament ? '30px' : '24px',
+                  height: isStarOrnament ? '30px' : '24px'
                 }}
                 title={`Click to meet ${child.name}`}
               >
-                {/* Realistic ornament highlight */}
-                <div 
-                  className="absolute inset-1 rounded-full bg-gradient-to-br from-white/80 via-white/40 to-transparent"
-                  style={{
-                    background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 40%, transparent 70%)`
-                  }}
-                ></div>
-                
-                {/* Ornament cap */}
-                <div 
-                  className="absolute -top-1 left-1/2 transform -translate-x-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full border border-yellow-300"
-                  style={{
-                    width: `${ornamentSize * 0.4}px`,
-                    height: `${ornamentSize * 0.25}px`
-                  }}
-                ></div>
-                
-                {/* Ornament pattern */}
-                <div className="absolute inset-2 rounded-full border border-white/30"></div>
+                {isStarOrnament ? (
+                  // Star ornament
+                  <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+                    <path 
+                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" 
+                      fill={color} 
+                      stroke="white" 
+                      strokeWidth="1"
+                    />
+                  </svg>
+                ) : (
+                  // Circle ornament
+                  <div 
+                    className="w-full h-full rounded-full border-2 border-white/50"
+                    style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}80` }}
+                  />
+                )}
               </button>
             );
           })}
         </div>
 
-        {/* Enhanced Instructions with photorealistic styling */}
+        {/* Enhanced Instructions with styling */}
         <div className="relative z-20 mt-16 text-center max-w-4xl px-6">
           <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-10 border border-white/20 shadow-2xl">
             <p className={cn(
