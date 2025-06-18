@@ -36,17 +36,31 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     "#3b82f6", "#d97706", "#8b5cf6", "#e11d48"
   ];
 
-  // Responsive ornament positions using percentages relative to the tree image
+  // More uniformly distributed ornament positions across the entire tree
   const ornamentPositions = [
-    // Top section
-    { x: 50, y: 19 }, { x: 56, y: 23 }, { x: 44, y: 23 },
-    // Upper middle section
-    { x: 40, y: 28 }, { x: 60, y: 28 }, { x: 50, y: 32 },
-    { x: 37, y: 36 }, { x: 63, y: 36 },
-    // Lower middle section
-    { x: 35, y: 43 }, { x: 65, y: 43 }, { x: 45, y: 47 }, { x: 55, y: 47 },
-    // Bottom section
-    { x: 32, y: 54 }, { x: 68, y: 54 }, { x: 42, y: 58 }, { x: 58, y: 58 }
+    // Top tier (narrow)
+    { x: 50, y: 20 }, { x: 47, y: 22 }, { x: 53, y: 22 },
+    
+    // Upper-middle tier (wider)
+    { x: 43, y: 26 }, { x: 57, y: 26 }, { x: 50, y: 28 },
+    { x: 40, y: 30 }, { x: 60, y: 30 },
+    
+    // Middle tier (wider still)
+    { x: 37, y: 34 }, { x: 63, y: 34 }, { x: 45, y: 36 }, 
+    { x: 55, y: 36 }, { x: 50, y: 38 },
+    
+    // Lower-middle tier (getting wider)
+    { x: 34, y: 42 }, { x: 66, y: 42 }, { x: 42, y: 44 },
+    { x: 58, y: 44 }, { x: 38, y: 46 }, { x: 62, y: 46 },
+    
+    // Bottom tier (widest part)
+    { x: 31, y: 50 }, { x: 69, y: 50 }, { x: 40, y: 52 },
+    { x: 60, y: 52 }, { x: 35, y: 54 }, { x: 65, y: 54 },
+    { x: 45, y: 56 }, { x: 55, y: 56 }, { x: 50, y: 58 },
+    
+    // Lower bottom tier (very wide)
+    { x: 28, y: 60 }, { x: 72, y: 60 }, { x: 33, y: 62 },
+    { x: 67, y: 62 }, { x: 38, y: 64 }, { x: 62, y: 64 }
   ];
 
   return (
@@ -102,9 +116,10 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               className="w-full h-auto max-w-[800px] mx-auto drop-shadow-2xl"
             />
 
-            {/* Interactive Ornaments with responsive positioning */}
-            {children.slice(0, 16).map((child, index) => {
-              const position = ornamentPositions[index] || ornamentPositions[0];
+            {/* Interactive Ornaments with uniform distribution */}
+            {children.map((child, index) => {
+              // Use modulo to cycle through positions if we have more children than positions
+              const position = ornamentPositions[index % ornamentPositions.length];
               
               return (
                 <button
