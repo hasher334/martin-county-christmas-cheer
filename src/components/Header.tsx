@@ -39,7 +39,23 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
             </div>
           </Link>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
+            {/* Navigation Links */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link 
+                to="/wishlists" 
+                className="text-christmas-green-700 hover:text-christmas-green-800 font-medium transition-colors"
+              >
+                Browse Wishlists
+              </Link>
+              <Link 
+                to="/about" 
+                className="text-christmas-green-700 hover:text-christmas-green-800 font-medium transition-colors"
+              >
+                About Our Mission
+              </Link>
+            </nav>
+
             {user ? (
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2 text-christmas-green-700">
