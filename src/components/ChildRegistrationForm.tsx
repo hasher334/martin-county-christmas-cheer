@@ -130,7 +130,7 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
         body: {
           type: 'child_registration',
           data: data,
-          recipientEmail: 'admin@candycanekindness.org', // Replace with actual admin email
+          recipientEmail: 'arodseo@gmail.com', // Updated admin email
           parentName: data.parentName,
           childName: data.childName,
         }
