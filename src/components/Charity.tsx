@@ -19,7 +19,7 @@ export const Charity = () => {
           <div>
             <h3 className="text-2xl font-bold text-christmas-green-800 mb-6">Our Mission</h3>
             <p className="text-lg text-christmas-brown-700 mb-6">
-              We believe that every child deserves to wake up on Christmas morning with gifts under the tree. Our mission is to connect generous community members with families in need, creating lasting bonds and spreading holiday joy throughout the Treasure Coast.
+              We believe that every child deserves to wake up on Christmas morning with gifts under the tree. Our mission is to connect generous community members with families in need, creating lasting bonds and spreading holiday joy throughout Martin County.
             </p>
             <p className="text-lg text-christmas-brown-700 mb-6">
               Through our Christmas adoption program, we provide a platform where donors can "adopt" children for the holidays, purchasing gifts from their carefully curated wishlists and helping to create magical Christmas memories.
@@ -55,7 +55,7 @@ export const Charity = () => {
           </h4>
           <p className="text-lg text-christmas-brown-700 max-w-3xl mx-auto">
             Whether you're adopting a child for Christmas, volunteering your time, or spreading the word about our mission, 
-            every contribution helps us bring more joy to families in the Treasure Coast. Together, we can ensure that no child 
+            every contribution helps us bring more joy to families in Martin County. Together, we can ensure that no child 
             goes without the magic of Christmas.
           </p>
         </div>

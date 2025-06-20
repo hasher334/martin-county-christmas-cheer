@@ -126,75 +126,12 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
-        Row: {
-          address: string | null
-          avatar_url: string | null
-          bio: string | null
-          created_at: string
-          email: string | null
-          first_name: string | null
-          id: string
-          last_name: string | null
-          phone: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          address?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          email?: string | null
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          address?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          email?: string | null
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       adoption_status:
@@ -203,7 +140,6 @@ export type Database = {
         | "fulfilled"
         | "draft"
         | "pending_review"
-      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -326,7 +262,6 @@ export const Constants = {
         "draft",
         "pending_review",
       ],
-      app_role: ["admin", "user"],
     },
   },
 } as const

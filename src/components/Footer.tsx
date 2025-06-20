@@ -1,3 +1,4 @@
+
 import { Heart, Mail, Phone, MapPin } from "lucide-react";
 
 export const Footer = () => {
@@ -11,7 +12,7 @@ export const Footer = () => {
               <h3 className="text-xl font-bold font-dancing">Candy Cane Kindness</h3>
             </div>
             <p className="text-christmas-green-100 mb-4">
-              Bringing Christmas joy to children in need throughout the Treasure Coast of Florida. 
+              Bringing Christmas joy to children in need throughout Martin County, Florida. 
               Every child deserves to experience the magic of Christmas.
             </p>
           </div>
@@ -21,7 +22,7 @@ export const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-christmas-green-300" />
-                <span className="text-christmas-green-100">info@treasurecoastcheer.org</span>
+                <span className="text-christmas-green-100">info@martincountycheer.org</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-christmas-green-300" />
@@ -29,7 +30,7 @@ export const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-christmas-green-300" />
-                <span className="text-christmas-green-100">Treasure Coast, Florida</span>
+                <span className="text-christmas-green-100">Martin County, Florida</span>
               </div>
             </div>
           </div>
@@ -47,7 +48,7 @@ export const Footer = () => {
 
         <div className="border-t border-christmas-green-700 mt-8 pt-8 text-center">
           <p className="text-christmas-green-200">
-            © 2025 Candy Cane Kindness. Made with ❤️ for the children of the Treasure Coast.
+            © 2025 Candy Cane Kindness. Made with ❤️ for the children of Martin County.
           </p>
         </div>
       </div>
