@@ -14,28 +14,54 @@ export const useAuthNotifications = () => {
           switch (event) {
             case 'SIGNED_IN':
               if (session?.user?.email) {
-                // Check if this is a new user (sign up) by looking at user metadata
-                const isNewUser = session.user.user_metadata?.iss === undefined || 
-                                  session.user.email_confirmed_at === session.user.created_at;
+                // Check if this is a new user by looking at creation time vs confirmation time
+                const user = session.user;
+                const createdAt = new Date(user.created_at);
+                const now = new Date();
+                const timeDiff = now.getTime() - createdAt.getTime();
+                const isRecentSignup = timeDiff < 5 * 60 * 1000; // 5 minutes
                 
-                if (isNewUser) {
+                console.log('User created at:', user.created_at);
+                console.log('Time difference (ms):', timeDiff);
+                console.log('Is recent signup:', isRecentSignup);
+                console.log('Email confirmed at:', user.email_confirmed_at);
+                
+                // If the user was created very recently, treat as signup
+                if (isRecentSignup && user.email_confirmed_at) {
+                  console.log('Sending user signup notification for:', user.email);
                   await notifyUserSignup(
-                    session.user.email,
-                    session.user.user_metadata?.full_name || session.user.user_metadata?.name
+                    user.email,
+                    user.user_metadata?.full_name || user.user_metadata?.name,
+                    // Try to get IP from session or use placeholder
+                    '(IP not available in client)'
                   );
                 } else {
+                  console.log('Sending user signin notification for:', user.email);
                   await notifyAuthEvent(
                     'user_signin', 
-                    session.user.email, 
+                    user.email, 
                     'User successfully signed in'
                   );
                 }
               }
               break;
 
+            case 'SIGNED_UP':
+              console.log('SIGNED_UP event detected');
+              if (session?.user?.email) {
+                console.log('Sending signup notification for SIGNED_UP event:', session.user.email);
+                await notifyUserSignup(
+                  session.user.email,
+                  session.user.user_metadata?.full_name || session.user.user_metadata?.name,
+                  '(IP not available in client)'
+                );
+              }
+              break;
+
             case 'SIGNED_OUT':
               // Note: session will be null for sign out, so we can't get user email here
               // We handle this in the sign out function instead
+              console.log('User signed out');
               await notifySystemEvent('user_signout', 'User session ended');
               break;
 
@@ -70,6 +96,7 @@ export const useAuthNotifications = () => {
               break;
 
             default:
+              console.log('Unhandled auth event:', event);
               if (session?.user?.email) {
                 await notifyAuthEvent(
                   `auth_${event.toLowerCase()}`, 
