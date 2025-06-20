@@ -9,7 +9,7 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { ChristmasColorUtility } from "@/components/ChristmasColorUtility";
 import { Stats } from "@/components/Stats";
 import { NavigationBanner } from "@/components/NavigationBanner";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { MobileLoadingSpinner } from "@/components/MobileLoadingSpinner";
 import { Gift, Users, Heart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
@@ -21,68 +21,73 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [componentsLoaded, setComponentsLoaded] = useState({
+    header: false,
+    hero: false,
+    tree: false,
+    navigation: false,
+    stats: false,
+    footer: false
+  });
   const { toast } = useToast();
 
   useEffect(() => {
-    let isMounted = true;
+    console.log("Index page mobile optimization active");
     
-    const initializeApp = async () => {
-      console.log("Index page initializing");
-      
+    // Check auth state
+    const checkAuth = async () => {
       try {
-        // Check current auth state
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
-        if (isMounted) {
-          setUser(currentUser);
-        }
-
-        // Fetch children data
-        await fetchChildren();
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        setComponentsLoaded(prev => ({ ...prev, header: true }));
       } catch (error) {
-        console.error("Initialization error:", error);
-        if (isMounted) {
-          setError("Failed to initialize application");
-          setLoading(false);
-        }
+        console.error("Auth check error:", error);
       }
     };
-
-    initializeApp();
+    
+    checkAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (isMounted) {
-        setUser(session?.user ?? null);
-      }
+      setUser(session?.user ?? null);
     });
 
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
+    // Progressive component loading
+    const loadSequence = [
+      { key: 'hero', delay: 50 },
+      { key: 'tree', delay: 150 },
+      { key: 'navigation', delay: 250 },
+      { key: 'stats', delay: 350 },
+      { key: 'footer', delay: 450 }
+    ];
+
+    loadSequence.forEach(({ key, delay }) => {
+      setTimeout(() => {
+        setComponentsLoaded(prev => ({ ...prev, [key]: true }));
+      }, delay);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (componentsLoaded.tree) {
+      fetchChildren();
+    }
+  }, [componentsLoaded.tree]);
 
   const fetchChildren = async () => {
     try {
-      console.log('Fetching children data...');
       const { data, error } = await supabase
         .from("children")
         .select("*")
         .eq("status", "available")
         .order("created_at", { ascending: true });
 
-      if (error) {
-        console.error('Error fetching children:', error);
-        throw error;
-      }
-      
-      console.log('Children data fetched successfully:', data?.length || 0, 'children');
+      if (error) throw error;
       setChildren(data || []);
-      setError(null);
     } catch (error) {
       console.error("Error fetching children:", error);
-      setError("Failed to load children profiles");
       toast({
         title: "Error",
         description: "Failed to load children profiles",
@@ -100,34 +105,9 @@ const Index = () => {
     }
   };
 
-  // Show loading spinner while fetching data
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized">
-        <LoadingSpinner message="Loading Christmas magic..." size="lg" />
-      </div>
-    );
-  }
-
-  // Show error state if there was a critical error
-  if (error && children.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized">
-        <div className="flex flex-col items-center justify-center py-20">
-          <p className="text-christmas-red-600 text-center mb-4">{error}</p>
-          <button 
-            onClick={() => {
-              setLoading(true);
-              setError(null);
-              fetchChildren();
-            }}
-            className="bg-christmas-green-600 hover:bg-christmas-green-700 text-white px-6 py-2 rounded-lg"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+  // Show loading spinner until core components are ready
+  if (!componentsLoaded.header || !componentsLoaded.hero) {
+    return <MobileLoadingSpinner />;
   }
 
   return (
@@ -151,53 +131,67 @@ const Index = () => {
             Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
           
-          <div className="animate-fade-in">
-            <InteractiveChristmasTree 
-              children={children} 
-              onAdopt={handleAdopt}
-              user={user}
-            />
-          </div>
+          {componentsLoaded.tree && (
+            <div className="animate-fade-in">
+              {loading ? (
+                <div className="flex justify-center items-center py-16 md:py-20">
+                  <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-2 border-christmas-green-600"></div>
+                </div>
+              ) : (
+                <InteractiveChristmasTree 
+                  children={children} 
+                  onAdopt={handleAdopt}
+                  user={user}
+                />
+              )}
+            </div>
+          )}
 
           {/* Navigation Banners */}
-          <div className="mt-12 md:mt-16 mb-12 md:mb-16 animate-fade-in">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto px-4">
-              <NavigationBanner
-                title="Browse Wishlists"
-                description="Discover children's Christmas wishes and choose the perfect child to sponsor"
-                icon={Gift}
-                href="/wishlists"
-                variant="primary"
-              />
-              
-              <NavigationBanner
-                title="Register Child"
-                description="Help a child in need by registering them for our Christmas program"
-                icon={Users}
-                href="/register"
-                variant="secondary"
-              />
-              
-              <NavigationBanner
-                title="About Our Mission"
-                description="Learn how Candy Cane Kindness spreads Christmas joy throughout our community"
-                icon={Heart}
-                href="/about"
-                variant="tertiary"
-              />
+          {componentsLoaded.navigation && (
+            <div className="mt-12 md:mt-16 mb-12 md:mb-16 animate-fade-in">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto px-4">
+                <NavigationBanner
+                  title="Browse Wishlists"
+                  description="Discover children's Christmas wishes and choose the perfect child to sponsor"
+                  icon={Gift}
+                  href="/wishlists"
+                  variant="primary"
+                />
+                
+                <NavigationBanner
+                  title="Register Child"
+                  description="Help a child in need by registering them for our Christmas program"
+                  icon={Users}
+                  href="/register"
+                  variant="secondary"
+                />
+                
+                <NavigationBanner
+                  title="About Our Mission"
+                  description="Learn how Candy Cane Kindness spreads Christmas joy throughout our community"
+                  icon={Heart}
+                  href="/about"
+                  variant="tertiary"
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
       {/* Stats Section */}
-      <div className="animate-fade-in">
-        <Stats />
-      </div>
+      {componentsLoaded.stats && (
+        <div className="animate-fade-in">
+          <Stats />
+        </div>
+      )}
 
-      <div className="animate-fade-in">
-        <Footer />
-      </div>
+      {componentsLoaded.footer && (
+        <div className="animate-fade-in">
+          <Footer />
+        </div>
+      )}
 
       <AuthDialog 
         open={showAuthDialog} 

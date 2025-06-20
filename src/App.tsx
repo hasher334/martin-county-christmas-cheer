@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  // Initialize auth notifications once at the app level
+  // Initialize auth notifications
   useAuthNotifications();
 
   return (

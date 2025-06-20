@@ -1,48 +1,106 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { notifyAuthEvent } from '@/utils/notificationService';
+import { notifyUserSignup, notifyAuthEvent, notifySystemEvent } from '@/utils/notificationService';
 
 export const useAuthNotifications = () => {
-  const initializeRef = useRef(false);
-
   useEffect(() => {
-    // Prevent multiple initializations
-    if (initializeRef.current) {
-      console.log('Auth notifications already initialized, skipping');
-      return;
-    }
-    
-    initializeRef.current = true;
-    console.log('Initializing auth notifications');
+    // Set up auth state listener with notifications
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth event:', event, session?.user?.email);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const user = session?.user;
-      
-      if (event === 'SIGNED_IN' && user?.email) {
-        console.log('Auth event:', event, user.email);
-        
-        // Check if this is a recent signup (within 5 minutes)
-        const userCreatedAt = new Date(user.created_at).getTime();
-        const timeDifference = Date.now() - userCreatedAt;
-        const isRecentSignup = timeDifference < 5 * 60 * 1000; // 5 minutes
-        
-        if (isRecentSignup) {
-          console.log('Sending user signup notification for:', user.email);
-          await notifyAuthEvent('user_signup', user.email, 'New user successfully signed up');
-        } else {
-          console.log('Sending user signin notification for:', user.email);
-          await notifyAuthEvent('user_signin', user.email, 'User successfully signed in');
+        try {
+          switch (event) {
+            case 'SIGNED_IN':
+              if (session?.user?.email) {
+                // Check if this is a new user by looking at creation time vs confirmation time
+                const user = session.user;
+                const createdAt = new Date(user.created_at);
+                const now = new Date();
+                const timeDiff = now.getTime() - createdAt.getTime();
+                const isRecentSignup = timeDiff < 5 * 60 * 1000; // 5 minutes
+                
+                console.log('User created at:', user.created_at);
+                console.log('Time difference (ms):', timeDiff);
+                console.log('Is recent signup:', isRecentSignup);
+                console.log('Email confirmed at:', user.email_confirmed_at);
+                
+                // If the user was created very recently, treat as signup
+                if (isRecentSignup && user.email_confirmed_at) {
+                  console.log('Sending user signup notification for:', user.email);
+                  await notifyUserSignup(
+                    user.email,
+                    user.user_metadata?.full_name || user.user_metadata?.name,
+                    // Try to get IP from session or use placeholder
+                    '(IP not available in client)'
+                  );
+                } else {
+                  console.log('Sending user signin notification for:', user.email);
+                  await notifyAuthEvent(
+                    'user_signin', 
+                    user.email, 
+                    'User successfully signed in'
+                  );
+                }
+              }
+              break;
+
+            case 'SIGNED_OUT':
+              // Note: session will be null for sign out, so we can't get user email here
+              // We handle this in the sign out function instead
+              console.log('User signed out');
+              await notifySystemEvent('user_signout', 'User session ended');
+              break;
+
+            case 'PASSWORD_RECOVERY':
+              if (session?.user?.email) {
+                await notifyAuthEvent(
+                  'password_recovery', 
+                  session.user.email, 
+                  'User requested password recovery'
+                );
+              }
+              break;
+
+            case 'TOKEN_REFRESHED':
+              if (session?.user?.email) {
+                await notifyAuthEvent(
+                  'token_refresh', 
+                  session.user.email, 
+                  'User session token refreshed'
+                );
+              }
+              break;
+
+            case 'USER_UPDATED':
+              if (session?.user?.email) {
+                await notifyAuthEvent(
+                  'user_updated', 
+                  session.user.email, 
+                  'User profile updated'
+                );
+              }
+              break;
+
+            default:
+              console.log('Unhandled auth event:', event);
+              if (session?.user?.email) {
+                await notifyAuthEvent(
+                  `auth_${event.toLowerCase()}`, 
+                  session.user.email, 
+                  `Authentication event: ${event}`
+                );
+              }
+              break;
+          }
+        } catch (error) {
+          console.error('Error sending auth notification:', error);
+          // Don't throw the error to avoid disrupting the auth flow
         }
-      } else if (event === 'SIGNED_OUT') {
-        console.log('Auth event: SIGNED_OUT');
       }
-    });
+    );
 
-    return () => {
-      console.log('Cleaning up auth notifications');
-      subscription.unsubscribe();
-      initializeRef.current = false;
-    };
+    return () => subscription.unsubscribe();
   }, []);
 };
