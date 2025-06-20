@@ -10,6 +10,7 @@ import { ChristmasColorUtility } from "@/components/ChristmasColorUtility";
 import { Stats } from "@/components/Stats";
 import { NavigationBanner } from "@/components/NavigationBanner";
 import { MobileLoadingSpinner } from "@/components/MobileLoadingSpinner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Gift, Users, Heart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
@@ -18,83 +19,110 @@ type Child = Tables<"children">;
 
 const Index = () => {
   const [children, setChildren] = useState<Child[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [childrenLoading, setChildrenLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [componentsLoaded, setComponentsLoaded] = useState({
-    header: false,
-    hero: false,
-    tree: false,
-    navigation: false,
-    stats: false,
-    footer: false
-  });
+  const [pageReady, setPageReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log("Index page mobile optimization active");
+    console.log("🚀 Index page initializing...");
     
-    // Check auth state
-    const checkAuth = async () => {
+    let authTimeout: NodeJS.Timeout;
+    let pageTimeout: NodeJS.Timeout;
+    
+    const initializePage = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-        setComponentsLoaded(prev => ({ ...prev, header: true }));
+        // Set a timeout to ensure page loads even if auth fails
+        authTimeout = setTimeout(() => {
+          console.log("⚠️ Auth check timeout - proceeding without auth");
+          setUser(null);
+          setPageReady(true);
+        }, 3000);
+
+        // Check auth state
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        clearTimeout(authTimeout);
+        
+        if (authError) {
+          console.error("❌ Auth error:", authError);
+          setError("Authentication check failed");
+        } else {
+          console.log("✅ Auth check complete:", user?.email || "No user");
+          setUser(user);
+        }
+        
+        setPageReady(true);
+        
       } catch (error) {
-        console.error("Auth check error:", error);
+        console.error("❌ Page initialization error:", error);
+        clearTimeout(authTimeout);
+        setError("Failed to initialize page");
+        setPageReady(true); // Still show page even if auth fails
       }
     };
-    
-    checkAuth();
+
+    // Set overall page timeout as fallback
+    pageTimeout = setTimeout(() => {
+      console.log("⚠️ Page initialization timeout - forcing page load");
+      setPageReady(true);
+      setChildrenLoading(false);
+    }, 5000);
+
+    initializePage();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("🔄 Auth state changed:", event, session?.user?.email || "No user");
       setUser(session?.user ?? null);
     });
 
-    // Progressive component loading
-    const loadSequence = [
-      { key: 'hero', delay: 50 },
-      { key: 'tree', delay: 150 },
-      { key: 'navigation', delay: 250 },
-      { key: 'stats', delay: 350 },
-      { key: 'footer', delay: 450 }
-    ];
-
-    loadSequence.forEach(({ key, delay }) => {
-      setTimeout(() => {
-        setComponentsLoaded(prev => ({ ...prev, [key]: true }));
-      }, delay);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(authTimeout);
+      clearTimeout(pageTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
-    if (componentsLoaded.tree) {
+    if (pageReady) {
+      console.log("📊 Page ready, fetching children...");
       fetchChildren();
     }
-  }, [componentsLoaded.tree]);
+  }, [pageReady]);
 
   const fetchChildren = async () => {
     try {
+      setChildrenLoading(true);
+      console.log("🔄 Fetching children data...");
+      
       const { data, error } = await supabase
         .from("children")
         .select("*")
         .eq("status", "available")
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Children fetch error:", error);
+        throw error;
+      }
+      
+      console.log("✅ Children fetched successfully:", data?.length || 0);
       setChildren(data || []);
+      setError(null);
+      
     } catch (error) {
-      console.error("Error fetching children:", error);
+      console.error("❌ Error fetching children:", error);
+      setError("Failed to load children profiles");
       toast({
         title: "Error",
-        description: "Failed to load children profiles",
+        description: "Failed to load children profiles. Please try refreshing the page.",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setChildrenLoading(false);
     }
   };
 
@@ -105,8 +133,8 @@ const Index = () => {
     }
   };
 
-  // Show loading spinner until core components are ready
-  if (!componentsLoaded.header || !componentsLoaded.hero) {
+  // Show loading spinner only for the initial page load
+  if (!pageReady) {
     return <MobileLoadingSpinner />;
   }
 
@@ -131,67 +159,70 @@ const Index = () => {
             Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
           
-          {componentsLoaded.tree && (
-            <div className="animate-fade-in">
-              {loading ? (
-                <div className="flex justify-center items-center py-16 md:py-20">
-                  <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-2 border-christmas-green-600"></div>
-                </div>
-              ) : (
-                <InteractiveChristmasTree 
-                  children={children} 
-                  onAdopt={handleAdopt}
-                  user={user}
-                />
-              )}
+          {/* Show error message if there's an error */}
+          {error && (
+            <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700">{error}</p>
+              <button 
+                onClick={fetchChildren}
+                className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
             </div>
           )}
+          
+          <div className="animate-fade-in">
+            {childrenLoading ? (
+              <LoadingSpinner message="Loading children profiles..." />
+            ) : (
+              <InteractiveChristmasTree 
+                children={children} 
+                onAdopt={handleAdopt}
+                user={user}
+              />
+            )}
+          </div>
 
           {/* Navigation Banners */}
-          {componentsLoaded.navigation && (
-            <div className="mt-12 md:mt-16 mb-12 md:mb-16 animate-fade-in">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto px-4">
-                <NavigationBanner
-                  title="Browse Wishlists"
-                  description="Discover children's Christmas wishes and choose the perfect child to sponsor"
-                  icon={Gift}
-                  href="/wishlists"
-                  variant="primary"
-                />
-                
-                <NavigationBanner
-                  title="Register Child"
-                  description="Help a child in need by registering them for our Christmas program"
-                  icon={Users}
-                  href="/register"
-                  variant="secondary"
-                />
-                
-                <NavigationBanner
-                  title="About Our Mission"
-                  description="Learn how Candy Cane Kindness spreads Christmas joy throughout our community"
-                  icon={Heart}
-                  href="/about"
-                  variant="tertiary"
-                />
-              </div>
+          <div className="mt-12 md:mt-16 mb-12 md:mb-16 animate-fade-in">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto px-4">
+              <NavigationBanner
+                title="Browse Wishlists"
+                description="Discover children's Christmas wishes and choose the perfect child to sponsor"
+                icon={Gift}
+                href="/wishlists"
+                variant="primary"
+              />
+              
+              <NavigationBanner
+                title="Register Child"
+                description="Help a child in need by registering them for our Christmas program"
+                icon={Users}
+                href="/register"
+                variant="secondary"
+              />
+              
+              <NavigationBanner
+                title="About Our Mission"
+                description="Learn how Candy Cane Kindness spreads Christmas joy throughout our community"
+                icon={Heart}
+                href="/about"
+                variant="tertiary"
+              />
             </div>
-          )}
+          </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      {componentsLoaded.stats && (
-        <div className="animate-fade-in">
-          <Stats />
-        </div>
-      )}
+      <div className="animate-fade-in">
+        <Stats />
+      </div>
 
-      {componentsLoaded.footer && (
-        <div className="animate-fade-in">
-          <Footer />
-        </div>
-      )}
+      <div className="animate-fade-in">
+        <Footer />
+      </div>
 
       <AuthDialog 
         open={showAuthDialog} 
