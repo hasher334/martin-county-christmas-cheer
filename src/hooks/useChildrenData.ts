@@ -37,17 +37,20 @@ export const useChildrenData = (): UseChildrenDataReturn => {
       // Test basic connectivity first
       console.log('🔍 Testing Supabase connectivity...');
       
-      const fetchWithRetry = () => supabase
-        .from('children')
-        .select('*')
-        .eq('status', 'available')
-        .order('created_at', { ascending: true });
+      const fetchWithRetry = async () => {
+        const result = await supabase
+          .from('children')
+          .select('*')
+          .eq('status', 'available')
+          .order('created_at', { ascending: true });
+        return result;
+      };
 
       const { data, error: supabaseError } = await createRetryWrapper(
         fetchWithRetry,
         3,
         1000
-      );
+      ) as { data: Child[] | null; error: any };
 
       console.log('📊 Supabase response:', { 
         data: data?.length, 
