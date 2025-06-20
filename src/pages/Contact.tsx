@@ -1,3 +1,4 @@
+
 import { Mail, MapPin, Heart, Send } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -20,6 +21,7 @@ const Contact = () => {
   });
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -43,14 +45,44 @@ const Contact = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for contacting us. We'll get back to you soon.",
-    });
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setIsSubmitting(true);
+
+    try {
+      console.log("Sending contact form email");
+      
+      const { error } = await supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'contact',
+          contactName: formData.name,
+          contactEmail: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }
+      });
+
+      if (error) {
+        console.error("Error sending contact email:", error);
+        throw error;
+      }
+
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for contacting us. We'll get back to you soon.",
+      });
+      
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      toast({
+        title: "Failed to send message",
+        description: "There was an error sending your message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -148,6 +180,7 @@ const Contact = () => {
                         required
                         className="mt-1"
                         placeholder="Enter your full name"
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div>
@@ -163,6 +196,7 @@ const Contact = () => {
                         required
                         className="mt-1"
                         placeholder="your.email@example.com"
+                        disabled={isSubmitting}
                       />
                     </div>
                   </div>
@@ -179,6 +213,7 @@ const Contact = () => {
                       required
                       className="mt-1"
                       placeholder="What is this regarding?"
+                      disabled={isSubmitting}
                     />
                   </div>
 
@@ -194,15 +229,17 @@ const Contact = () => {
                       required
                       className="mt-1 min-h-[120px]"
                       placeholder="Tell us more about how we can help you..."
+                      disabled={isSubmitting}
                     />
                   </div>
 
                   <Button
                     type="submit"
+                    disabled={isSubmitting}
                     className="w-full bg-christmas-green-600 hover:bg-christmas-green-700 text-white py-3"
                   >
                     <Send className="h-4 w-4 mr-2" />
-                    Send Message
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               </CardContent>
