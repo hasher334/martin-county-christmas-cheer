@@ -5,8 +5,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ChildCard } from "@/components/ChildCard";
-import { Snowflake } from "lucide-react";
+import { Snowflake, RefreshCw, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Child = Tables<"children">;
@@ -14,6 +15,8 @@ type Child = Tables<"children">;
 const Wishlists = () => {
   const [children, setChildren] = useState<Child[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { toast } = useToast();
@@ -74,14 +77,25 @@ const Wishlists = () => {
   useEffect(() => {
     // Check auth state
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      console.log("Checking auth state...");
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error("Auth error:", error);
+        } else {
+          console.log("Auth user:", user ? "authenticated" : "not authenticated");
+        }
+        setUser(user);
+      } catch (error) {
+        console.error("Auth check failed:", error);
+      }
     };
     
     checkAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session?.user ? "user present" : "no user");
       setUser(session?.user ?? null);
     });
 
@@ -92,26 +106,80 @@ const Wishlists = () => {
     fetchChildren();
   }, []);
 
-  const fetchChildren = async () => {
+  const fetchChildren = async (attempt = 1) => {
+    console.log(`Fetching children, attempt ${attempt}...`);
+    setLoading(true);
+    setError(null);
+    
     try {
+      // Test basic connection first
+      console.log("Testing Supabase connection...");
+      const { data: connectionTest, error: connectionError } = await supabase
+        .from("children")
+        .select("count", { count: 'exact' })
+        .limit(0);
+      
+      if (connectionError) {
+        console.error("Connection test failed:", connectionError);
+        throw new Error(`Connection failed: ${connectionError.message}`);
+      }
+      
+      console.log("Connection successful, children count:", connectionTest);
+
+      // Now fetch the actual data
+      console.log("Fetching children data...");
       const { data, error } = await supabase
         .from("children")
         .select("*")
         .eq("status", "available")
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Data fetch error:", error);
+        throw error;
+      }
+      
+      console.log("Children data fetched:", data);
+      console.log("Number of children:", data?.length || 0);
+      
       setChildren(data || []);
-    } catch (error) {
+      setRetryCount(0);
+      
+      if (!data || data.length === 0) {
+        console.warn("No children found in database");
+        toast({
+          title: "No Children Found",
+          description: "No children profiles are currently available. The demo data might not have been inserted yet.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
       console.error("Error fetching children:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load children profiles",
-        variant: "destructive",
-      });
+      setError(error.message || "Failed to fetch children data");
+      
+      // Auto-retry up to 3 times with exponential backoff
+      if (attempt < 3) {
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        console.log(`Retrying in ${delay}ms...`);
+        setTimeout(() => {
+          setRetryCount(attempt);
+          fetchChildren(attempt + 1);
+        }, delay);
+      } else {
+        toast({
+          title: "Connection Error",
+          description: "Unable to load children profiles. Please check your internet connection and try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    console.log("Manual retry triggered");
+    fetchChildren();
   };
 
   const handleAdopt = (childId: string) => {
@@ -188,8 +256,28 @@ const Wishlists = () => {
           </div>
 
           {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-christmas-green-600"></div>
+            <div className="flex flex-col justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-christmas-green-600 mb-4"></div>
+              <p className="text-christmas-green-700">
+                Loading children profiles... {retryCount > 0 && `(Attempt ${retryCount + 1})`}
+              </p>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col justify-center items-center py-20 text-center">
+              <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
+              <h3 className="text-xl md:text-2xl font-semibold text-red-700 mb-2">
+                Connection Problem
+              </h3>
+              <p className="text-red-600 mb-4 max-w-md">
+                {error}
+              </p>
+              <Button 
+                onClick={handleRetry}
+                className="bg-christmas-green-600 hover:bg-christmas-green-700 text-white"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mobile-optimized">
@@ -204,15 +292,22 @@ const Wishlists = () => {
             </div>
           )}
 
-          {!loading && children.length === 0 && (
+          {!loading && !error && children.length === 0 && (
             <div className="text-center py-20">
               <Snowflake className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
               <h3 className="text-xl md:text-2xl font-semibold text-christmas-green-800 mb-2">
                 No Wishlists Available
               </h3>
-              <p className="text-christmas-brown-600">
-                Check back soon for new children's wishlists!
+              <p className="text-christmas-brown-600 mb-4">
+                The demo children data might not have been inserted yet.
               </p>
+              <Button 
+                onClick={handleRetry}
+                className="bg-christmas-green-600 hover:bg-christmas-green-700 text-white"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
             </div>
           )}
         </div>
