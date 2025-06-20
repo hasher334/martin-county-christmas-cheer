@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useAuthNotifications } from "@/hooks/useAuthNotifications";
+import { useEffect, useState } from "react";
 import Index from "./pages/Index";
 import Wishlists from "./pages/Wishlists";
 import About from "./pages/About";
@@ -24,8 +25,27 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  // Initialize auth notifications
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Initialize auth notifications only once
   useAuthNotifications();
+
+  useEffect(() => {
+    // Small delay to ensure proper initialization
+    const timer = setTimeout(() => {
+      setIsInitialized(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-christmas-green-600"></div>
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
