@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { notifyUserSignup, notifyAuthEvent } from "@/utils/notificationService";
 
 interface AuthDialogProps {
   open: boolean;
@@ -34,6 +35,9 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
 
       if (error) throw error;
 
+      // Send signin notification
+      await notifyAuthEvent('signin', email, 'User signed in successfully');
+
       toast({
         title: "Welcome back!",
         description: "You're now signed in and ready to adopt a child for Christmas.",
@@ -56,13 +60,11 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
     setLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: undefined, // Remove email confirmation
           data: {
             name: name,
           },
@@ -71,9 +73,12 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
 
       if (error) throw error;
 
+      // Send signup notification immediately
+      await notifyUserSignup(email, name);
+
       toast({
-        title: "Account created!",
-        description: "Please check your email to verify your account.",
+        title: "Account created successfully!",
+        description: "Welcome! You can now start adopting children for Christmas.",
       });
       
       onSuccess();

@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ContactInfo } from "@/components/ContactInfo";
-import { ContactFormSection } from "@/components/ContactFormSection";
+import { ContactForm } from "@/components/ContactForm";
 
 const Contact = () => {
   const [user, setUser] = useState(null);
@@ -52,7 +52,7 @@ const Contact = () => {
             <ContactInfo />
           </div>
           <div>
-            <ContactFormSection />
+            <ContactForm />
           </div>
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,9 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, X, Send, AlertCircle, CheckCircle } from "lucide-react";
+import { notifyChildRegistration } from "@/utils/notificationService";
 
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
@@ -86,35 +85,10 @@ export const ChildRegistrationForm = ({ onSuccess }: ChildRegistrationFormProps)
       console.log("Sending notification email for child registration");
       setEmailStatus('sending');
       
-      const { data: response, error } = await supabase.functions.invoke('send-notification-email', {
-        body: {
-          type: 'child_registration',
-          data: data,
-          parentName: data.parentName,
-          childName: data.childName,
-        }
-      });
-
-      if (error) {
-        console.error("Error sending notification email:", error);
-        setEmailStatus('error');
-        throw error;
-      }
-
-      console.log("Notification email response:", response);
+      await notifyChildRegistration(data.parentName, data.childName, data);
       
-      if (response?.success) {
-        console.log("Notification email sent successfully");
-        setEmailStatus('success');
-        
-        if (response.note) {
-          console.log("Email note:", response.note);
-        }
-      } else {
-        console.error("Email sending failed:", response);
-        setEmailStatus('error');
-        throw new Error("Email sending failed");
-      }
+      console.log("Notification email sent successfully");
+      setEmailStatus('success');
     } catch (error) {
       console.error("Error in sendNotificationEmail:", error);
       setEmailStatus('error');

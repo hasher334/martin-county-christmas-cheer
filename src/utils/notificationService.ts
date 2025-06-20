@@ -21,6 +21,29 @@ interface AuthEventNotification extends BaseNotification {
   eventDescription?: string;
 }
 
+interface AdoptionNotification extends BaseNotification {
+  type: 'adoption';
+  childName: string;
+  donorName: string;
+  donorEmail: string;
+  adoptionNotes?: string;
+}
+
+interface ContactFormNotification extends BaseNotification {
+  type: 'contact_form';
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+interface ChildRegistrationNotification extends BaseNotification {
+  type: 'child_registration';
+  parentName: string;
+  childName: string;
+  data: any;
+}
+
 interface AnalyticsSummaryNotification extends BaseNotification {
   type: 'analytics_summary';
   analyticsData: {
@@ -48,7 +71,7 @@ interface AdminActivityNotification extends BaseNotification {
   data?: any;
 }
 
-type NotificationRequest = UserSignupNotification | AuthEventNotification | AnalyticsSummaryNotification | SystemEventNotification | AdminActivityNotification;
+type NotificationRequest = UserSignupNotification | AuthEventNotification | AdoptionNotification | ContactFormNotification | ChildRegistrationNotification | AnalyticsSummaryNotification | SystemEventNotification | AdminActivityNotification;
 
 export const sendNotification = async (notification: NotificationRequest) => {
   try {
@@ -95,6 +118,36 @@ export const notifyAuthEvent = (eventType: string, userEmail: string, eventDescr
     eventDescription,
     ipAddress,
     userAgent: navigator.userAgent
+  });
+};
+
+export const notifyAdoption = (childName: string, donorName: string, donorEmail: string, adoptionNotes?: string) => {
+  return sendNotification({
+    type: 'adoption',
+    childName,
+    donorName,
+    donorEmail,
+    adoptionNotes
+  });
+};
+
+export const notifyContactForm = (name: string, email: string, subject: string, message: string) => {
+  return sendNotification({
+    type: 'contact_form',
+    name,
+    email,
+    subject,
+    message,
+    userAgent: navigator.userAgent
+  });
+};
+
+export const notifyChildRegistration = (parentName: string, childName: string, data: any) => {
+  return sendNotification({
+    type: 'child_registration',
+    parentName,
+    childName,
+    data
   });
 };
 

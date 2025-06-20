@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Heart, Gift, MapPin, Calendar } from "lucide-react";
+import { notifyAdoption } from "@/utils/notificationService";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Child = Tables<"children">;
@@ -30,30 +31,6 @@ export const AdoptionDialog = ({ open, onOpenChange, child, user }: AdoptionDial
   });
   const [notes, setNotes] = useState("");
   const { toast } = useToast();
-
-  const sendAdoptionNotification = async () => {
-    try {
-      console.log("Sending adoption notification email");
-      
-      const { error } = await supabase.functions.invoke('send-notification-email', {
-        body: {
-          type: 'adoption',
-          childName: child.name,
-          donorName: donorInfo.name,
-          donorEmail: donorInfo.email,
-          adoptionNotes: notes,
-        }
-      });
-
-      if (error) {
-        console.error("Error sending adoption notification:", error);
-      } else {
-        console.log("Adoption notification sent successfully");
-      }
-    } catch (error) {
-      console.error("Error in sendAdoptionNotification:", error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,8 +91,8 @@ export const AdoptionDialog = ({ open, onOpenChange, child, user }: AdoptionDial
 
       if (updateChildError) throw updateChildError;
 
-      // Send adoption notification email
-      await sendAdoptionNotification();
+      // Send adoption notification using the updated notification service
+      await notifyAdoption(child.name, donorInfo.name, donorInfo.email, notes);
 
       toast({
         title: "Adoption successful! 🎄",
