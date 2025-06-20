@@ -18,6 +18,12 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
   const [showModal, setShowModal] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // Log the children data for debugging
+  useEffect(() => {
+    console.log("InteractiveChristmasTree received children:", children.length);
+    console.log("Children data:", children);
+  }, [children]);
+
   useEffect(() => {
     console.log("InteractiveChristmasTree mobile optimization active");
     
@@ -67,6 +73,22 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
     return children.slice(0, isMobile ? 12 : 16);
   }, [children]);
 
+  // Show debug info if no children
+  if (children.length === 0) {
+    return (
+      <div className="relative bg-gradient-to-b from-slate-300 via-slate-200 to-white mobile-optimized no-horizontal-scroll">
+        <div className="relative z-10 flex flex-col items-center justify-center py-8 md:py-12 mobile-optimized">
+          <div className="relative w-full max-w-4xl mx-auto px-4">
+            <div className="text-center p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-lg font-semibold text-yellow-800 mb-2">No Children Data Available</p>
+              <p className="text-yellow-700">Waiting for children profiles to load...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative bg-gradient-to-b from-slate-300 via-slate-200 to-white mobile-optimized no-horizontal-scroll">
       {/* Simplified static background for mobile performance */}
@@ -111,7 +133,7 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
             />
 
             {/* Interactive Ornaments - Mobile optimized */}
-            {imageLoaded && displayChildren.map((child, index) => {
+            {imageLoaded && displayChildren.length > 0 && displayChildren.map((child, index) => {
               const position = ornamentPositions[index] || ornamentPositions[0];
               
               return (
@@ -142,6 +164,14 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
                 </button>
               );
             })}
+
+            {/* Debug info for development */}
+            {imageLoaded && displayChildren.length === 0 && (
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 p-4 rounded-lg">
+                <p className="text-sm text-gray-700">No ornaments to display</p>
+                <p className="text-xs text-gray-500">Children count: {children.length}</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -155,6 +185,11 @@ export const InteractiveChristmasTree = ({ children, onAdopt, user }: Interactiv
               Each sparkling ornament represents a child hoping for Christmas magic. 
               Discover their story and help make their holiday dreams come true!
             </p>
+            {displayChildren.length > 0 && (
+              <p className="text-sm text-slate-600 mt-2">
+                Showing {displayChildren.length} children ready for adoption
+              </p>
+            )}
           </div>
         </div>
 

@@ -70,10 +70,8 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background font-nunito mobile-optimized">
-      {/* Header - loads first */}
-      {componentsLoaded.header && (
-        <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
-      )}
+      {/* Header - Always show for navigation */}
+      <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
       {/* Page Title Section - Mobile optimized */}
       <section className="py-12 md:py-16 bg-gradient-to-b from-christmas-red-600 to-christmas-red-700 text-white mobile-optimized">
