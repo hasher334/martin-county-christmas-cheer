@@ -107,9 +107,8 @@ export const runNetworkDiagnostics = async () => {
   const fetchIsWrapped = originalFetch.toString().includes('native code') === false;
   console.log('Fetch appears to be wrapped:', fetchIsWrapped);
   
-  // Test 4: Check Supabase client status
-  console.log('Supabase client URL:', supabase.supabaseUrl);
-  console.log('Supabase client key (first 10 chars):', supabase.supabaseKey.substring(0, 10) + '...');
+  // Test 4: Basic Supabase client status
+  console.log('Supabase client available:', !!supabase);
   
   console.groupEnd();
   
