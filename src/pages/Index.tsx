@@ -9,7 +9,7 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { ChristmasColorUtility } from "@/components/ChristmasColorUtility";
 import { Stats } from "@/components/Stats";
 import { NavigationBanner } from "@/components/NavigationBanner";
-import { MobileLoadingSpinner } from "@/components/MobileLoadingSpinner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Gift, Users, Heart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
@@ -21,15 +21,13 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
     
     const initializeApp = async () => {
-      if (isInitialized) return;
-      
       console.log("Index page initializing");
       
       try {
@@ -37,12 +35,15 @@ const Index = () => {
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         if (isMounted) {
           setUser(currentUser);
-          setIsInitialized(true);
         }
+
+        // Fetch children data
+        await fetchChildren();
       } catch (error) {
-        console.error("Auth check error:", error);
+        console.error("Initialization error:", error);
         if (isMounted) {
-          setIsInitialized(true);
+          setError("Failed to initialize application");
+          setLoading(false);
         }
       }
     };
@@ -60,26 +61,28 @@ const Index = () => {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
-      fetchChildren();
-    }
-  }, [isInitialized]);
+  }, []);
 
   const fetchChildren = async () => {
     try {
+      console.log('Fetching children data...');
       const { data, error } = await supabase
         .from("children")
         .select("*")
         .eq("status", "available")
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching children:', error);
+        throw error;
+      }
+      
+      console.log('Children data fetched successfully:', data?.length || 0, 'children');
       setChildren(data || []);
+      setError(null);
     } catch (error) {
       console.error("Error fetching children:", error);
+      setError("Failed to load children profiles");
       toast({
         title: "Error",
         description: "Failed to load children profiles",
@@ -97,9 +100,34 @@ const Index = () => {
     }
   };
 
-  // Show loading spinner until initialized
-  if (!isInitialized) {
-    return <MobileLoadingSpinner />;
+  // Show loading spinner while fetching data
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized">
+        <LoadingSpinner message="Loading Christmas magic..." size="lg" />
+      </div>
+    );
+  }
+
+  // Show error state if there was a critical error
+  if (error && children.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized">
+        <div className="flex flex-col items-center justify-center py-20">
+          <p className="text-christmas-red-600 text-center mb-4">{error}</p>
+          <button 
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              fetchChildren();
+            }}
+            className="bg-christmas-green-600 hover:bg-christmas-green-700 text-white px-6 py-2 rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -124,17 +152,11 @@ const Index = () => {
           </p>
           
           <div className="animate-fade-in">
-            {loading ? (
-              <div className="flex justify-center items-center py-16 md:py-20">
-                <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-2 border-christmas-green-600"></div>
-              </div>
-            ) : (
-              <InteractiveChristmasTree 
-                children={children} 
-                onAdopt={handleAdopt}
-                user={user}
-              />
-            )}
+            <InteractiveChristmasTree 
+              children={children} 
+              onAdopt={handleAdopt}
+              user={user}
+            />
           </div>
 
           {/* Navigation Banners */}
