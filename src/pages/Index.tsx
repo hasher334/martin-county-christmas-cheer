@@ -13,18 +13,16 @@ import { MobileLoadingSpinner } from "@/components/MobileLoadingSpinner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Gift, Users, Heart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import type { Tables } from "@/integrations/supabase/types";
-
-type Child = Tables<"children">;
+import { useChildrenData } from "@/hooks/useChildrenData";
 
 const Index = () => {
-  const [children, setChildren] = useState<Child[]>([]);
-  const [childrenLoading, setChildrenLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [pageReady, setPageReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  // Use the useChildrenData hook instead of manual fetching
+  const { children, loading: childrenLoading, error, refetch, isUsingFallback } = useChildrenData();
 
   useEffect(() => {
     console.log("🚀 Index page initializing...");
@@ -48,7 +46,6 @@ const Index = () => {
         
         if (authError) {
           console.error("❌ Auth error:", authError);
-          setError("Authentication check failed");
         } else {
           console.log("✅ Auth check complete:", user?.email || "No user");
           setUser(user);
@@ -59,7 +56,6 @@ const Index = () => {
       } catch (error) {
         console.error("❌ Page initialization error:", error);
         clearTimeout(authTimeout);
-        setError("Failed to initialize page");
         setPageReady(true); // Still show page even if auth fails
       }
     };
@@ -68,7 +64,6 @@ const Index = () => {
     pageTimeout = setTimeout(() => {
       console.log("⚠️ Page initialization timeout - forcing page load");
       setPageReady(true);
-      setChildrenLoading(false);
     }, 5000);
 
     initializePage();
@@ -85,46 +80,6 @@ const Index = () => {
       subscription.unsubscribe();
     };
   }, []);
-
-  useEffect(() => {
-    if (pageReady) {
-      console.log("📊 Page ready, fetching children...");
-      fetchChildren();
-    }
-  }, [pageReady]);
-
-  const fetchChildren = async () => {
-    try {
-      setChildrenLoading(true);
-      console.log("🔄 Fetching children data...");
-      
-      const { data, error } = await supabase
-        .from("children")
-        .select("*")
-        .eq("status", "available")
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.error("❌ Children fetch error:", error);
-        throw error;
-      }
-      
-      console.log("✅ Children fetched successfully:", data?.length || 0);
-      setChildren(data || []);
-      setError(null);
-      
-    } catch (error) {
-      console.error("❌ Error fetching children:", error);
-      setError("Failed to load children profiles");
-      toast({
-        title: "Error",
-        description: "Failed to load children profiles. Please try refreshing the page.",
-        variant: "destructive",
-      });
-    } finally {
-      setChildrenLoading(false);
-    }
-  };
 
   const handleAdopt = (childId: string) => {
     if (!user) {
@@ -159,15 +114,28 @@ const Index = () => {
             Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
           
-          {/* Show error message if there's an error */}
-          {error && (
+          {/* Show error message if there's an error and it's not using fallback */}
+          {error && !isUsingFallback && (
             <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-700">{error}</p>
               <button 
-                onClick={fetchChildren}
+                onClick={refetch}
                 className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
               >
                 Retry
+              </button>
+            </div>
+          )}
+
+          {/* Show fallback notice */}
+          {isUsingFallback && (
+            <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-700">Showing sample data while we work to restore the connection.</p>
+              <button 
+                onClick={refetch}
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                Try to refresh data
               </button>
             </div>
           )}
