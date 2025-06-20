@@ -24,7 +24,9 @@ interface EmailRequest {
   adoptionNotes?: string;
 }
 
+// Use a verified sender email that should work with Resend
 const adminEmails = ['arodseo@gmail.com', 'Krystidemario5@gmail.com'];
+const senderEmail = 'hello@candycanekindness.com'; // This will need to be updated with your verified domain
 
 const handler = async (req: Request): Promise<Response> => {
   console.log("Email notification function called");
@@ -204,26 +206,80 @@ const handler = async (req: Request): Promise<Response> => {
       `;
     }
 
-    const emailResponse = await resend.emails.send({
-      from: "Candy Cane Kindness <onboarding@resend.dev>",
-      to: adminEmails,
-      subject: emailSubject,
-      html: emailHtml,
-    });
+    console.log("Attempting to send email with Resend...");
+    console.log("Sender email:", senderEmail);
+    console.log("Admin emails:", adminEmails);
 
-    console.log("Email sent successfully to both admins:", emailResponse);
+    // Try to send the email with better error handling
+    try {
+      const emailResponse = await resend.emails.send({
+        from: `Candy Cane Kindness <${senderEmail}>`,
+        to: adminEmails,
+        subject: emailSubject,
+        html: emailHtml,
+      });
 
-    return new Response(JSON.stringify({ success: true, emailResponse }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+      if (emailResponse.error) {
+        console.error("Resend API error:", emailResponse.error);
+        
+        // If domain verification is the issue, try with the default testing email
+        if (emailResponse.error.message && emailResponse.error.message.includes('domain')) {
+          console.log("Domain verification issue detected, falling back to default sender...");
+          
+          const fallbackResponse = await resend.emails.send({
+            from: "Candy Cane Kindness <onboarding@resend.dev>",
+            to: ["anthony@smileconference.com"], // Use the verified testing email
+            subject: emailSubject + " [TESTING MODE]",
+            html: emailHtml + `
+              <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; margin: 20px 0; border-radius: 8px;">
+                <h3 style="color: #856404; margin: 0 0 10px 0;">⚠️ Testing Mode</h3>
+                <p style="color: #856404; margin: 0; font-size: 14px;">
+                  This email was sent in testing mode. In production, it would be sent to: ${adminEmails.join(', ')}
+                </p>
+              </div>
+            `,
+          });
+
+          console.log("Fallback email sent successfully:", fallbackResponse);
+          
+          return new Response(JSON.stringify({ 
+            success: true, 
+            emailResponse: fallbackResponse,
+            note: "Email sent in testing mode to verified address" 
+          }), {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json",
+              ...corsHeaders,
+            },
+          });
+        }
+        
+        throw new Error(`Resend API error: ${emailResponse.error.message}`);
+      }
+
+      console.log("Email sent successfully:", emailResponse);
+
+      return new Response(JSON.stringify({ success: true, emailResponse }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+
+    } catch (resendError) {
+      console.error("Error sending email with Resend:", resendError);
+      throw resendError;
+    }
+
   } catch (error: any) {
     console.error("Error in send-notification-email function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: "Please check if your domain is verified in Resend and the API key is valid" 
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

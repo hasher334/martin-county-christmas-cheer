@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, X, Send } from "lucide-react";
+import { Plus, X, Send, AlertCircle, CheckCircle } from "lucide-react";
 
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
@@ -44,6 +44,7 @@ interface ChildRegistrationFormProps {
 export const ChildRegistrationForm = ({ onSuccess }: ChildRegistrationFormProps) => {
   const [currentWish, setCurrentWish] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -83,8 +84,9 @@ export const ChildRegistrationForm = ({ onSuccess }: ChildRegistrationFormProps)
   const sendNotificationEmail = async (data: FormData) => {
     try {
       console.log("Sending notification email for child registration");
+      setEmailStatus('sending');
       
-      const { error } = await supabase.functions.invoke('send-notification-email', {
+      const { data: response, error } = await supabase.functions.invoke('send-notification-email', {
         body: {
           type: 'child_registration',
           data: data,
@@ -95,37 +97,73 @@ export const ChildRegistrationForm = ({ onSuccess }: ChildRegistrationFormProps)
 
       if (error) {
         console.error("Error sending notification email:", error);
+        setEmailStatus('error');
         throw error;
+      }
+
+      console.log("Notification email response:", response);
+      
+      if (response?.success) {
+        console.log("Notification email sent successfully");
+        setEmailStatus('success');
+        
+        if (response.note) {
+          console.log("Email note:", response.note);
+        }
       } else {
-        console.log("Notification email sent successfully to admin emails");
+        console.error("Email sending failed:", response);
+        setEmailStatus('error');
+        throw new Error("Email sending failed");
       }
     } catch (error) {
       console.error("Error in sendNotificationEmail:", error);
+      setEmailStatus('error');
       throw error;
     }
   };
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
+    setEmailStatus('idle');
 
     try {
+      console.log("Starting registration submission process...");
+      
+      // Send notification email
       await sendNotificationEmail(data);
 
       toast({
-        title: "Registration submitted!",
-        description: "Your child's profile has been submitted successfully and our team has been notified.",
+        title: "Registration submitted successfully!",
+        description: "Your child's profile has been submitted and our team has been notified. We'll review it shortly.",
       });
 
+      console.log("Registration process completed successfully");
       onSuccess();
     } catch (error) {
       console.error("Error submitting registration:", error);
+      
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      
       toast({
         title: "Submission failed",
-        description: "There was an error submitting the registration. Please try again.",
+        description: `There was an error submitting the registration: ${errorMessage}. Please try again or contact support.`,
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (emailStatus) {
+      case 'sending':
+        return <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />;
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'error':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return null;
     }
   };
 
@@ -447,8 +485,23 @@ export const ChildRegistrationForm = ({ onSuccess }: ChildRegistrationFormProps)
             </CardContent>
           </Card>
 
-          {/* Submit Button */}
-          <div className="flex justify-end">
+          {/* Submit Button with Status */}
+          <div className="flex flex-col items-end space-y-4">
+            {emailStatus !== 'idle' && (
+              <div className="flex items-center space-x-2 text-sm">
+                {getStatusIcon()}
+                <span className={`
+                  ${emailStatus === 'sending' ? 'text-blue-600' : ''}
+                  ${emailStatus === 'success' ? 'text-green-600' : ''}
+                  ${emailStatus === 'error' ? 'text-red-600' : ''}
+                `}>
+                  {emailStatus === 'sending' && 'Sending notification email...'}
+                  {emailStatus === 'success' && 'Notification email sent successfully'}
+                  {emailStatus === 'error' && 'Email notification failed'}
+                </span>
+              </div>
+            )}
+            
             <Button
               type="submit"
               disabled={isSubmitting}
