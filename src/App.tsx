@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useAuthNotifications } from "@/hooks/useAuthNotifications";
+import { useEmailConfirmation } from "@/hooks/useEmailConfirmation";
 import Index from "./pages/Index";
 import Wishlists from "./pages/Wishlists";
 import About from "./pages/About";
@@ -26,6 +27,9 @@ const queryClient = new QueryClient({
 function AppContent() {
   // Initialize auth notifications
   useAuthNotifications();
+  
+  // Handle email confirmations
+  useEmailConfirmation();
 
   return (
     <BrowserRouter>
