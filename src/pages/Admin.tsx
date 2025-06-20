@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
@@ -9,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Shield, Users, Settings } from "lucide-react";
-import { ProfileForm } from "@/components/ProfileForm";
-import { RoleManagement } from "@/components/RoleManagement";
+import { ProfileFormDialog } from "@/components/ProfileFormDialog";
+import { RoleManagementDialog } from "@/components/RoleManagementDialog";
 
 const Admin = () => {
   const [user, setUser] = useState(null);
@@ -295,7 +294,7 @@ const Admin = () => {
 
       <Footer />
 
-      <ProfileForm 
+      <ProfileFormDialog 
         open={showProfileForm}
         onOpenChange={setShowProfileForm}
         onSuccess={() => {
@@ -304,7 +303,7 @@ const Admin = () => {
         }}
       />
 
-      <RoleManagement
+      <RoleManagementDialog
         open={showRoleManagement}
         onOpenChange={setShowRoleManagement}
         onSuccess={() => {
