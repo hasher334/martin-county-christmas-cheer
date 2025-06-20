@@ -13,25 +13,37 @@ export type Database = {
         Row: {
           adopted_at: string | null
           child_id: string | null
+          contact_allowed: boolean | null
           donor_id: string | null
+          gift_amount: number | null
           gift_delivered: boolean | null
+          gift_description: string | null
           id: string
+          last_contact_date: string | null
           notes: string | null
         }
         Insert: {
           adopted_at?: string | null
           child_id?: string | null
+          contact_allowed?: boolean | null
           donor_id?: string | null
+          gift_amount?: number | null
           gift_delivered?: boolean | null
+          gift_description?: string | null
           id?: string
+          last_contact_date?: string | null
           notes?: string | null
         }
         Update: {
           adopted_at?: string | null
           child_id?: string | null
+          contact_allowed?: boolean | null
           donor_id?: string | null
+          gift_amount?: number | null
           gift_delivered?: boolean | null
+          gift_description?: string | null
           id?: string
+          last_contact_date?: string | null
           notes?: string | null
         }
         Relationships: [
@@ -95,6 +107,44 @@ export type Database = {
           wishes?: string[] | null
         }
         Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          adoption_id: string | null
+          created_at: string | null
+          id: string
+          message: string
+          sender_email: string
+          sender_name: string
+          sender_type: string
+        }
+        Insert: {
+          adoption_id?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          sender_email: string
+          sender_name: string
+          sender_type: string
+        }
+        Update: {
+          adoption_id?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          sender_email?: string
+          sender_name?: string
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_messages_adoption_id_fkey"
+            columns: ["adoption_id"]
+            isOneToOne: false
+            referencedRelation: "adoptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       donors: {
         Row: {
