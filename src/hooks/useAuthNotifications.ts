@@ -46,18 +46,6 @@ export const useAuthNotifications = () => {
               }
               break;
 
-            case 'SIGNED_UP':
-              console.log('SIGNED_UP event detected');
-              if (session?.user?.email) {
-                console.log('Sending signup notification for SIGNED_UP event:', session.user.email);
-                await notifyUserSignup(
-                  session.user.email,
-                  session.user.user_metadata?.full_name || session.user.user_metadata?.name,
-                  '(IP not available in client)'
-                );
-              }
-              break;
-
             case 'SIGNED_OUT':
               // Note: session will be null for sign out, so we can't get user email here
               // We handle this in the sign out function instead
