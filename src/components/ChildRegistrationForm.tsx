@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,10 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, X, Upload, Save, Send } from "lucide-react";
-import type { Database } from "@/integrations/supabase/types";
-
-type AdoptionStatus = Database["public"]["Enums"]["adoption_status"];
+import { Plus, X, Send } from "lucide-react";
 
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
@@ -23,7 +21,6 @@ const formSchema = z.object({
   location: z.string().min(1, "Location is required"),
   story: z.string().min(50, "Please provide at least 50 characters for the story"),
   wishes: z.array(z.string()).min(1, "Please add at least one wish"),
-  photoUrl: z.string().optional(),
   // Parent/Guardian Information
   parentName: z.string().min(1, "Your name is required"),
   parentEmail: z.string().email("Valid email is required"),
@@ -39,16 +36,14 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 interface ChildRegistrationFormProps {
-  user: any;
+  user?: any;
   onSuccess: () => void;
-  onAuthRequired: () => void;
+  onAuthRequired?: () => void;
 }
 
-export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: ChildRegistrationFormProps) => {
+export const ChildRegistrationForm = ({ onSuccess }: ChildRegistrationFormProps) => {
   const [currentWish, setCurrentWish] = useState("");
-  const [isDraft, setIsDraft] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -60,9 +55,8 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
       location: "",
       story: "",
       wishes: [],
-      photoUrl: "",
       parentName: "",
-      parentEmail: user?.email || "",
+      parentEmail: "",
       parentPhone: "",
       relationship: "",
       householdSize: 1,
@@ -86,42 +80,6 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
     form.setValue("wishes", newWishes);
   };
 
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `child-photos/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('child-photos')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('child-photos')
-        .getPublicUrl(filePath);
-
-      setUploadedPhoto(publicUrl);
-      form.setValue("photoUrl", publicUrl);
-      
-      toast({
-        title: "Photo uploaded successfully!",
-        description: "Your child's photo has been added to the profile.",
-      });
-    } catch (error) {
-      console.error("Error uploading photo:", error);
-      toast({
-        title: "Upload failed",
-        description: "There was an error uploading the photo. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const sendNotificationEmail = async (data: FormData) => {
     try {
       console.log("Sending notification email for child registration");
@@ -137,68 +95,28 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
 
       if (error) {
         console.error("Error sending notification email:", error);
-        // Don't throw error here - we don't want to block the registration if email fails
+        throw error;
       } else {
-        console.log("Notification email sent successfully to both admin emails");
+        console.log("Notification email sent successfully to admin emails");
       }
     } catch (error) {
       console.error("Error in sendNotificationEmail:", error);
-      // Don't throw error here - we don't want to block the registration if email fails
+      throw error;
     }
   };
 
-  const onSubmit = async (data: FormData, saveAsDraft = false) => {
-    if (!user) {
-      onAuthRequired();
-      return;
-    }
-
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    setIsDraft(saveAsDraft);
 
     try {
-      const childData = {
-        name: data.childName,
-        age: data.age,
-        gender: data.gender,
-        location: data.location,
-        story: data.story,
-        wishes: data.wishes,
-        photo_url: data.photoUrl,
-        status: (saveAsDraft ? 'draft' : 'pending_review') as AdoptionStatus,
-        parent_info: {
-          name: data.parentName,
-          email: data.parentEmail,
-          phone: data.parentPhone,
-          relationship: data.relationship,
-          householdSize: data.householdSize,
-          annualIncome: data.annualIncome,
-          specialNeeds: data.specialNeeds,
-          additionalInfo: data.additionalInfo,
-        }
-      };
-
-      const { error } = await supabase
-        .from('children')
-        .insert([childData]);
-
-      if (error) throw error;
-
-      // Send notification email for submitted registrations (not drafts)
-      if (!saveAsDraft) {
-        await sendNotificationEmail(data);
-      }
+      await sendNotificationEmail(data);
 
       toast({
-        title: saveAsDraft ? "Draft saved!" : "Registration submitted!",
-        description: saveAsDraft 
-          ? "You can continue editing later."
-          : "Your child's profile has been submitted for review and our team has been notified.",
+        title: "Registration submitted!",
+        description: "Your child's profile has been submitted successfully and our team has been notified.",
       });
 
-      if (!saveAsDraft) {
-        onSuccess();
-      }
+      onSuccess();
     } catch (error) {
       console.error("Error submitting registration:", error);
       toast({
@@ -208,14 +126,13 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
       });
     } finally {
       setIsSubmitting(false);
-      setIsDraft(false);
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((data) => onSubmit(data, false))} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           
           {/* Child Information Section */}
           <Card>
@@ -294,37 +211,6 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
                     </FormItem>
                   )}
                 />
-              </div>
-
-              {/* Photo Upload */}
-              <div>
-                <FormLabel>Child's Photo</FormLabel>
-                <div className="mt-2">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    id="photo-upload"
-                  />
-                  <label
-                    htmlFor="photo-upload"
-                    className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-christmas-green-400 transition-colors"
-                  >
-                    {uploadedPhoto ? (
-                      <img 
-                        src={uploadedPhoto} 
-                        alt="Child's photo" 
-                        className="h-full w-auto object-cover rounded-lg"
-                      />
-                    ) : (
-                      <div className="text-center">
-                        <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600">Click to upload photo</p>
-                      </div>
-                    )}
-                  </label>
-                </div>
               </div>
 
               <FormField
@@ -561,26 +447,15 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
             </CardContent>
           </Card>
 
-          {/* Submit Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.handleSubmit((data) => onSubmit(data, true))()}
-              disabled={isSubmitting}
-              className="order-2 sm:order-1"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isDraft ? "Saving Draft..." : "Save as Draft"}
-            </Button>
-            
+          {/* Submit Button */}
+          <div className="flex justify-end">
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-christmas-red-600 hover:bg-christmas-red-700 order-1 sm:order-2"
+              className="bg-christmas-red-600 hover:bg-christmas-red-700"
             >
               <Send className="h-4 w-4 mr-2" />
-              {isSubmitting && !isDraft ? "Submitting..." : "Submit for Review"}
+              {isSubmitting ? "Submitting..." : "Submit Registration"}
             </Button>
           </div>
         </form>

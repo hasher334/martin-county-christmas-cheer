@@ -1,36 +1,15 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { AuthDialog } from "@/components/AuthDialog";
 import { ChildRegistrationForm } from "@/components/ChildRegistrationForm";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Heart, Users, FileText } from "lucide-react";
 
 const Register = () => {
-  const [user, setUser] = useState(null);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  useEffect(() => {
-    // Check auth state
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    
-    checkAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleRegistrationSuccess = () => {
     toast({
@@ -42,7 +21,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
-      <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
+      <Header />
       
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-b from-christmas-green-600 to-christmas-green-700 text-white">
@@ -85,20 +64,12 @@ const Register = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <ChildRegistrationForm 
-            user={user}
             onSuccess={handleRegistrationSuccess}
-            onAuthRequired={() => setShowAuthDialog(true)}
           />
         </div>
       </section>
 
       <Footer />
-
-      <AuthDialog 
-        open={showAuthDialog} 
-        onOpenChange={setShowAuthDialog}
-        onSuccess={() => setShowAuthDialog(false)}
-      />
     </div>
   );
 };
