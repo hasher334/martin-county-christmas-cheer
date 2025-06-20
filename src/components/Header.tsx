@@ -1,11 +1,18 @@
 
 import { Button } from "@/components/ui/button";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import { MobileMenu } from "./MobileMenu";
 import { notifyAuthEvent, notifySystemEvent } from "@/utils/notificationService";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   user: any;
@@ -90,21 +97,35 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
             <div className="hidden md:flex items-center space-x-4">
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-full px-4 py-2">
-                    <User className="h-4 w-4" />
-                    <span className="text-sm font-medium font-nunito">
-                      Welcome, {user.email?.split('@')[0]}!
-                    </span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSignOut}
-                    className="text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400 transition-all duration-200 font-nunito"
-                  >
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Sign Out
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-full px-4 py-2 hover:bg-white/50 transition-all duration-200"
+                      >
+                        <User className="h-4 w-4" />
+                        <span className="text-sm font-medium font-nunito">
+                          Welcome, {user.email?.split('@')[0]}!
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile" className="flex items-center cursor-pointer">
+                          <Settings className="h-4 w-4 mr-2" />
+                          <span>Donor Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={handleSignOut}
+                        className="text-christmas-red-600 cursor-pointer"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        <span>Sign Out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ) : (
                 <Button
