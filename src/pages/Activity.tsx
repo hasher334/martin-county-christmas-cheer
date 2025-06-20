@@ -4,8 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
-import { DonorDashboard } from "@/components/DonorDashboard";
-import { MobileLoadingSpinner } from "@/components/MobileLoadingSpinner";
+import { OptimizedDonorDashboard } from "@/components/OptimizedDonorDashboard";
 import { Button } from "@/components/ui/button";
 import { User, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -13,11 +12,12 @@ import { Link } from "react-router-dom";
 const Activity = () => {
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   useEffect(() => {
-    console.log("Activity page mounting");
+    console.log("Activity page mounting - optimized version");
     
+    // Fast auth check with immediate UI update
     const checkAuth = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -25,7 +25,7 @@ const Activity = () => {
       } catch (error) {
         console.error("Auth check error:", error);
       } finally {
-        setIsLoading(false);
+        setIsAuthChecking(false);
       }
     };
     
@@ -34,15 +34,13 @@ const Activity = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      setIsAuthChecking(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  if (isLoading) {
-    return <MobileLoadingSpinner />;
-  }
-
+  // Render immediately without loading spinner
   return (
     <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background font-nunito">
       <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
@@ -62,8 +60,17 @@ const Activity = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          {user ? (
-            <DonorDashboard user={user} />
+          {isAuthChecking ? (
+            // Minimal skeleton while checking auth
+            <div className="animate-pulse">
+              <div className="h-8 bg-christmas-green-100 rounded w-1/3 mb-6"></div>
+              <div className="space-y-4">
+                <div className="h-4 bg-christmas-green-100 rounded w-2/3"></div>
+                <div className="h-4 bg-christmas-green-100 rounded w-1/2"></div>
+              </div>
+            </div>
+          ) : user ? (
+            <OptimizedDonorDashboard user={user} />
           ) : (
             <div className="text-center max-w-2xl mx-auto">
               <User className="h-24 w-24 text-christmas-green-300 mx-auto mb-6" />
