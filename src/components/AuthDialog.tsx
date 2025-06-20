@@ -28,12 +28,19 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log("Attempting sign in for:", email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Sign in error:", error);
+        throw error;
+      }
+
+      console.log("Sign in successful:", data);
 
       // Send signin notification
       await notifyAuthEvent('signin', email, 'User signed in successfully');
@@ -43,11 +50,16 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
         description: "You're now signed in and ready to adopt a child for Christmas.",
       });
       
+      // Clear form
+      setEmail("");
+      setPassword("");
+      
       onSuccess();
     } catch (error: any) {
+      console.error("Sign in failed:", error);
       toast({
         title: "Sign in failed",
-        description: error.message,
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
     } finally {
@@ -60,18 +72,26 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
     setLoading(true);
 
     try {
+      console.log("Attempting sign up for:", email);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: undefined, // Remove email confirmation
+          emailRedirectTo: `${window.location.origin}/activity`,
           data: {
             name: name,
+            full_name: name,
           },
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Sign up error:", error);
+        throw error;
+      }
+
+      console.log("Sign up successful:", data);
 
       // Send signup notification immediately
       await notifyUserSignup(email, name);
@@ -81,11 +101,17 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
         description: "Welcome! You can now start adopting children for Christmas.",
       });
       
+      // Clear form
+      setEmail("");
+      setPassword("");
+      setName("");
+      
       onSuccess();
     } catch (error: any) {
+      console.error("Sign up failed:", error);
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: error.message || "Please try again with different credentials.",
         variant: "destructive",
       });
     } finally {
@@ -119,6 +145,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="mt-1"
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -130,6 +157,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="mt-1"
+                  disabled={loading}
                 />
               </div>
               <Button
@@ -138,7 +166,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                 className="w-full bg-red-500 hover:bg-red-600"
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
+                {loading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
           </TabsContent>
@@ -154,6 +182,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setName(e.target.value)}
                   required
                   className="mt-1"
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -165,6 +194,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="mt-1"
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -177,6 +207,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   required
                   minLength={6}
                   className="mt-1"
+                  disabled={loading}
                 />
               </div>
               <Button
@@ -185,7 +216,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                 className="w-full bg-green-600 hover:bg-green-700"
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Account
+                {loading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
           </TabsContent>

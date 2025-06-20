@@ -37,6 +37,7 @@ export const useDonorData = (user: any): UseDonorDataReturn => {
 
   const fetchDonorData = useCallback(async (useCache: boolean = true) => {
     if (!user?.id) {
+      console.log("No user ID found");
       setDonorData(null);
       setLoading(false);
       return;
@@ -67,37 +68,52 @@ export const useDonorData = (user: any): UseDonorDataReturn => {
       setLoading(true);
       setError(null);
 
-      // Fetch donor profile and adoptions in parallel
-      const [donorResponse, adoptionsResponse] = await Promise.all([
-        supabase
-          .from("donors")
-          .select("*")
-          .eq("user_id", user.id)
-          .abortSignal(abortControllerRef.current.signal)
-          .single(),
-        
-        supabase
-          .from("adoptions")
-          .select(`
-            *,
-            children (*)
-          `)
-          .eq("donor_id", user.id)
-          .order("adopted_at", { ascending: false })
-          .abortSignal(abortControllerRef.current.signal)
-      ]);
+      console.log("Fetching donor data for user:", user.id);
 
-      if (donorResponse.error && donorResponse.error.code !== 'PGRST116') {
-        throw donorResponse.error;
+      // First, find the donor profile for this user
+      const { data: donor, error: donorError } = await supabase
+        .from("donors")
+        .select("*")
+        .eq("user_id", user.id)
+        .abortSignal(abortControllerRef.current.signal)
+        .maybeSingle();
+
+      if (donorError) {
+        console.error("Error fetching donor profile:", donorError);
+        throw donorError;
       }
 
-      if (adoptionsResponse.error) {
-        throw adoptionsResponse.error;
+      if (!donor) {
+        console.log("No donor profile found for user");
+        setDonorData({ donor: null, adoptions: [] });
+        setError(null);
+        setLoading(false);
+        return;
       }
+
+      console.log("Found donor profile:", donor);
+
+      // Then get all adoptions for this donor with child details
+      const { data: adoptions, error: adoptionsError } = await supabase
+        .from("adoptions")
+        .select(`
+          *,
+          children (*)
+        `)
+        .eq("donor_id", donor.id)
+        .order("adopted_at", { ascending: false })
+        .abortSignal(abortControllerRef.current.signal);
+
+      if (adoptionsError) {
+        console.error("Error fetching adoptions:", adoptionsError);
+        throw adoptionsError;
+      }
+
+      console.log("Found adoptions:", adoptions);
 
       const data: DonorData = {
-        donor: donorResponse.data,
-        adoptions: adoptionsResponse.data as AdoptionWithChild[] || []
+        donor,
+        adoptions: adoptions as AdoptionWithChild[] || []
       };
 
       // Cache the result

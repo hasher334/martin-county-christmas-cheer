@@ -21,6 +21,7 @@ const Activity = () => {
     const checkAuth = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
+        console.log("Current user in Activity page:", user);
         setUser(user);
       } catch (error) {
         console.error("Auth check error:", error);
@@ -33,6 +34,7 @@ const Activity = () => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change in Activity page:", event, session?.user?.email);
       setUser(session?.user ?? null);
       setIsAuthChecking(false);
     });
