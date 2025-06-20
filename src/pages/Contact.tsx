@@ -1,4 +1,3 @@
-
 import { Mail, MapPin, Heart, Send } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -7,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { AuthDialog } from "@/components/AuthDialog";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,30 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [user, setUser] = useState(null);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check auth state
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error("Auth check error:", error);
+      }
+    };
+    
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +62,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-white">
-      <Header />
+      <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
       
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
@@ -188,6 +212,12 @@ const Contact = () => {
       </div>
 
       <Footer />
+
+      <AuthDialog 
+        open={showAuthDialog} 
+        onOpenChange={setShowAuthDialog}
+        onSuccess={() => setShowAuthDialog(false)}
+      />
     </div>
   );
 };
