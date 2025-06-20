@@ -12,15 +12,19 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  type: 'child_registration' | 'contact';
+  type: 'child_registration' | 'contact' | 'adoption';
   data: any;
-  recipientEmail: string;
   parentName?: string;
   childName?: string;
   contactName?: string;
   contactEmail?: string;
   message?: string;
+  donorName?: string;
+  donorEmail?: string;
+  adoptionNotes?: string;
 }
+
+const adminEmails = ['arodseo@gmail.com', 'Krystidemario5@gmail.com'];
 
 const handler = async (req: Request): Promise<Response> => {
   console.log("Email notification function called");
@@ -31,63 +35,170 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { type, data, recipientEmail, parentName, childName, contactName, contactEmail, message }: EmailRequest = await req.json();
+    const { type, data, parentName, childName, contactName, contactEmail, message, donorName, donorEmail, adoptionNotes }: EmailRequest = await req.json();
 
     let emailSubject = "";
     let emailHtml = "";
 
     if (type === 'child_registration') {
-      emailSubject = `New Child Registration - ${childName}`;
+      emailSubject = `🎄 New Child Registration - ${childName}`;
       emailHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #dc2626; text-align: center;">New Child Registration Submitted</h1>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">
+          <div style="background: linear-gradient(135deg, #dc2626 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 28px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">🎄 New Child Registration</h1>
+            <p style="color: white; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Candy Cane Kindness Platform</p>
+          </div>
           
-          <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="color: #059669; margin-bottom: 15px;">Child Information</h2>
-            <p><strong>Child's Name:</strong> ${childName}</p>
-            <p><strong>Age:</strong> ${data.age}</p>
-            <p><strong>Gender:</strong> ${data.gender}</p>
-            <p><strong>Location:</strong> ${data.location}</p>
-            <p><strong>Story:</strong> ${data.story}</p>
-            <p><strong>Wishes:</strong> ${data.wishes?.join(', ')}</p>
+          <div style="padding: 30px; background-color: white;">
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #ecfdf5 100%); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #059669;">
+              <h2 style="color: #059669; margin: 0 0 20px 0; font-size: 22px; display: flex; align-items: center;">
+                👧 Child Information
+              </h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151; width: 120px;">Name:</td><td style="padding: 8px 0; color: #1f2937;">${childName}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Age:</td><td style="padding: 8px 0; color: #1f2937;">${data.age} years old</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Gender:</td><td style="padding: 8px 0; color: #1f2937;">${data.gender}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Location:</td><td style="padding: 8px 0; color: #1f2937;">${data.location}</td></tr>
+              </table>
+              
+              <div style="margin-top: 20px;">
+                <h3 style="color: #059669; margin: 0 0 10px 0; font-size: 16px;">📖 Story:</h3>
+                <p style="background-color: white; padding: 15px; border-radius: 8px; margin: 0; line-height: 1.6; color: #374151; border: 1px solid #e5e7eb;">${data.story}</p>
+              </div>
+              
+              ${data.wishes && data.wishes.length > 0 ? `
+                <div style="margin-top: 20px;">
+                  <h3 style="color: #dc2626; margin: 0 0 10px 0; font-size: 16px;">🎁 Christmas Wishes:</h3>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    ${data.wishes.map((wish: string) => `<span style="background-color: #fecaca; color: #991b1b; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 500;">${wish}</span>`).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #3b82f6;">
+              <h2 style="color: #3b82f6; margin: 0 0 20px 0; font-size: 22px; display: flex; align-items: center;">
+                👨‍👩‍👧‍👦 Parent/Guardian Information
+              </h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151; width: 140px;">Name:</td><td style="padding: 8px 0; color: #1f2937;">${parentName}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Email:</td><td style="padding: 8px 0; color: #1f2937;"><a href="mailto:${data.parentEmail}" style="color: #3b82f6; text-decoration: none;">${data.parentEmail}</a></td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Phone:</td><td style="padding: 8px 0; color: #1f2937;">${data.parentPhone}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Relationship:</td><td style="padding: 8px 0; color: #1f2937;">${data.relationship}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Household Size:</td><td style="padding: 8px 0; color: #1f2937;">${data.householdSize} people</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Annual Income:</td><td style="padding: 8px 0; color: #1f2937;">${data.annualIncome}</td></tr>
+              </table>
+              
+              ${data.specialNeeds ? `
+                <div style="margin-top: 20px;">
+                  <h3 style="color: #3b82f6; margin: 0 0 10px 0; font-size: 16px;">🏥 Special Needs:</h3>
+                  <p style="background-color: white; padding: 15px; border-radius: 8px; margin: 0; line-height: 1.6; color: #374151; border: 1px solid #e5e7eb;">${data.specialNeeds}</p>
+                </div>
+              ` : ''}
+              
+              ${data.additionalInfo ? `
+                <div style="margin-top: 20px;">
+                  <h3 style="color: #3b82f6; margin: 0 0 10px 0; font-size: 16px;">ℹ️ Additional Information:</h3>
+                  <p style="background-color: white; padding: 15px; border-radius: 8px; margin: 0; line-height: 1.6; color: #374151; border: 1px solid #e5e7eb;">${data.additionalInfo}</p>
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="background-color: #fef3c7; padding: 20px; border-radius: 12px; text-align: center; border: 2px dashed #f59e0b;">
+              <h3 style="color: #92400e; margin: 0 0 10px 0; font-size: 18px;">⚡ Action Required</h3>
+              <p style="color: #92400e; margin: 0; font-weight: 500;">This registration requires review and approval.</p>
+            </div>
           </div>
 
-          <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="color: #059669; margin-bottom: 15px;">Parent/Guardian Information</h2>
-            <p><strong>Name:</strong> ${parentName}</p>
-            <p><strong>Email:</strong> ${data.parentEmail}</p>
-            <p><strong>Phone:</strong> ${data.parentPhone}</p>
-            <p><strong>Relationship:</strong> ${data.relationship}</p>
-            <p><strong>Household Size:</strong> ${data.householdSize}</p>
-            <p><strong>Annual Income:</strong> ${data.annualIncome}</p>
-            ${data.specialNeeds ? `<p><strong>Special Needs:</strong> ${data.specialNeeds}</p>` : ''}
-            ${data.additionalInfo ? `<p><strong>Additional Info:</strong> ${data.additionalInfo}</p>` : ''}
-          </div>
-
-          <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #6b7280;">This registration requires review and approval.</p>
+          <div style="background-color: #374151; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+            <p style="color: white; margin: 0; font-size: 14px;">
+              🎄 Candy Cane Kindness - Spreading joy one child at a time
+            </p>
           </div>
         </div>
       `;
     } else if (type === 'contact') {
-      emailSubject = `New Contact Form Submission - ${contactName}`;
+      emailSubject = `📧 New Contact Form Submission - ${contactName}`;
       emailHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #dc2626; text-align: center;">New Contact Form Submission</h1>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 28px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">📧 New Contact Message</h1>
+            <p style="color: white; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Candy Cane Kindness Platform</p>
+          </div>
           
-          <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="color: #059669; margin-bottom: 15px;">Contact Information</h2>
-            <p><strong>Name:</strong> ${contactName}</p>
-            <p><strong>Email:</strong> ${contactEmail}</p>
+          <div style="padding: 30px; background-color: white;">
+            <div style="background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #3b82f6;">
+              <h2 style="color: #3b82f6; margin: 0 0 20px 0; font-size: 22px;">👤 Contact Information</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151; width: 80px;">Name:</td><td style="padding: 8px 0; color: #1f2937;">${contactName}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Email:</td><td style="padding: 8px 0; color: #1f2937;"><a href="mailto:${contactEmail}" style="color: #3b82f6; text-decoration: none;">${contactEmail}</a></td></tr>
+              </table>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #ecfdf5 100%); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #059669;">
+              <h2 style="color: #059669; margin: 0 0 15px 0; font-size: 22px;">💬 Message</h2>
+              <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <p style="margin: 0; line-height: 1.6; color: #374151; white-space: pre-wrap;">${message}</p>
+              </div>
+            </div>
+
+            <div style="background-color: #fecaca; padding: 20px; border-radius: 12px; text-align: center; border: 2px dashed #dc2626;">
+              <h3 style="color: #991b1b; margin: 0 0 10px 0; font-size: 18px;">⚡ Action Required</h3>
+              <p style="color: #991b1b; margin: 0; font-weight: 500;">Please respond to this inquiry promptly.</p>
+            </div>
           </div>
 
-          <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="color: #059669; margin-bottom: 15px;">Message</h2>
-            <p style="white-space: pre-wrap;">${message}</p>
+          <div style="background-color: #374151; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+            <p style="color: white; margin: 0; font-size: 14px;">
+              🎄 Candy Cane Kindness - Spreading joy one child at a time
+            </p>
+          </div>
+        </div>
+      `;
+    } else if (type === 'adoption') {
+      emailSubject = `❤️ New Child Adoption - ${childName}`;
+      emailHtml = `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">
+          <div style="background: linear-gradient(135deg, #dc2626 0%, #ec4899 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 28px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">❤️ Child Adoption Notification</h1>
+            <p style="color: white; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Candy Cane Kindness Platform</p>
+          </div>
+          
+          <div style="padding: 30px; background-color: white;">
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 100%); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #ec4899;">
+              <h2 style="color: #ec4899; margin: 0 0 20px 0; font-size: 22px;">👧 Child Information</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151; width: 80px;">Name:</td><td style="padding: 8px 0; color: #1f2937;">${childName}</td></tr>
+              </table>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #3b82f6;">
+              <h2 style="color: #3b82f6; margin: 0 0 20px 0; font-size: 22px;">🎅 Donor Information</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151; width: 80px;">Name:</td><td style="padding: 8px 0; color: #1f2937;">${donorName}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: 600; color: #374151;">Email:</td><td style="padding: 8px 0; color: #1f2937;"><a href="mailto:${donorEmail}" style="color: #3b82f6; text-decoration: none;">${donorEmail}</a></td></tr>
+              </table>
+              
+              ${adoptionNotes ? `
+                <div style="margin-top: 20px;">
+                  <h3 style="color: #3b82f6; margin: 0 0 10px 0; font-size: 16px;">📝 Notes:</h3>
+                  <div style="background-color: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <p style="margin: 0; line-height: 1.6; color: #374151; white-space: pre-wrap;">${adoptionNotes}</p>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="background-color: #dcfce7; padding: 20px; border-radius: 12px; text-align: center; border: 2px dashed #16a34a;">
+              <h3 style="color: #15803d; margin: 0 0 10px 0; font-size: 18px;">🎉 Great News!</h3>
+              <p style="color: #15803d; margin: 0; font-weight: 500;">A generous donor has adopted this child for Christmas!</p>
+            </div>
           </div>
 
-          <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #6b7280;">Please respond to this inquiry promptly.</p>
+          <div style="background-color: #374151; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+            <p style="color: white; margin: 0; font-size: 14px;">
+              🎄 Candy Cane Kindness - Spreading joy one child at a time
+            </p>
           </div>
         </div>
       `;
@@ -95,12 +206,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Candy Cane Kindness <onboarding@resend.dev>",
-      to: [recipientEmail],
+      to: adminEmails,
       subject: emailSubject,
       html: emailHtml,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Email sent successfully to both admins:", emailResponse);
 
     return new Response(JSON.stringify({ success: true, emailResponse }), {
       status: 200,

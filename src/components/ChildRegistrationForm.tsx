@@ -130,7 +130,6 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
         body: {
           type: 'child_registration',
           data: data,
-          recipientEmail: 'arodseo@gmail.com', // Updated admin email
           parentName: data.parentName,
           childName: data.childName,
         }
@@ -140,7 +139,7 @@ export const ChildRegistrationForm = ({ user, onSuccess, onAuthRequired }: Child
         console.error("Error sending notification email:", error);
         // Don't throw error here - we don't want to block the registration if email fails
       } else {
-        console.log("Notification email sent successfully");
+        console.log("Notification email sent successfully to both admin emails");
       }
     } catch (error) {
       console.error("Error in sendNotificationEmail:", error);

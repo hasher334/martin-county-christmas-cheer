@@ -31,6 +31,30 @@ export const AdoptionDialog = ({ open, onOpenChange, child, user }: AdoptionDial
   const [notes, setNotes] = useState("");
   const { toast } = useToast();
 
+  const sendAdoptionNotification = async () => {
+    try {
+      console.log("Sending adoption notification email");
+      
+      const { error } = await supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'adoption',
+          childName: child.name,
+          donorName: donorInfo.name,
+          donorEmail: donorInfo.email,
+          adoptionNotes: notes,
+        }
+      });
+
+      if (error) {
+        console.error("Error sending adoption notification:", error);
+      } else {
+        console.log("Adoption notification sent successfully");
+      }
+    } catch (error) {
+      console.error("Error in sendAdoptionNotification:", error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -89,6 +113,9 @@ export const AdoptionDialog = ({ open, onOpenChange, child, user }: AdoptionDial
         .eq("id", child.id);
 
       if (updateChildError) throw updateChildError;
+
+      // Send adoption notification email
+      await sendAdoptionNotification();
 
       toast({
         title: "Adoption successful! 🎄",
