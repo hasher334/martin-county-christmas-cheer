@@ -1,5 +1,5 @@
 
-import { Heart, Mail, Phone, MapPin } from "lucide-react";
+import { Heart, Mail, MapPin } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -22,11 +22,7 @@ export const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-christmas-green-300" />
-                <span className="text-christmas-green-100">info@treasurecoastcheer.org</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-christmas-green-300" />
-                <span className="text-christmas-green-100">(772) 555-CHEER</span>
+                <span className="text-christmas-green-100">info@candycanekindness.com</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-christmas-green-300" />
@@ -47,6 +43,11 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-christmas-green-700 mt-8 pt-8 text-center">
+          <div className="flex justify-center space-x-6 mb-4">
+            <a href="/contact" className="text-christmas-green-200 hover:text-white transition-colors">
+              Contact Us
+            </a>
+          </div>
           <p className="text-christmas-green-200">
             © 2025 Candy Cane Kindness. Made with ❤️ for the children of the Treasure Coast.
           </p>
