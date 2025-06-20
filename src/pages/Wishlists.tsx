@@ -1,22 +1,24 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ChildCard } from "@/components/ChildCard";
-import { Snowflake } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import type { Tables } from "@/integrations/supabase/types";
-
-type Child = Tables<"children">;
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Snowflake, Wifi, WifiOff, RefreshCw } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useChildrenData } from "@/hooks/useChildrenData";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Wishlists = () => {
-  const [children, setChildren] = useState<Child[]>([]);
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { toast } = useToast();
+  const networkStatus = useNetworkStatus();
+  const { children, loading, error, refetch, retryCount } = useChildrenData();
 
   // Generate snowflakes with the same logic as Hero component
   const snowflakePositions = useMemo(() => {
@@ -69,163 +71,201 @@ const Wishlists = () => {
   useEffect(() => {
     console.log("Wishlists page - Mobile scroll test");
     console.log("Page can scroll:", document.body.scrollHeight > window.innerHeight);
-  }, []);
+    console.log("Network status on mount:", networkStatus);
+  }, [networkStatus]);
 
   useEffect(() => {
     // Check auth state
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      console.log("🔐 Checking authentication status...");
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log("🔐 Auth check result:", { user: !!user, userId: user?.id });
+        setUser(user);
+      } catch (error) {
+        console.error("🔐 Auth check failed:", error);
+      }
     };
     
     checkAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("🔐 Auth state changed:", { event, user: !!session?.user });
       setUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    fetchChildren();
-  }, []);
-
-  const fetchChildren = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("children")
-        .select("*")
-        .eq("status", "available")
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-      setChildren(data || []);
-    } catch (error) {
-      console.error("Error fetching children:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load children profiles",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleAdopt = (childId: string) => {
+    console.log("🎁 Adoption initiated for child:", childId);
     if (!user) {
+      console.log("🔐 User not authenticated, showing auth dialog");
       setShowAuthDialog(true);
       return;
     }
     // Adoption flow will be handled by the child card/modal
   };
 
+  const handleRetry = async () => {
+    console.log("🔄 User triggered manual retry");
+    await refetch();
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
-      <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
-      
-      {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden mobile-optimized">
-        {/* Candy Cane Stripe Pattern Overlay */}
-        <div 
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: `repeating-linear-gradient(
-              45deg,
-              transparent 0px,
-              transparent 10px,
-              rgba(255, 255, 255, 0.8) 10px,
-              rgba(255, 255, 255, 0.8) 20px,
-              transparent 20px,
-              transparent 30px,
-              #dc2626 30px,
-              #dc2626 40px
-            )`
-          }}
-        ></div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
+        <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
+        
+        {/* Network Status Alert */}
+        {!networkStatus.isOnline && (
+          <Alert className="mx-4 mb-4 border-orange-500 bg-orange-50">
+            <WifiOff className="h-4 w-4" />
+            <AlertDescription>
+              You appear to be offline. Some features may not work properly.
+            </AlertDescription>
+          </Alert>
+        )}
 
-        {/* Floating Christmas Elements - Same as Hero component */}
-        <div className="absolute inset-0 overflow-hidden">
-          {snowflakePositions.map((position, i) => (
-            <div
-              key={i}
-              className="absolute animate-pulse"
-              style={{
-                left: `${position.x}%`,
-                top: `${position.y}%`,
-                animationDelay: `${position.animationDelay}s`,
-                animationDuration: `${position.animationDuration}s`,
-              }}
-            >
-              <Snowflake className="h-4 w-4 text-white/30" />
-            </div>
-          ))}
-        </div>
+        {/* Hero Section */}
+        <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden mobile-optimized">
+          {/* Candy Cane Stripe Pattern Overlay */}
+          <div 
+            className="absolute inset-0 opacity-15"
+            style={{
+              backgroundImage: `repeating-linear-gradient(
+                45deg,
+                transparent 0px,
+                transparent 10px,
+                rgba(255, 255, 255, 0.8) 10px,
+                rgba(255, 255, 255, 0.8) 20px,
+                transparent 20px,
+                transparent 30px,
+                #dc2626 30px,
+                #dc2626 40px
+              )`
+            }}
+          ></div>
 
-        <div className="container mx-auto px-4 text-center relative z-10 mobile-optimized">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 animate-fade-in">
-            Christmas Wishlists
-          </h1>
-          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90">
-            Browse through the Christmas wishlists of children in our community. 
-            Each child has shared their holiday dreams - help make them come true!
-          </p>
-        </div>
-      </section>
-
-      {/* Wishlists Section */}
-      <section className="py-20 mobile-optimized" data-section="wishlists">
-        <div className="container mx-auto px-4 mobile-optimized no-horizontal-scroll">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-christmas-green-800 mb-4">
-              Children's Wishlists
-            </h2>
-            <p className="text-base md:text-lg text-christmas-brown-700 max-w-2xl mx-auto">
-              Each child below has created a special wishlist for Christmas. Click on their profile to see what would make their holiday magical.
-            </p>
+          {/* Floating Christmas Elements - Same as Hero component */}
+          <div className="absolute inset-0 overflow-hidden">
+            {snowflakePositions.map((position, i) => (
+              <div
+                key={i}
+                className="absolute animate-pulse"
+                style={{
+                  left: `${position.x}%`,
+                  top: `${position.y}%`,
+                  animationDelay: `${position.animationDelay}s`,
+                  animationDuration: `${position.animationDuration}s`,
+                }}
+              >
+                <Snowflake className="h-4 w-4 text-white/30" />
+              </div>
+            ))}
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-christmas-green-600"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mobile-optimized">
-              {children.map((child) => (
-                <ChildCard
-                  key={child.id}
-                  child={child}
-                  onAdopt={handleAdopt}
-                  user={user}
-                />
-              ))}
-            </div>
-          )}
+          <div className="container mx-auto px-4 text-center relative z-10 mobile-optimized">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 animate-fade-in">
+              Christmas Wishlists
+            </h1>
+            <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90">
+              Browse through the Christmas wishlists of children in our community. 
+              Each child has shared their holiday dreams - help make them come true!
+            </p>
+          </div>
+        </section>
 
-          {!loading && children.length === 0 && (
-            <div className="text-center py-20">
-              <Snowflake className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
-              <h3 className="text-xl md:text-2xl font-semibold text-christmas-green-800 mb-2">
-                No Wishlists Available
-              </h3>
-              <p className="text-christmas-brown-600">
-                Check back soon for new children's wishlists!
+        {/* Wishlists Section */}
+        <section className="py-20 mobile-optimized" data-section="wishlists">
+          <div className="container mx-auto px-4 mobile-optimized no-horizontal-scroll">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-christmas-green-800 mb-4">
+                Children's Wishlists
+              </h2>
+              <p className="text-base md:text-lg text-christmas-brown-700 max-w-2xl mx-auto">
+                Each child below has created a special wishlist for Christmas. Click on their profile to see what would make their holiday magical.
               </p>
             </div>
-          )}
-        </div>
-      </section>
 
-      <Footer />
+            {/* Loading State */}
+            {loading && (
+              <LoadingSpinner 
+                message={retryCount > 0 ? `Loading... (attempt ${retryCount + 1})` : "Loading children's wishlists..."} 
+              />
+            )}
 
-      <AuthDialog 
-        open={showAuthDialog} 
-        onOpenChange={setShowAuthDialog}
-        onSuccess={() => setShowAuthDialog(false)}
-      />
-    </div>
+            {/* Error State */}
+            {!loading && error && (
+              <div className="text-center py-20">
+                <div className="max-w-md mx-auto">
+                  <Alert variant="destructive" className="mb-4">
+                    <WifiOff className="h-4 w-4" />
+                    <AlertDescription>
+                      {error.includes('fetch') 
+                        ? 'Unable to connect to our servers. Please check your internet connection and try again.'
+                        : error
+                      }
+                    </AlertDescription>
+                  </Alert>
+                  
+                  <div className="space-y-2">
+                    <Button onClick={handleRetry} disabled={loading}>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Try Again
+                    </Button>
+                    
+                    <div className="flex items-center justify-center text-sm text-gray-500">
+                      {networkStatus.isOnline ? (
+                        <><Wifi className="h-4 w-4 mr-1" /> Online</>
+                      ) : (
+                        <><WifiOff className="h-4 w-4 mr-1" /> Offline</>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Success State */}
+            {!loading && !error && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mobile-optimized">
+                {children.map((child) => (
+                  <ChildCard
+                    key={child.id}
+                    child={child}
+                    onAdopt={handleAdopt}
+                    user={user}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && children.length === 0 && (
+              <div className="text-center py-20">
+                <Snowflake className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
+                <h3 className="text-xl md:text-2xl font-semibold text-christmas-green-800 mb-2">
+                  No Wishlists Available
+                </h3>
+                <p className="text-christmas-brown-600">
+                  Check back soon for new children's wishlists!
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <Footer />
+
+        <AuthDialog 
+          open={showAuthDialog} 
+          onOpenChange={setShowAuthDialog}
+          onSuccess={() => setShowAuthDialog(false)}
+        />
+      </div>
+    </ErrorBoundary>
   );
 };
 
