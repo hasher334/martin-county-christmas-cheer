@@ -30,21 +30,29 @@ export const createRetryWrapper = <T>(
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`Network request attempt ${attempt}/${maxRetries}`);
+        console.log(`🔄 Network request attempt ${attempt}/${maxRetries}`);
         const result = await fn();
-        console.log(`Network request succeeded on attempt ${attempt}`);
+        console.log(`✅ Network request succeeded on attempt ${attempt}`);
         resolve(result);
         return;
       } catch (error) {
         lastError = error as Error;
-        console.error(`Network request failed on attempt ${attempt}:`, error);
+        console.error(`❌ Network request failed on attempt ${attempt}:`, {
+          error: error,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorType: typeof error,
+          stack: error instanceof Error ? error.stack : undefined
+        });
         
         if (attempt === maxRetries) {
+          console.error(`🔴 All ${maxRetries} attempts failed. Final error:`, lastError);
           break;
         }
         
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, delay * attempt));
+        // Wait before retrying with exponential backoff
+        const retryDelay = delay * attempt;
+        console.log(`⏱️ Waiting ${retryDelay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
       }
     }
     
@@ -60,7 +68,9 @@ export const logNetworkError = (error: any, context: string) => {
   console.log("Network status:", networkStatus);
   console.log("User agent:", navigator.userAgent);
   console.log("Timestamp:", new Date().toISOString());
+  console.log("URL:", window.location.href);
   
+  // Enhanced error logging
   if (error?.message) {
     console.log("Error message:", error.message);
   }
@@ -73,5 +83,56 @@ export const logNetworkError = (error: any, context: string) => {
     console.log("Error details:", error.details);
   }
   
+  if (error?.hint) {
+    console.log("Error hint:", error.hint);
+  }
+  
+  // Check for common network issues
+  const errorMessage = error?.message?.toLowerCase() || '';
+  if (errorMessage.includes('fetch')) {
+    console.log("⚠️ Fetch-related error detected - possible network wrapper interference");
+  }
+  if (errorMessage.includes('cors')) {
+    console.log("⚠️ CORS error detected - check server configuration");
+  }
+  if (errorMessage.includes('timeout')) {
+    console.log("⚠️ Timeout error detected - slow network or server issues");
+  }
+  
+  // Log current fetch implementation status
+  const originalFetch = window.fetch;
+  const fetchIsNative = originalFetch.toString().includes('native code');
+  console.log("Fetch is native:", fetchIsNative);
+  
   console.groupEnd();
+};
+
+// Enhanced network performance monitoring
+export const measureNetworkPerformance = async <T>(
+  operation: () => Promise<T>,
+  operationName: string = 'network_operation'
+): Promise<{ result: T; performance: { duration: number; timestamp: string } }> => {
+  const startTime = performance.now();
+  const startTimestamp = new Date().toISOString();
+  
+  console.log(`⏱️ Starting ${operationName}...`);
+  
+  try {
+    const result = await operation();
+    const duration = performance.now() - startTime;
+    
+    console.log(`✅ ${operationName} completed in ${duration.toFixed(2)}ms`);
+    
+    return {
+      result,
+      performance: {
+        duration,
+        timestamp: startTimestamp
+      }
+    };
+  } catch (error) {
+    const duration = performance.now() - startTime;
+    console.error(`❌ ${operationName} failed after ${duration.toFixed(2)}ms:`, error);
+    throw error;
+  }
 };

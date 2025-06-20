@@ -18,7 +18,7 @@ const Wishlists = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { toast } = useToast();
   const networkStatus = useNetworkStatus();
-  const { children, loading, error, refetch, retryCount } = useChildrenData();
+  const { children, loading, error, refetch, retryCount, isUsingFallback, networkDiagnostics } = useChildrenData();
 
   // Generate snowflakes with the same logic as Hero component
   const snowflakePositions = useMemo(() => {
@@ -72,7 +72,12 @@ const Wishlists = () => {
     console.log("Wishlists page - Mobile scroll test");
     console.log("Page can scroll:", document.body.scrollHeight > window.innerHeight);
     console.log("Network status on mount:", networkStatus);
-  }, [networkStatus]);
+    
+    // Log enhanced data loading status
+    if (networkDiagnostics) {
+      console.log("Network diagnostics:", networkDiagnostics);
+    }
+  }, [networkStatus, networkDiagnostics]);
 
   useEffect(() => {
     // Check auth state
@@ -113,6 +118,14 @@ const Wishlists = () => {
     await refetch();
   };
 
+  const handleRunDiagnostics = () => {
+    console.log("🔧 User requested network diagnostics");
+    toast({
+      title: "Running Diagnostics",
+      description: "Check the browser console for detailed network information.",
+    });
+  };
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
@@ -124,6 +137,25 @@ const Wishlists = () => {
             <WifiOff className="h-4 w-4" />
             <AlertDescription>
               You appear to be offline. Some features may not work properly.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Fallback Data Alert */}
+        {isUsingFallback && (
+          <Alert className="mx-4 mb-4 border-blue-500 bg-blue-50">
+            <Wifi className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>Showing sample data while restoring connection...</span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRetry}
+                disabled={loading}
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Retry
+              </Button>
             </AlertDescription>
           </Alert>
         )}
@@ -197,7 +229,7 @@ const Wishlists = () => {
             )}
 
             {/* Error State */}
-            {!loading && error && (
+            {!loading && error && !isUsingFallback && (
               <div className="text-center py-20">
                 <div className="max-w-md mx-auto">
                   <Alert variant="destructive" className="mb-4">
@@ -216,7 +248,15 @@ const Wishlists = () => {
                       Try Again
                     </Button>
                     
-                    <div className="flex items-center justify-center text-sm text-gray-500">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleRunDiagnostics}
+                      className="ml-2"
+                    >
+                      Run Diagnostics
+                    </Button>
+                    
+                    <div className="flex items-center justify-center text-sm text-gray-500 mt-2">
                       {networkStatus.isOnline ? (
                         <><Wifi className="h-4 w-4 mr-1" /> Online</>
                       ) : (
@@ -229,7 +269,7 @@ const Wishlists = () => {
             )}
 
             {/* Success State */}
-            {!loading && !error && (
+            {!loading && (children.length > 0) && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mobile-optimized">
                 {children.map((child) => (
                   <ChildCard
@@ -243,7 +283,7 @@ const Wishlists = () => {
             )}
 
             {/* Empty State */}
-            {!loading && !error && children.length === 0 && (
+            {!loading && !error && children.length === 0 && !isUsingFallback && (
               <div className="text-center py-20">
                 <Snowflake className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
                 <h3 className="text-xl md:text-2xl font-semibold text-christmas-green-800 mb-2">
