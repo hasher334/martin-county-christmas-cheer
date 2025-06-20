@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import { MobileMenu } from "./MobileMenu";
+import { notifyAuthEvent, notifySystemEvent } from "@/utils/notificationService";
 
 interface HeaderProps {
   user: any;
@@ -16,13 +17,29 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
 
   const handleSignOut = async () => {
     try {
+      // Notify about logout attempt
+      if (user?.email) {
+        await notifyAuthEvent('user_logout', user.email, 'User initiated logout');
+      }
+
       await supabase.auth.signOut();
+      
+      // Notify about successful logout
+      if (user?.email) {
+        await notifyAuthEvent('user_logout_success', user.email, 'User successfully logged out');
+      }
+
       toast({
         title: "Signed out successfully",
         description: "Thank you for spreading Christmas cheer!",
       });
     } catch (error) {
       console.error("Error signing out:", error);
+      
+      // Notify about logout error
+      if (user?.email) {
+        await notifySystemEvent('logout_error', `Failed to logout user: ${error}`, { userEmail: user.email, error: error.message });
+      }
     }
   };
 

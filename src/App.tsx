@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useAuthNotifications } from "@/hooks/useAuthNotifications";
 import Index from "./pages/Index";
 import Wishlists from "./pages/Wishlists";
 import About from "./pages/About";
@@ -21,6 +22,24 @@ const queryClient = new QueryClient({
   },
 });
 
+function AppContent() {
+  // Initialize auth notifications
+  useAuthNotifications();
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/wishlists" element={<Wishlists />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/register" element={<Register />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -28,16 +47,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/wishlists" element={<Wishlists />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/register" element={<Register />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <AppContent />
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
