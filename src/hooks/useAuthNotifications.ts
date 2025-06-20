@@ -14,20 +14,22 @@ export const useAuthNotifications = () => {
           switch (event) {
             case 'SIGNED_IN':
               if (session?.user?.email) {
-                await notifyAuthEvent(
-                  'user_signin', 
-                  session.user.email, 
-                  'User successfully signed in'
-                );
-              }
-              break;
-
-            case 'SIGNED_UP':
-              if (session?.user?.email) {
-                await notifyUserSignup(
-                  session.user.email,
-                  session.user.user_metadata?.full_name || session.user.user_metadata?.name
-                );
+                // Check if this is a new user (sign up) by looking at user metadata
+                const isNewUser = session.user.user_metadata?.iss === undefined || 
+                                  session.user.email_confirmed_at === session.user.created_at;
+                
+                if (isNewUser) {
+                  await notifyUserSignup(
+                    session.user.email,
+                    session.user.user_metadata?.full_name || session.user.user_metadata?.name
+                  );
+                } else {
+                  await notifyAuthEvent(
+                    'user_signin', 
+                    session.user.email, 
+                    'User successfully signed in'
+                  );
+                }
               }
               break;
 
