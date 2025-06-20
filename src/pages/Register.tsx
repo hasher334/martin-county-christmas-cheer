@@ -19,9 +19,15 @@ const Register = () => {
     navigate("/");
   };
 
+  const handleAuthClick = () => {
+    // For the registration page, we don't need auth functionality
+    // This is just to satisfy the Header component props
+    console.log("Auth not required for registration");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
-      <Header />
+      <Header user={null} onAuthClick={handleAuthClick} />
       
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-b from-christmas-green-600 to-christmas-green-700 text-white">
