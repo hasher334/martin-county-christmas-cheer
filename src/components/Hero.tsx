@@ -101,7 +101,7 @@ export const Hero = () => {
           Make Christmas Magical
         </h1>
         <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
-          Help bring joy to children in Martin County by adopting them for Christmas. 
+          Help bring joy to children in the Treasure Coast by adopting them for Christmas. 
           Every child deserves to experience the wonder of the holiday season.
         </p>
         

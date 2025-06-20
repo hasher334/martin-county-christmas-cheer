@@ -150,7 +150,7 @@ const About = () => {
             </h4>
             <p className="text-lg text-christmas-brown-700 max-w-4xl mx-auto">
               What started as a family's desire to help others has grown into Candy Cane Kindness, 
-              a beacon of hope for families throughout Martin County and the greater Treasure Coast. 
+              a beacon of hope for families throughout the Treasure Coast. 
               Suzanne, Ashley, and Krysti continue to lead by example, showing that when we come 
               together with open hearts, we can create extraordinary moments of joy for those who 
               need it most.
