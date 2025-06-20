@@ -8,7 +8,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Menu, X, User, LogOut, Settings } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -117,15 +117,6 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
                       Welcome, {user.email?.split('@')[0]}!
                     </span>
                   </div>
-                  
-                  <button
-                    onClick={() => handleNavigation("/profile")}
-                    className="w-full flex items-center py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Donor Dashboard
-                  </button>
-                  
                   <Button
                     variant="outline"
                     onClick={handleSignOut}
