@@ -1,155 +1,144 @@
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Home, Gift, UserPlus, Heart, User, LogOut, Settings, X } from "lucide-react";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useState, useEffect } from "react";
 
 interface MobileMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
   user: any;
   onAuthClick: () => void;
-  onLogout: () => void;
-  onAdminAccess: () => void;
 }
 
-export const MobileMenu = ({ 
-  isOpen, 
-  onClose, 
-  user, 
-  onAuthClick, 
-  onLogout, 
-  onAdminAccess 
-}: MobileMenuProps) => {
+export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Fix #2: Hard-clean on every route change
+  useEffect(() => {
+    const clearBodyClasses = () => {
+      console.log("Clearing body scroll lock classes on route change");
+      document.body.classList.remove('overflow-hidden', 'fixed', 'inset-0');
+      document.documentElement.classList.remove('overflow-hidden', 'fixed');
+    };
+
+    // Clear classes when location changes
+    clearBodyClasses();
+  }, [location.pathname]);
+
+  // Fix #1: Always close drawer before routing
   const handleNavigation = (href: string) => {
-    window.location.href = href;
-    onClose();
+    console.log(`Mobile menu navigation to: ${href}`);
+    setIsOpen(false); // Close drawer first
+    
+    // Small delay to ensure drawer cleanup completes
+    setTimeout(() => {
+      navigate(href);
+    }, 50);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      setIsOpen(false); // Close drawer before sign out
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "Thank you for spreading Christmas cheer!",
+      });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const handleAuthClick = () => {
+    setIsOpen(false); // Close drawer before opening auth
+    onAuthClick();
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-[300px] bg-gradient-to-b from-christmas-cream to-white">
-        <SheetHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="text-xl">🎄</div>
-              <SheetTitle className="text-christmas-green-800 font-christmas">
-                Candy Cane Kindness
-              </SheetTitle>
+    <div className="md:hidden">
+      <Drawer open={isOpen} onOpenChange={setIsOpen}>
+        <DrawerTrigger asChild>
+          <Button variant="ghost" size="icon" className="text-christmas-green-700">
+            <Menu className="h-6 w-6" />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent className="bg-christmas-cream font-nunito">
+          <DrawerHeader className="text-left">
+            <DrawerTitle className="text-christmas-green-800 font-christmas">Menu</DrawerTitle>
+            <DrawerClose className="absolute right-4 top-4">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DrawerClose>
+          </DrawerHeader>
+          
+          <div className="px-4 pb-8">
+            <nav className="space-y-4">
+              <button
+                onClick={() => handleNavigation("/wishlists")}
+                className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                Browse Wishlists
+              </button>
+              
+              <button
+                onClick={() => handleNavigation("/register")}
+                className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                Register Child
+              </button>
+              
+              <button
+                onClick={() => handleNavigation("/about")}
+                className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                About Our Mission
+              </button>
+            </nav>
+
+            <div className="mt-6 pt-6 border-t border-christmas-green-200">
+              {user ? (
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2 text-christmas-green-700 bg-white/30 rounded-lg px-4 py-3">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm font-medium">
+                      Welcome, {user.email?.split('@')[0]}!
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={handleSignOut}
+                    className="w-full text-christmas-red-600 border-christmas-red-300 hover:bg-christmas-red-50 hover:border-christmas-red-400"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  onClick={handleAuthClick}
+                  className="w-full bg-christmas-red-600 hover:bg-christmas-red-700 text-white"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In to Adopt
+                </Button>
+              )}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-christmas-green-700"
-            >
-              <X className="h-5 w-5" />
-            </Button>
           </div>
-          <SheetDescription className="text-christmas-brown-600 font-nunito">
-            Spreading Christmas joy throughout our community
-          </SheetDescription>
-        </SheetHeader>
-
-        <div className="space-y-4 mt-6">
-          {/* Navigation Links */}
-          <div className="space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-christmas-green-700 hover:bg-christmas-green-50"
-              onClick={() => handleNavigation("/")}
-            >
-              <Home className="h-5 w-5 mr-3" />
-              Home
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-christmas-green-700 hover:bg-christmas-green-50"
-              onClick={() => handleNavigation("/wishlists")}
-            >
-              <Gift className="h-5 w-5 mr-3" />
-              Wishlists
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-christmas-green-700 hover:bg-christmas-green-50"
-              onClick={() => handleNavigation("/register")}
-            >
-              <UserPlus className="h-5 w-5 mr-3" />
-              Register Child
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-christmas-green-700 hover:bg-christmas-green-50"
-              onClick={() => handleNavigation("/about")}
-            >
-              <Heart className="h-5 w-5 mr-3" />
-              About
-            </Button>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-christmas-green-200 my-4"></div>
-
-          {/* Auth Section */}
-          <div className="space-y-2">
-            {user ? (
-              <>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start border-christmas-green-600 text-christmas-green-700 hover:bg-christmas-green-50"
-                  onClick={() => {
-                    onAdminAccess();
-                    onClose();
-                  }}
-                >
-                  <Settings className="h-5 w-5 mr-3" />
-                  Admin Panel
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="w-full justify-start border-christmas-red-600 text-christmas-red-700 hover:bg-christmas-red-50"
-                  onClick={() => {
-                    onLogout();
-                    onClose();
-                  }}
-                >
-                  <LogOut className="h-5 w-5 mr-3" />
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start border-christmas-green-600 text-christmas-green-700 hover:bg-christmas-green-50"
-                  onClick={() => {
-                    onAuthClick();
-                    onClose();
-                  }}
-                >
-                  <User className="h-5 w-5 mr-3" />
-                  Login
-                </Button>
-                
-                <Button
-                  className="w-full justify-start bg-christmas-red-600 hover:bg-christmas-red-700 text-white"
-                  onClick={() => {
-                    onAuthClick();
-                    onClose();
-                  }}
-                >
-                  <UserPlus className="h-5 w-5 mr-3" />
-                  Sign Up
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </DrawerContent>
+      </Drawer>
+    </div>
   );
 };

@@ -8,7 +8,6 @@ import Index from "./pages/Index";
 import Wishlists from "./pages/Wishlists";
 import About from "./pages/About";
 import Register from "./pages/Register";
-import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -31,7 +30,6 @@ function App() {
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/about" element={<About />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<Admin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
