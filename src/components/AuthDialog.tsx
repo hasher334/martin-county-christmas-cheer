@@ -93,6 +93,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
 
       console.log("Sign up successful:", data);
 
+      // The donor profile will be created automatically by the database trigger
       // Send signup notification immediately
       await notifyUserSignup(email, name);
 

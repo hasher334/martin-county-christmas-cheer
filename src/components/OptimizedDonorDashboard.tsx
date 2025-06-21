@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { Gift, Heart, User, Mail, Phone, MapPin, Calendar } from "lucide-react";
+import { DonorDebugInfo } from "./DonorDebugInfo";
 
 interface OptimizedDonorDashboardProps {
   user: any;
@@ -80,24 +81,30 @@ export const OptimizedDonorDashboard = ({ user }: OptimizedDonorDashboardProps) 
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-500 mb-4">⚠️ Error loading data</div>
-        <p className="text-christmas-brown-700 mb-4">{error}</p>
-        <Button onClick={refetch} className="bg-christmas-green-600 hover:bg-christmas-green-700">
-          Try Again
-        </Button>
+      <div className="space-y-4">
+        <DonorDebugInfo user={user} />
+        <div className="text-center py-12">
+          <div className="text-red-500 mb-4">⚠️ Error loading data</div>
+          <p className="text-christmas-brown-700 mb-4">{error}</p>
+          <Button onClick={refetch} className="bg-christmas-green-600 hover:bg-christmas-green-700">
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
 
   if (!donorData?.donor) {
     return (
-      <div className="text-center py-12">
-        <Heart className="h-16 w-16 text-christmas-red-300 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-christmas-green-800 mb-2">No Donor Profile Found</h2>
-        <p className="text-christmas-brown-700">
-          You haven't adopted any children yet. Start spreading Christmas joy by browsing our wishlists!
-        </p>
+      <div className="space-y-4">
+        <DonorDebugInfo user={user} />
+        <div className="text-center py-12">
+          <Heart className="h-16 w-16 text-christmas-red-300 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-christmas-green-800 mb-2">No Donor Profile Found</h2>
+          <p className="text-christmas-brown-700">
+            You haven't adopted any children yet. Start spreading Christmas joy by browsing our wishlists!
+          </p>
+        </div>
       </div>
     );
   }
@@ -106,6 +113,9 @@ export const OptimizedDonorDashboard = ({ user }: OptimizedDonorDashboardProps) 
 
   return (
     <div className="space-y-8">
+      {/* Debug info - only show if there are issues or in development */}
+      {(adoptions.length === 0 || error) && <DonorDebugInfo user={user} />}
+
       {/* Donor Profile Summary */}
       <Card className="bg-gradient-to-r from-christmas-green-50 to-christmas-red-50 border-christmas-green-200">
         <CardHeader>
