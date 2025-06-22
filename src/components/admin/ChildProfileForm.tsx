@@ -17,7 +17,7 @@ interface Child {
   name: string;
   age: number;
   gender: string;
-  status: string;
+  status: "draft" | "available" | "adopted" | "fulfilled" | "pending_review";
   location: string;
   photo_url: string;
   story: string;
@@ -36,7 +36,7 @@ interface FormData {
   name: string;
   age: number;
   gender: string;
-  status: string;
+  status: "draft" | "available" | "adopted" | "fulfilled" | "pending_review";
   location: string;
   story: string;
   wishes: string[];
@@ -248,7 +248,7 @@ export const ChildProfileForm = ({ open, onOpenChange, child, editMode, onSucces
 
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select onValueChange={(value) => setValue("status", value)}>
+              <Select onValueChange={(value: "draft" | "available" | "adopted" | "fulfilled" | "pending_review") => setValue("status", value)}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
