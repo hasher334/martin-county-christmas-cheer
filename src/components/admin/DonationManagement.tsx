@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,10 +12,12 @@ type Donation = Tables<"donations"> & {
   donors: Tables<"donors"> | null;
 };
 
+type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+
 export const DonationManagement = () => {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<PaymentStatus | "all">("all");
   const [totalAmount, setTotalAmount] = useState(0);
   const { toast } = useToast();
 
@@ -148,7 +149,7 @@ export const DonationManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Donation History</CardTitle>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(value: PaymentStatus | "all") => setStatusFilter(value)}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>

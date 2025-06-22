@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -16,12 +15,14 @@ type Application = Tables<"applications"> & {
   donors: Tables<"donors"> | null;
 };
 
+type ApplicationStatus = "pending" | "approved" | "rejected" | "draft";
+
 export const ApplicationManagement = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export const ApplicationManagement = () => {
     }
   };
 
-  const updateApplicationStatus = async (applicationId: string, newStatus: string) => {
+  const updateApplicationStatus = async (applicationId: string, newStatus: ApplicationStatus) => {
     try {
       const { error } = await supabase
         .from("applications")
@@ -124,7 +125,7 @@ export const ApplicationManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Application Management</CardTitle>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(value: ApplicationStatus | "all") => setStatusFilter(value)}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>

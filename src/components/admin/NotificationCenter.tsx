@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,11 +9,12 @@ import { Bell, Mail, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Notification = Tables<"notifications">;
+type NotificationType = "application_status" | "donation_receipt" | "adoption_confirmation" | "admin_alert";
 
 export const NotificationCenter = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<NotificationType | "all">("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -155,7 +155,7 @@ export const NotificationCenter = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Notification History</CardTitle>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <Select value={typeFilter} onValueChange={(value: NotificationType | "all") => setTypeFilter(value)}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
