@@ -1,7 +1,5 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -15,59 +13,9 @@ import { AuditLogs } from "@/components/admin/AuditLogs";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
 
 export default function Admin() {
-  const [user, setUser] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { user, isAdmin, loading } = useAdminAuth();
 
-  useEffect(() => {
-    checkAdminAccess();
-  }, []);
-
-  const checkAdminAccess = async () => {
-    try {
-      // Get current session directly
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
-        console.log("No user session found");
-        setUser(null);
-        setIsAdmin(false);
-        setLoading(false);
-        return;
-      }
-
-      const currentUser = session.user;
-      console.log("User found:", currentUser.email);
-      setUser(currentUser);
-
-      // Simple email-based admin check
-      const adminEmails = ['arodseo@gmail.com'];
-      const hasAdminAccess = adminEmails.includes(currentUser.email || '');
-      
-      console.log("Admin access:", hasAdminAccess);
-      setIsAdmin(hasAdminAccess);
-
-      if (!hasAdminAccess) {
-        toast({
-          title: "Access Denied",
-          description: "You don't have permission to access the admin panel.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Admin access check failed:', error);
-      setUser(null);
-      setIsAdmin(false);
-      toast({
-        title: "Error",
-        description: "Failed to check admin access. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  console.log("Admin component render:", { user: user?.email, isAdmin, loading });
 
   if (loading) {
     return (
