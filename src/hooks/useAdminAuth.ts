@@ -10,54 +10,89 @@ export const useAdminAuth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    let mounted = true;
+
+    const checkAuth = async () => {
+      try {
+        console.log("Starting auth check...");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session error:', error);
+          throw error;
+        }
+
+        if (!mounted) return; // Prevent state updates if component unmounted
+
+        if (!session?.user) {
+          console.log("No session found");
+          setUser(null);
+          setIsAdmin(false);
+          setLoading(false);
+          return;
+        }
+
+        const currentUser = session.user;
+        console.log("User session found:", currentUser.email);
+        setUser(currentUser);
+
+        // Simple email-based admin check
+        const adminEmails = ['arodseo@gmail.com'];
+        const hasAdminAccess = adminEmails.includes(currentUser.email || '');
+        console.log("Admin access granted:", hasAdminAccess);
+        setIsAdmin(hasAdminAccess);
+
+      } catch (error) {
+        console.error('Auth error:', error);
+        if (mounted) {
+          setUser(null);
+          setIsAdmin(false);
+        }
+      } finally {
+        if (mounted) {
+          console.log("Setting loading to false");
+          setLoading(false);
+        }
+      }
+    };
+
+    // Initial auth check
     checkAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.email);
+        
+        if (!mounted) return;
+
         if (event === 'SIGNED_OUT') {
           setUser(null);
           setIsAdmin(false);
           setLoading(false);
         } else if (session?.user) {
-          checkAuth();
+          setUser(session.user);
+          const adminEmails = ['arodseo@gmail.com'];
+          const hasAdminAccess = adminEmails.includes(session.user.email || '');
+          setIsAdmin(hasAdminAccess);
+          setLoading(false);
+        } else {
+          setUser(null);
+          setIsAdmin(false);
+          setLoading(false);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
-
-  const checkAuth = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
-        setUser(null);
-        setIsAdmin(false);
-        setLoading(false);
-        return;
-      }
-
-      const currentUser = session.user;
-      setUser(currentUser);
-
-      // Simple email-based admin check
-      const adminEmails = ['arodseo@gmail.com'];
-      const hasAdminAccess = adminEmails.includes(currentUser.email || '');
-      setIsAdmin(hasAdminAccess);
-
-    } catch (error) {
-      console.error('Auth error:', error);
-      setUser(null);
-      setIsAdmin(false);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const signOut = async () => {
     try {
+      setLoading(true);
       await supabase.auth.signOut();
       setUser(null);
       setIsAdmin(false);
@@ -72,6 +107,8 @@ export const useAdminAuth = () => {
         description: "Failed to sign out",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,6 +117,21 @@ export const useAdminAuth = () => {
     isAdmin,
     loading,
     signOut,
-    refetch: checkAuth
+    refetch: () => {
+      setLoading(true);
+      // This will trigger the auth state check
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          setUser(session.user);
+          const adminEmails = ['arodseo@gmail.com'];
+          const hasAdminAccess = adminEmails.includes(session.user.email || '');
+          setIsAdmin(hasAdminAccess);
+        } else {
+          setUser(null);
+          setIsAdmin(false);
+        }
+        setLoading(false);
+      });
+    }
   };
 };
