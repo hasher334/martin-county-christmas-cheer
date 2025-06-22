@@ -13,6 +13,7 @@ import { UserManagement } from "@/components/admin/UserManagement";
 import { DonationManagement } from "@/components/admin/DonationManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
+import { ChildManagement } from "@/components/admin/ChildManagement";
 import { useEffect } from "react";
 
 export default function Admin() {
@@ -157,8 +158,9 @@ export default function Admin() {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="children">Children</TabsTrigger>
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="donations">Donations</TabsTrigger>
@@ -168,6 +170,10 @@ export default function Admin() {
 
           <TabsContent value="dashboard">
             <AdminDashboardStats />
+          </TabsContent>
+
+          <TabsContent value="children">
+            <ChildManagement />
           </TabsContent>
 
           <TabsContent value="applications">
