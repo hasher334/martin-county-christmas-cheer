@@ -12,11 +12,13 @@ export const useAdminAuth = () => {
   useEffect(() => {
     checkAuth();
 
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'SIGNED_OUT') {
           setUser(null);
           setIsAdmin(false);
+          setLoading(false);
         } else if (session?.user) {
           checkAuth();
         }
@@ -28,31 +30,22 @@ export const useAdminAuth = () => {
 
   const checkAuth = async () => {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) throw error;
-
-      setUser(user);
-
-      if (!user) {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user) {
+        setUser(null);
         setIsAdmin(false);
         setLoading(false);
         return;
       }
 
-      // Check if user is admin
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .single();
+      const currentUser = session.user;
+      setUser(currentUser);
 
-      if (roleError && roleError.code !== 'PGRST116') {
-        console.error('Error checking admin role:', roleError);
-      }
-
-      const adminAccess = !!roleData || user.email === 'arodseo@gmail.com';
-      setIsAdmin(adminAccess);
+      // Simple email-based admin check
+      const adminEmails = ['arodseo@gmail.com'];
+      const hasAdminAccess = adminEmails.includes(currentUser.email || '');
+      setIsAdmin(hasAdminAccess);
 
     } catch (error) {
       console.error('Auth error:', error);
