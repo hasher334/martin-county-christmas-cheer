@@ -4,14 +4,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, FileText, Gift, DollarSign, Heart, TrendingUp } from "lucide-react";
 
-interface DashboardStat {
-  stat_name: string;
-  stat_value: number;
-  stat_description: string;
+interface DashboardStats {
+  available_children: number;
+  pending_applications: number;
+  new_donors_this_month: number;
+  donations_this_month: number;
+  adopted_children: number;
+  recent_adoptions: number;
 }
 
 export const AdminDashboardStats = () => {
-  const [stats, setStats] = useState<DashboardStat[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    available_children: 0,
+    pending_applications: 0,
+    new_donors_this_month: 0,
+    donations_this_month: 0,
+    adopted_children: 0,
+    recent_adoptions: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,9 +30,23 @@ export const AdminDashboardStats = () => {
 
   const fetchStats = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_admin_dashboard_data');
+      const { data, error } = await supabase
+        .from('dashboard_stats')
+        .select('*')
+        .single();
+      
       if (error) throw error;
-      setStats(data || []);
+      
+      if (data) {
+        setStats({
+          available_children: data.available_children || 0,
+          pending_applications: data.pending_applications || 0,
+          new_donors_this_month: data.new_donors_this_month || 0,
+          donations_this_month: data.donations_this_month || 0,
+          adopted_children: data.adopted_children || 0,
+          recent_adoptions: data.recent_adoptions || 0,
+        });
+      }
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
     } finally {
@@ -30,38 +54,44 @@ export const AdminDashboardStats = () => {
     }
   };
 
-  const getStatIcon = (statName: string) => {
-    switch (statName) {
-      case 'available_children':
-        return <Users className="h-6 w-6" />;
-      case 'pending_applications':
-        return <FileText className="h-6 w-6" />;
-      case 'new_donors_week':
-        return <Heart className="h-6 w-6" />;
-      case 'total_donations_month':
-        return <DollarSign className="h-6 w-6" />;
-      default:
-        return <TrendingUp className="h-6 w-6" />;
-    }
-  };
+  const statItems = [
+    {
+      key: 'available_children',
+      icon: Users,
+      label: 'Available Children',
+      value: stats.available_children,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+    },
+    {
+      key: 'pending_applications',
+      icon: FileText,
+      label: 'Pending Applications',
+      value: stats.pending_applications,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50',
+    },
+    {
+      key: 'new_donors_this_month',
+      icon: Heart,
+      label: 'New Donors This Week',
+      value: stats.new_donors_this_month,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+    },
+    {
+      key: 'donations_this_month',
+      icon: DollarSign,
+      label: 'Donations This Month',
+      value: stats.donations_this_month,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+      format: 'currency',
+    },
+  ];
 
-  const getStatColor = (statName: string) => {
-    switch (statName) {
-      case 'available_children':
-        return 'text-blue-600 bg-blue-50';
-      case 'pending_applications':
-        return 'text-yellow-600 bg-yellow-50';
-      case 'new_donors_week':
-        return 'text-green-600 bg-green-50';
-      case 'total_donations_month':
-        return 'text-purple-600 bg-purple-50';
-      default:
-        return 'text-gray-600 bg-gray-50';
-    }
-  };
-
-  const formatStatValue = (statName: string, value: number) => {
-    if (statName === 'total_donations_month') {
+  const formatValue = (value: number, format?: string) => {
+    if (format === 'currency') {
       return `$${(value / 100).toFixed(2)}`;
     }
     return value.toString();
@@ -85,25 +115,63 @@ export const AdminDashboardStats = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <Card key={stat.stat_name} className="hover:shadow-lg transition-shadow">
+        {statItems.map((item) => (
+          <Card key={item.key} className="hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
-                    {stat.stat_description}
+                    {item.label}
                   </p>
                   <p className="text-3xl font-bold text-gray-900">
-                    {formatStatValue(stat.stat_name, stat.stat_value)}
+                    {formatValue(item.value, item.format)}
                   </p>
                 </div>
-                <div className={`p-3 rounded-full ${getStatColor(stat.stat_name)}`}>
-                  {getStatIcon(stat.stat_name)}
+                <div className={`p-3 rounded-full ${item.bgColor}`}>
+                  <item.icon className={`h-6 w-6 ${item.color}`} />
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Adopted Children
+                </p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {stats.adopted_children}
+                </p>
+              </div>
+              <div className="p-3 rounded-full bg-red-50">
+                <Heart className="h-6 w-6 text-red-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Recent Adoptions (7 days)
+                </p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {stats.recent_adoptions}
+                </p>
+              </div>
+              <div className="p-3 rounded-full bg-green-50">
+                <TrendingUp className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,16 +21,15 @@ export const Stats = () => {
 
   const fetchStats = async () => {
     try {
-      // Get total children
-      const { count: totalChildren } = await supabase
-        .from("children")
-        .select("*", { count: "exact", head: true });
+      // Use the dashboard_stats view for some metrics and fetch others directly
+      const { data: dashboardData, error: dashboardError } = await supabase
+        .from("dashboard_stats")
+        .select("*")
+        .single();
 
-      // Get adopted children
-      const { count: adoptedChildren } = await supabase
-        .from("children")
-        .select("*", { count: "exact", head: true })
-        .neq("status", "available");
+      if (dashboardError) {
+        console.error("Error fetching dashboard stats:", dashboardError);
+      }
 
       // Get total donors
       const { count: totalDonors } = await supabase
@@ -42,9 +42,12 @@ export const Stats = () => {
         .select("*", { count: "exact", head: true })
         .eq("gift_delivered", true);
 
+      // Calculate total children (available + adopted)
+      const totalChildren = (dashboardData?.available_children || 0) + (dashboardData?.adopted_children || 0);
+
       setStats({
-        totalChildren: totalChildren || 0,
-        adoptedChildren: adoptedChildren || 0,
+        totalChildren: totalChildren,
+        adoptedChildren: dashboardData?.adopted_children || 0,
         totalDonors: totalDonors || 0,
         deliveredGifts: deliveredGifts || 0,
       });
