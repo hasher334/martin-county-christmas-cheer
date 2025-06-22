@@ -6,20 +6,29 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Database, CheckCircle, XCircle } from "lucide-react";
 
+interface TestResult {
+  success: boolean;
+  count?: number;
+  user?: any;
+  error?: string;
+}
+
+interface TestResults {
+  children: TestResult;
+  auth: TestResult;
+}
+
 export const DatabaseTest = () => {
-  const [testResults, setTestResults] = useState<{
-    children: { success: boolean; count?: number; error?: string };
-    auth: { success: boolean; user?: any; error?: string };
-  } | null>(null);
+  const [testResults, setTestResults] = useState<TestResults | null>(null);
   const [testing, setTesting] = useState(false);
 
   const runTests = async () => {
     setTesting(true);
     console.log('🧪 Running database connectivity tests...');
     
-    const results = {
-      children: { success: false, count: 0, error: '' },
-      auth: { success: false, user: null, error: '' }
+    const results: TestResults = {
+      children: { success: false },
+      auth: { success: false }
     };
 
     // Test 1: Children table access
