@@ -13,7 +13,7 @@ export const useAdminAuth = () => {
   const mountedRef = useRef(true);
 
   // Known admin emails for fallback
-  const knownAdminEmails = ['areodseo@gmail.com'];
+  const knownAdminEmails = ['arodseo@gmail.com'];
 
   useEffect(() => {
     mountedRef.current = true;
