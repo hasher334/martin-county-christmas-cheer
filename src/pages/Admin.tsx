@@ -1,10 +1,12 @@
 
-import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Activity } from "lucide-react";
+import { Users, FileText, Gift, DollarSign, AlertCircle, Activity } from "lucide-react";
 import { AdminDashboardStats } from "@/components/admin/AdminDashboardStats";
 import { ApplicationManagement } from "@/components/admin/ApplicationManagement";
 import { UserManagement } from "@/components/admin/UserManagement";
@@ -13,42 +15,71 @@ import { AuditLogs } from "@/components/admin/AuditLogs";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
 
 export default function Admin() {
-  const { user, isAdmin, loading } = useAdminAuth();
+  const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  console.log("Admin component render:", { user: user?.email, isAdmin, loading });
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) throw error;
+
+      if (!user) {
+        window.location.href = '/';
+        return;
+      }
+
+      setUser(user);
+
+      // Check if user is admin
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+
+      if (roleError && roleError.code !== 'PGRST116') {
+        console.error('Error checking admin role:', roleError);
+      }
+
+      const adminAccess = !!roleData || user.email === 'arodseo@gmail.com';
+      setIsAdmin(adminAccess);
+
+      if (!adminAccess) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to access the admin panel.",
+          variant: "destructive",
+        });
+        window.location.href = '/';
+        return;
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      window.location.href = '/';
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin panel...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <AlertCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
-            <p className="text-gray-600 mb-4">Please sign in to access the admin panel.</p>
-            <Button onClick={() => window.location.href = '/'}>
-              Go to Home
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
       </div>
     );
   }
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-96">
           <CardContent className="p-6 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
