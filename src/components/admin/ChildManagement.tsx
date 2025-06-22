@@ -31,27 +31,40 @@ export const ChildManagement = () => {
   const [editMode, setEditMode] = useState(false);
   const { toast } = useToast();
 
-  const { data: children, isLoading, refetch } = useQuery({
+  const { data: children, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-children'],
     queryFn: async () => {
-      console.log('Fetching children for admin management');
-      const { data, error } = await supabase
-        .from('children')
-        .select('*')
-        .order('created_at', { ascending: false });
+      console.log('🔄 Fetching children for admin management');
+      
+      try {
+        const { data, error } = await supabase
+          .from('children')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching children:', error);
-        throw error;
+        if (error) {
+          console.error('❌ Error fetching children:', error);
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        console.log('✅ Successfully fetched children:', {
+          count: data?.length || 0,
+          data: data
+        });
+
+        return data as Child[];
+      } catch (fetchError) {
+        console.error('❌ Complete fetch failure:', fetchError);
+        throw fetchError;
       }
-
-      return data as Child[];
     },
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
 
   const handleDelete = async (childId: string) => {
     try {
-      console.log('Deleting child:', childId);
+      console.log('🗑️ Deleting child:', childId);
       const { error } = await supabase
         .from('children')
         .delete()
@@ -109,13 +122,36 @@ export const ChildManagement = () => {
     }
   };
 
-  if (isLoading) {
+  if (error) {
+    console.error('❌ Query error in ChildManagement:', error);
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+        <Card className="w-96">
+          <CardContent className="p-6 text-center">
+            <h3 className="text-lg font-semibold text-red-600 mb-2">Error Loading Children</h3>
+            <p className="text-gray-600 mb-4">{error.message || 'Failed to load children data'}</p>
+            <Button onClick={() => refetch()} variant="outline">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
+
+  if (isLoading) {
+    console.log('⏳ ChildManagement is loading...');
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading children profiles...</p>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('✅ ChildManagement rendering with data:', { childrenCount: children?.length });
 
   return (
     <div className="space-y-6">
