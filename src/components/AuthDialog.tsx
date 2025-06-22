@@ -42,9 +42,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
 
       console.log("Sign in successful:", data);
 
-      // Send signin notification
-      await notifyAuthEvent('signin', email, 'User signed in successfully');
-
       toast({
         title: "Welcome back!",
         description: "You're now signed in and ready to adopt a child for Christmas.",
@@ -54,7 +51,17 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
       setEmail("");
       setPassword("");
       
+      // Complete the sign-in process first
       onSuccess();
+
+      // Send signin notification asynchronously without blocking
+      setTimeout(() => {
+        notifyAuthEvent('signin', email, 'User signed in successfully').catch(error => {
+          console.error('Failed to send signin notification:', error);
+          // Don't show this error to the user as it's not critical
+        });
+      }, 0);
+
     } catch (error: any) {
       console.error("Sign in failed:", error);
       toast({
@@ -93,10 +100,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
 
       console.log("Sign up successful:", data);
 
-      // The donor profile will be created automatically by the database trigger
-      // Send signup notification immediately
-      await notifyUserSignup(email, name);
-
       toast({
         title: "Account created successfully!",
         description: "Welcome! You can now start adopting children for Christmas.",
@@ -107,7 +110,17 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
       setPassword("");
       setName("");
       
+      // Complete the sign-up process first
       onSuccess();
+
+      // Send signup notification asynchronously without blocking
+      setTimeout(() => {
+        notifyUserSignup(email, name).catch(error => {
+          console.error('Failed to send signup notification:', error);
+          // Don't show this error to the user as it's not critical
+        });
+      }, 0);
+
     } catch (error: any) {
       console.error("Sign up failed:", error);
       toast({
