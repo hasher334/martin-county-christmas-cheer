@@ -15,7 +15,7 @@ interface Child {
   name: string;
   age: number;
   gender: string;
-  status: string;
+  status: "draft" | "available" | "adopted" | "fulfilled" | "pending_review";
   location: string;
   photo_url: string;
   story: string;
