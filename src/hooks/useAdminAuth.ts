@@ -12,7 +12,7 @@ export const useAdminAuth = () => {
   const checkingAuthRef = useRef(false);
   const mountedRef = useRef(true);
 
-  // Known admin emails for fallback
+  // Known admin emails for immediate access
   const knownAdminEmails = ['arodseo@gmail.com'];
 
   useEffect(() => {
@@ -39,7 +39,18 @@ export const useAdminAuth = () => {
           console.log('useAdminAuth: Session found, checking admin status');
           setUser(session.user);
           
-          // Check admin status with timeout
+          // Check for known admin emails first for instant access
+          if (knownAdminEmails.includes(session.user.email)) {
+            console.log('useAdminAuth: Known admin email detected, granting immediate access');
+            if (mountedRef.current) {
+              setIsAdmin(true);
+              setLoading(false);
+              setAuthError(null);
+            }
+            return;
+          }
+
+          // For non-known emails, check admin status with timeout
           const adminCheckPromise = checkAdminStatus(session.user);
           const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Admin check timeout')), 5000)
@@ -49,14 +60,10 @@ export const useAdminAuth = () => {
             await Promise.race([adminCheckPromise, timeoutPromise]);
           } catch (error) {
             console.error('useAdminAuth: Admin check failed:', error);
-            // Use fallback for known admin emails
-            const adminAccess = knownAdminEmails.includes(session.user.email);
             if (mountedRef.current) {
-              setIsAdmin(adminAccess);
+              setIsAdmin(false);
               setLoading(false);
-              if (!adminAccess) {
-                setAuthError('Admin verification failed');
-              }
+              setAuthError('Admin verification failed');
             }
           }
         } else {
@@ -106,7 +113,16 @@ export const useAdminAuth = () => {
         return;
       }
 
-      // Check admin status for existing user
+      // Check for known admin emails first for instant access
+      if (knownAdminEmails.includes(user.email)) {
+        console.log('useAdminAuth: Known admin email detected during initial check, granting immediate access');
+        setIsAdmin(true);
+        setLoading(false);
+        setAuthError(null);
+        return;
+      }
+
+      // For non-known emails, check admin status in database
       await checkAdminStatus(user);
 
     } catch (error) {
@@ -126,17 +142,7 @@ export const useAdminAuth = () => {
     try {
       console.log('useAdminAuth: Checking admin status for user:', user.email);
       
-      // Quick fallback check for known admin emails
-      if (knownAdminEmails.includes(user.email)) {
-        console.log('useAdminAuth: Known admin email detected, granting access');
-        if (mountedRef.current) {
-          setIsAdmin(true);
-          setLoading(false);
-          setAuthError(null);
-        }
-        return;
-      }
-
+      // This function should only be called for non-known admin emails now
       // Try to check user_roles table
       const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
@@ -149,11 +155,9 @@ export const useAdminAuth = () => {
 
       if (roleError && roleError.code !== 'PGRST116') {
         console.error('useAdminAuth: Error checking admin role:', roleError);
-        // Fall back to known admin emails on database error
-        const adminAccess = knownAdminEmails.includes(user.email);
-        setIsAdmin(adminAccess);
+        setIsAdmin(false);
       } else {
-        const adminAccess = !!roleData || knownAdminEmails.includes(user.email);
+        const adminAccess = !!roleData;
         console.log('useAdminAuth: Admin status determined:', { adminAccess, hasRoleData: !!roleData });
         setIsAdmin(adminAccess);
       }
@@ -161,10 +165,7 @@ export const useAdminAuth = () => {
     } catch (error) {
       console.error('useAdminAuth: Error in checkAdminStatus:', error);
       if (mountedRef.current) {
-        // Fallback for known admin emails
-        const adminAccess = knownAdminEmails.includes(user.email);
-        console.log('useAdminAuth: Using fallback admin check:', { adminAccess });
-        setIsAdmin(adminAccess);
+        setIsAdmin(false);
       }
     } finally {
       if (mountedRef.current) {
