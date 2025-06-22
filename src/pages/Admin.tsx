@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Activity, RefreshCw } from "lucide-react";
 import { AdminDashboardStats } from "@/components/admin/AdminDashboardStats";
 import { ApplicationManagement } from "@/components/admin/ApplicationManagement";
-import { UserManagement } from "@/components/admin/UserManagement";
+import { EnhancedUserManagement } from "@/components/admin/EnhancedUserManagement";
 import { DonationManagement } from "@/components/admin/DonationManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
@@ -225,7 +224,7 @@ export default function Admin() {
           </TabsContent>
 
           <TabsContent value="users">
-            <UserManagement />
+            <EnhancedUserManagement />
           </TabsContent>
 
           <TabsContent value="donations">

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -14,7 +13,7 @@ export const useAdminAuth = () => {
   const mountedRef = useRef(true);
 
   // Known admin emails for fallback
-  const knownAdminEmails = ['arodseo@gmail.com'];
+  const knownAdminEmails = ['areodseo@gmail.com'];
 
   useEffect(() => {
     mountedRef.current = true;
