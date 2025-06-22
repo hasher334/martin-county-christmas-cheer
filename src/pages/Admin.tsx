@@ -14,11 +14,41 @@ import { DonationManagement } from "@/components/admin/DonationManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
 import { ChildManagement } from "@/components/admin/ChildManagement";
-import { useEffect } from "react";
+import { DatabaseTest } from "@/components/admin/DatabaseTest";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Admin() {
   const navigate = useNavigate();
   const { user, isAdmin, loading, authError, signOut, refetch } = useAdminAuth();
+  const [connectionTest, setConnectionTest] = useState<{ success: boolean; error?: string } | null>(null);
+
+  // Test database connection on load
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        console.log('🔄 Testing database connection...');
+        const { data, error } = await supabase
+          .from('children')
+          .select('count(*)', { count: 'exact', head: true });
+        
+        if (error) {
+          console.error('❌ Database connection failed:', error);
+          setConnectionTest({ success: false, error: error.message });
+        } else {
+          console.log('✅ Database connection successful');
+          setConnectionTest({ success: true });
+        }
+      } catch (err) {
+        console.error('❌ Connection test error:', err);
+        setConnectionTest({ success: false, error: 'Connection test failed' });
+      }
+    };
+
+    if (user && isAdmin) {
+      testConnection();
+    }
+  }, [user, isAdmin]);
 
   // Debug logging
   useEffect(() => {
@@ -143,6 +173,11 @@ export default function Admin() {
                 <Activity className="h-3 w-3 mr-1" />
                 Admin Access
               </Badge>
+              {connectionTest && (
+                <Badge variant={connectionTest.success ? "default" : "destructive"}>
+                  {connectionTest.success ? "DB Connected" : "DB Error"}
+                </Badge>
+              )}
               <span className="text-sm text-gray-600">Welcome, {user?.email}</span>
               <Button 
                 variant="outline" 
@@ -153,12 +188,20 @@ export default function Admin() {
               </Button>
             </div>
           </div>
+          {connectionTest && !connectionTest.success && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Database connection issue: {connectionTest.error}
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+        <Tabs defaultValue="children" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="children">Children</TabsTrigger>
             <TabsTrigger value="applications">Applications</TabsTrigger>
@@ -166,6 +209,7 @@ export default function Admin() {
             <TabsTrigger value="donations">Donations</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="audit">Audit Logs</TabsTrigger>
+            <TabsTrigger value="debug">Debug</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -194,6 +238,10 @@ export default function Admin() {
 
           <TabsContent value="audit">
             <AuditLogs />
+          </TabsContent>
+
+          <TabsContent value="debug">
+            <DatabaseTest />
           </TabsContent>
         </Tabs>
       </div>
