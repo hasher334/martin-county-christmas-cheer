@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Activity } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Activity, RefreshCw } from "lucide-react";
 import { AdminDashboardStats } from "@/components/admin/AdminDashboardStats";
 import { ApplicationManagement } from "@/components/admin/ApplicationManagement";
 import { UserManagement } from "@/components/admin/UserManagement";
@@ -16,41 +17,82 @@ import { useEffect } from "react";
 
 export default function Admin() {
   const navigate = useNavigate();
-  const { user, isAdmin, loading, signOut } = useAdminAuth();
+  const { user, isAdmin, loading, authError, signOut, refetch } = useAdminAuth();
 
   // Debug logging
   useEffect(() => {
-    console.log('Admin component mounted');
-    console.log('Auth state:', { user: user?.email, isAdmin, loading });
-  }, [user, isAdmin, loading]);
+    console.log('Admin component: Auth state updated', { 
+      userEmail: user?.email, 
+      isAdmin, 
+      loading, 
+      authError 
+    });
+  }, [user, isAdmin, loading, authError]);
 
   // Redirect non-authenticated users
   useEffect(() => {
-    if (!loading && !user) {
-      console.log('No user found, redirecting to home');
+    if (!loading && !user && !authError) {
+      console.log('Admin component: No user found, redirecting to home');
       navigate('/');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, authError, navigate]);
 
   // Redirect non-admin users
   useEffect(() => {
-    if (!loading && user && !isAdmin) {
-      console.log('User is not admin, redirecting to home');
+    if (!loading && user && !isAdmin && !authError) {
+      console.log('Admin component: User is not admin, redirecting to home');
       navigate('/');
     }
-  }, [user, isAdmin, loading, navigate]);
+  }, [user, isAdmin, loading, authError, navigate]);
 
   if (loading) {
-    console.log('Showing loading spinner');
+    console.log('Admin component: Showing loading spinner');
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verifying admin access...</p>
+          <Button 
+            variant="outline" 
+            onClick={refetch} 
+            className="mt-4"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    console.log('Admin component: Showing auth error');
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Authentication Error</h2>
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{authError}</AlertDescription>
+            </Alert>
+            <div className="space-y-2">
+              <Button onClick={refetch} className="w-full">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Retry Authentication
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/')} className="w-full">
+                Return to Home
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (!user) {
-    console.log('No user, showing redirect message');
+    console.log('Admin component: No user, showing redirect message');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-96">
@@ -68,7 +110,7 @@ export default function Admin() {
   }
 
   if (!isAdmin) {
-    console.log('User is not admin, showing access denied');
+    console.log('Admin component: User is not admin, showing access denied');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-96">
@@ -85,7 +127,7 @@ export default function Admin() {
     );
   }
 
-  console.log('Rendering admin dashboard');
+  console.log('Admin component: Rendering admin dashboard');
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">
