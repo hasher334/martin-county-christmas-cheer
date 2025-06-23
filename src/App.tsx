@@ -11,8 +11,6 @@ import Wishlists from "./pages/Wishlists";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Register from "./pages/Register";
-import Activity from "./pages/Activity";
-import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -37,8 +35,6 @@ function AppContent() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/activity" element={<Activity />} />
-        <Route path="/admin" element={<Admin />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

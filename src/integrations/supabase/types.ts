@@ -51,109 +51,10 @@ export type Database = {
           },
         ]
       }
-      applications: {
-        Row: {
-          admin_notes: string | null
-          application_data: Json | null
-          child_id: string | null
-          created_at: string | null
-          donor_id: string | null
-          id: string
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: Database["public"]["Enums"]["application_status"] | null
-          submitted_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          admin_notes?: string | null
-          application_data?: Json | null
-          child_id?: string | null
-          created_at?: string | null
-          donor_id?: string | null
-          id?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["application_status"] | null
-          submitted_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          admin_notes?: string | null
-          application_data?: Json | null
-          child_id?: string | null
-          created_at?: string | null
-          donor_id?: string | null
-          id?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["application_status"] | null
-          submitted_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "applications_child_id_fkey"
-            columns: ["child_id"]
-            isOneToOne: false
-            referencedRelation: "children"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_donor_id_fkey"
-            columns: ["donor_id"]
-            isOneToOne: false
-            referencedRelation: "donors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      audit_logs: {
-        Row: {
-          action_type: string
-          admin_user_id: string
-          created_at: string | null
-          id: string
-          ip_address: unknown | null
-          new_values: Json | null
-          old_values: Json | null
-          target_id: string | null
-          target_table: string | null
-          user_agent: string | null
-        }
-        Insert: {
-          action_type: string
-          admin_user_id: string
-          created_at?: string | null
-          id?: string
-          ip_address?: unknown | null
-          new_values?: Json | null
-          old_values?: Json | null
-          target_id?: string | null
-          target_table?: string | null
-          user_agent?: string | null
-        }
-        Update: {
-          action_type?: string
-          admin_user_id?: string
-          created_at?: string | null
-          id?: string
-          ip_address?: unknown | null
-          new_values?: Json | null
-          old_values?: Json | null
-          target_id?: string | null
-          target_table?: string | null
-          user_agent?: string | null
-        }
-        Relationships: []
-      }
       children: {
         Row: {
           age: number
-          approved_at: string | null
-          approved_by: string | null
           created_at: string | null
-          created_by: string | null
           gender: string
           id: string
           location: string | null
@@ -167,10 +68,7 @@ export type Database = {
         }
         Insert: {
           age: number
-          approved_at?: string | null
-          approved_by?: string | null
           created_at?: string | null
-          created_by?: string | null
           gender: string
           id?: string
           location?: string | null
@@ -184,10 +82,7 @@ export type Database = {
         }
         Update: {
           age?: number
-          approved_at?: string | null
-          approved_by?: string | null
           created_at?: string | null
-          created_by?: string | null
           gender?: string
           id?: string
           location?: string | null
@@ -201,139 +96,32 @@ export type Database = {
         }
         Relationships: []
       }
-      donations: {
-        Row: {
-          amount: number
-          created_at: string | null
-          currency: string | null
-          donation_notes: string | null
-          donor_id: string | null
-          id: string
-          is_recurring: boolean | null
-          refund_amount: number | null
-          refunded_at: string | null
-          refunded_by: string | null
-          status: Database["public"]["Enums"]["payment_status"] | null
-          stripe_payment_intent_id: string | null
-          stripe_session_id: string | null
-          subscription_id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          currency?: string | null
-          donation_notes?: string | null
-          donor_id?: string | null
-          id?: string
-          is_recurring?: boolean | null
-          refund_amount?: number | null
-          refunded_at?: string | null
-          refunded_by?: string | null
-          status?: Database["public"]["Enums"]["payment_status"] | null
-          stripe_payment_intent_id?: string | null
-          stripe_session_id?: string | null
-          subscription_id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          currency?: string | null
-          donation_notes?: string | null
-          donor_id?: string | null
-          id?: string
-          is_recurring?: boolean | null
-          refund_amount?: number | null
-          refunded_at?: string | null
-          refunded_by?: string | null
-          status?: Database["public"]["Enums"]["payment_status"] | null
-          stripe_payment_intent_id?: string | null
-          stripe_session_id?: string | null
-          subscription_id?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "donations_donor_id_fkey"
-            columns: ["donor_id"]
-            isOneToOne: false
-            referencedRelation: "donors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       donors: {
         Row: {
           address: string | null
-          application_data: Json | null
           created_at: string | null
           email: string
           id: string
           name: string
-          notes: string | null
           phone: string | null
-          profile_status: string | null
           user_id: string | null
         }
         Insert: {
           address?: string | null
-          application_data?: Json | null
           created_at?: string | null
           email: string
           id?: string
           name: string
-          notes?: string | null
           phone?: string | null
-          profile_status?: string | null
           user_id?: string | null
         }
         Update: {
           address?: string | null
-          application_data?: Json | null
           created_at?: string | null
           email?: string
           id?: string
           name?: string
-          notes?: string | null
           phone?: string | null
-          profile_status?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      notifications: {
-        Row: {
-          content: string
-          created_at: string | null
-          error_message: string | null
-          id: string
-          metadata: Json | null
-          sent_at: string | null
-          subject: string
-          type: Database["public"]["Enums"]["notification_type"]
-          user_id: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          error_message?: string | null
-          id?: string
-          metadata?: Json | null
-          sent_at?: string | null
-          subject: string
-          type: Database["public"]["Enums"]["notification_type"]
-          user_id?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          error_message?: string | null
-          id?: string
-          metadata?: Json | null
-          sent_at?: string | null
-          subject?: string
-          type?: Database["public"]["Enums"]["notification_type"]
           user_id?: string | null
         }
         Relationships: []
@@ -400,27 +188,9 @@ export type Database = {
       }
     }
     Views: {
-      dashboard_stats: {
-        Row: {
-          adopted_children: number | null
-          available_children: number | null
-          donations_this_month: number | null
-          new_donors_this_month: number | null
-          pending_applications: number | null
-          recent_adoptions: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      get_admin_dashboard_data: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          stat_name: string
-          stat_value: number
-          stat_description: string
-        }[]
-      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
@@ -434,13 +204,6 @@ export type Database = {
         | "draft"
         | "pending_review"
       app_role: "admin" | "user"
-      application_status: "pending" | "approved" | "rejected" | "draft"
-      notification_type:
-        | "application_status"
-        | "donation_receipt"
-        | "adoption_confirmation"
-        | "admin_alert"
-      payment_status: "pending" | "completed" | "failed" | "refunded"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -564,14 +327,6 @@ export const Constants = {
         "pending_review",
       ],
       app_role: ["admin", "user"],
-      application_status: ["pending", "approved", "rejected", "draft"],
-      notification_type: [
-        "application_status",
-        "donation_receipt",
-        "adoption_confirmation",
-        "admin_alert",
-      ],
-      payment_status: ["pending", "completed", "failed", "refunded"],
     },
   },
 } as const

@@ -100,15 +100,6 @@ export const MobileMenu = ({ user, onAuthClick }: MobileMenuProps) => {
                 Register Child
               </button>
               
-              {user && (
-                <button
-                  onClick={() => handleNavigation("/activity")}
-                  className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"
-                >
-                  My Activity
-                </button>
-              )}
-              
               <button
                 onClick={() => handleNavigation("/about")}
                 className="block w-full text-left py-3 px-4 text-christmas-green-700 hover:bg-white/50 rounded-lg transition-colors"

@@ -77,14 +77,6 @@ export const Header = ({ user, onAuthClick }: HeaderProps) => {
                 >
                   Register Child
                 </Link>
-                {user && (
-                  <Link 
-                    to="/activity" 
-                    className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"
-                  >
-                    My Activity
-                  </Link>
-                )}
                 <Link 
                   to="/about" 
                   className="px-4 py-2 rounded-full text-christmas-green-700 hover:text-christmas-green-800 hover:bg-white/80 font-medium transition-all duration-200 ease-in-out font-nunito"

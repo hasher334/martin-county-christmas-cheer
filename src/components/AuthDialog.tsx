@@ -28,45 +28,26 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
     setLoading(true);
 
     try {
-      console.log("Attempting sign in for:", email);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        console.error("Sign in error:", error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log("Sign in successful:", data);
+      // Send signin notification
+      await notifyAuthEvent('signin', email, 'User signed in successfully');
 
       toast({
         title: "Welcome back!",
         description: "You're now signed in and ready to adopt a child for Christmas.",
       });
       
-      // Clear form
-      setEmail("");
-      setPassword("");
-      
-      // Complete the sign-in process first
       onSuccess();
-
-      // Send signin notification asynchronously without blocking
-      setTimeout(() => {
-        notifyAuthEvent('signin', email, 'User signed in successfully').catch(error => {
-          console.error('Failed to send signin notification:', error);
-          // Don't show this error to the user as it's not critical
-        });
-      }, 0);
-
     } catch (error: any) {
-      console.error("Sign in failed:", error);
       toast({
         title: "Sign in failed",
-        description: error.message || "Please check your credentials and try again.",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -79,53 +60,32 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
     setLoading(true);
 
     try {
-      console.log("Attempting sign up for:", email);
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/activity`,
+          emailRedirectTo: undefined, // Remove email confirmation
           data: {
             name: name,
-            full_name: name,
           },
         },
       });
 
-      if (error) {
-        console.error("Sign up error:", error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log("Sign up successful:", data);
+      // Send signup notification immediately
+      await notifyUserSignup(email, name);
 
       toast({
         title: "Account created successfully!",
         description: "Welcome! You can now start adopting children for Christmas.",
       });
       
-      // Clear form
-      setEmail("");
-      setPassword("");
-      setName("");
-      
-      // Complete the sign-up process first
       onSuccess();
-
-      // Send signup notification asynchronously without blocking
-      setTimeout(() => {
-        notifyUserSignup(email, name).catch(error => {
-          console.error('Failed to send signup notification:', error);
-          // Don't show this error to the user as it's not critical
-        });
-      }, 0);
-
     } catch (error: any) {
-      console.error("Sign up failed:", error);
       toast({
         title: "Sign up failed",
-        description: error.message || "Please try again with different credentials.",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -159,7 +119,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="mt-1"
-                  disabled={loading}
                 />
               </div>
               <div>
@@ -171,7 +130,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="mt-1"
-                  disabled={loading}
                 />
               </div>
               <Button
@@ -180,7 +138,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                 className="w-full bg-red-500 hover:bg-red-600"
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {loading ? "Signing In..." : "Sign In"}
+                Sign In
               </Button>
             </form>
           </TabsContent>
@@ -196,7 +154,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setName(e.target.value)}
                   required
                   className="mt-1"
-                  disabled={loading}
                 />
               </div>
               <div>
@@ -208,7 +165,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="mt-1"
-                  disabled={loading}
                 />
               </div>
               <div>
@@ -221,7 +177,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                   required
                   minLength={6}
                   className="mt-1"
-                  disabled={loading}
                 />
               </div>
               <Button
@@ -230,7 +185,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                 className="w-full bg-green-600 hover:bg-green-700"
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {loading ? "Creating Account..." : "Create Account"}
+                Create Account
               </Button>
             </form>
           </TabsContent>
