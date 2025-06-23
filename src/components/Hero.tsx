@@ -5,54 +5,20 @@ import { Link } from "react-router-dom";
 import { useMemo } from "react";
 
 export const Hero = () => {
-  const scrollToWishlists = () => {
-    const element = document.querySelector('[data-section="wishlists"]');
-    element?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  // Generate fewer snowflakes for mobile to improve performance
+  // Generate fewer snowflakes for better performance
   const snowflakePositions = useMemo(() => {
     const positions = [];
     const isMobile = window.innerWidth < 768;
-    const snowflakeSize = 16; // 4 * 4 (h-4 w-4 in pixels)
-    const minDistance = snowflakeSize * 2; // Minimum distance between snowflakes
-    const maxAttempts = 500; // Reduced attempts for better performance
-    const targetCount = isMobile ? 100 : 200; // Fewer snowflakes on mobile
+    const targetCount = isMobile ? 30 : 60; // Significantly reduced from 100/200
 
-    // Helper function to check if a position overlaps with existing positions
-    const isValidPosition = (x: number, y: number) => {
-      return positions.every(pos => {
-        const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
-        return distance >= minDistance;
-      });
-    };
-
-    // Generate positions
+    // Simplified positioning without collision detection for better performance
     for (let i = 0; i < targetCount; i++) {
-      let attempts = 0;
-      let validPosition = false;
-      let x, y;
-
-      while (!validPosition && attempts < maxAttempts) {
-        x = Math.random() * 100;
-        y = Math.random() * 100;
-        
-        if (isValidPosition(x, y)) {
-          validPosition = true;
-          positions.push({
-            x,
-            y,
-            animationDelay: Math.random() * 2,
-            animationDuration: 2 + Math.random() * 2,
-          });
-        }
-        attempts++;
-      }
-
-      // If we can't find a valid position after max attempts, stop adding more
-      if (!validPosition) {
-        break;
-      }
+      positions.push({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        animationDelay: Math.random() * 2,
+        animationDuration: 2 + Math.random() * 2,
+      });
     }
 
     return positions;
@@ -60,9 +26,9 @@ export const Hero = () => {
 
   return (
     <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
-      {/* Candy Cane Stripe Pattern Overlay */}
+      {/* Simplified Candy Cane Stripe Pattern Overlay */}
       <div 
-        className="absolute inset-0 opacity-15"
+        className="absolute inset-0 opacity-10"
         style={{
           backgroundImage: `repeating-linear-gradient(
             45deg,
@@ -78,7 +44,7 @@ export const Hero = () => {
         }}
       ></div>
 
-      {/* Floating Christmas Elements */}
+      {/* Optimized Floating Christmas Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {snowflakePositions.map((position, i) => (
           <div
@@ -91,7 +57,7 @@ export const Hero = () => {
               animationDuration: `${position.animationDuration}s`,
             }}
           >
-            <Snowflake className="h-4 w-4 text-white/30" />
+            <Snowflake className="h-3 w-3 text-white/20" />
           </div>
         ))}
       </div>

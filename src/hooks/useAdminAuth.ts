@@ -18,17 +18,16 @@ export const useAdminAuth = () => {
 
   useEffect(() => {
     mountedRef.current = true;
-    console.log('useAdminAuth: Component mounted, starting auth check');
+    console.log('useAdminAuth: Starting auth check');
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mountedRef.current) return;
         
-        console.log('useAdminAuth: Auth state changed', { event, hasSession: !!session, email: session?.user?.email });
+        console.log('useAdminAuth: Auth state changed', { event, hasSession: !!session });
         
         if (event === 'SIGNED_OUT') {
-          console.log('useAdminAuth: User signed out');
           setUser(null);
           setIsAdmin(false);
           setLoading(false);
@@ -37,12 +36,11 @@ export const useAdminAuth = () => {
         }
         
         if (session?.user) {
-          console.log('useAdminAuth: Session found, checking admin status');
           setUser(session.user);
           
-          // Check for known admin emails first for instant access
+          // Check for known admin emails first
           if (knownAdminEmails.includes(session.user.email)) {
-            console.log('useAdminAuth: Known admin email detected, granting immediate access');
+            console.log('useAdminAuth: Known admin email detected');
             if (mountedRef.current) {
               setIsAdmin(true);
               setLoading(false);
@@ -51,14 +49,14 @@ export const useAdminAuth = () => {
             return;
           }
 
-          // For non-known emails, check admin status with timeout
-          const adminCheckPromise = checkAdminStatus(session.user);
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Admin check timeout')), 5000)
-          );
-
+          // For other emails, check admin status with shorter timeout
           try {
-            await Promise.race([adminCheckPromise, timeoutPromise]);
+            await Promise.race([
+              checkAdminStatus(session.user),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Admin check timeout')), 2000)
+              )
+            ]);
           } catch (error) {
             console.error('useAdminAuth: Admin check failed:', error);
             if (mountedRef.current) {
@@ -68,7 +66,6 @@ export const useAdminAuth = () => {
             }
           }
         } else {
-          console.log('useAdminAuth: No session found');
           if (mountedRef.current) {
             setUser(null);
             setIsAdmin(false);
@@ -79,12 +76,22 @@ export const useAdminAuth = () => {
       }
     );
 
-    // Check for existing session
-    checkInitialAuth();
+    // Check for existing session with shorter timeout
+    const timeoutId = setTimeout(() => {
+      if (mountedRef.current && loading) {
+        console.log("⚠️ Auth check timeout - proceeding without auth");
+        setLoading(false);
+      }
+    }, 2000); // Reduced from 3000ms
+
+    checkInitialAuth().finally(() => {
+      clearTimeout(timeoutId);
+    });
 
     return () => {
       mountedRef.current = false;
       subscription.unsubscribe();
+      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -104,7 +111,7 @@ export const useAdminAuth = () => {
         throw error;
       }
 
-      console.log('useAdminAuth: Initial auth check complete', { hasUser: !!user, email: user?.email });
+      console.log('useAdminAuth: Initial auth check complete', { hasUser: !!user });
       setUser(user);
 
       if (!user) {
@@ -114,16 +121,16 @@ export const useAdminAuth = () => {
         return;
       }
 
-      // Check for known admin emails first for instant access
+      // Check for known admin emails first
       if (knownAdminEmails.includes(user.email)) {
-        console.log('useAdminAuth: Known admin email detected during initial check, granting immediate access');
+        console.log('useAdminAuth: Known admin email detected during initial check');
         setIsAdmin(true);
         setLoading(false);
         setAuthError(null);
         return;
       }
 
-      // For non-known emails, check admin status in database
+      // For other emails, check admin status
       await checkAdminStatus(user);
 
     } catch (error) {
@@ -143,8 +150,6 @@ export const useAdminAuth = () => {
     try {
       console.log('useAdminAuth: Checking admin status for user:', user.email);
       
-      // This function should only be called for non-known admin emails now
-      // Try to check user_roles table
       const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
@@ -159,7 +164,7 @@ export const useAdminAuth = () => {
         setIsAdmin(false);
       } else {
         const adminAccess = !!roleData;
-        console.log('useAdminAuth: Admin status determined:', { adminAccess, hasRoleData: !!roleData });
+        console.log('useAdminAuth: Admin status determined:', { adminAccess });
         setIsAdmin(adminAccess);
       }
 

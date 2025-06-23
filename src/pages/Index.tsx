@@ -12,34 +12,29 @@ import { NavigationBanner } from "@/components/NavigationBanner";
 import { MobileLoadingSpinner } from "@/components/MobileLoadingSpinner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Gift, Users, Heart } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 import { useChildrenData } from "@/hooks/useChildrenData";
 
 const Index = () => {
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [pageReady, setPageReady] = useState(false);
-  const { toast } = useToast();
   
-  // Use the useChildrenData hook instead of manual fetching
+  // Use the optimized useChildrenData hook
   const { children, loading: childrenLoading, error, refetch, isUsingFallback } = useChildrenData();
 
   useEffect(() => {
     console.log("🚀 Index page initializing...");
     
-    let authTimeout: NodeJS.Timeout;
-    let pageTimeout: NodeJS.Timeout;
-    
     const initializePage = async () => {
       try {
-        // Set a timeout to ensure page loads even if auth fails
-        authTimeout = setTimeout(() => {
+        // Shorter auth timeout for faster page load
+        const authTimeout = setTimeout(() => {
           console.log("⚠️ Auth check timeout - proceeding without auth");
           setUser(null);
           setPageReady(true);
-        }, 3000);
+        }, 1500); // Reduced from 3000ms
 
-        // Check auth state
+        // Quick auth check without blocking page load
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         
         clearTimeout(authTimeout);
@@ -55,16 +50,15 @@ const Index = () => {
         
       } catch (error) {
         console.error("❌ Page initialization error:", error);
-        clearTimeout(authTimeout);
         setPageReady(true); // Still show page even if auth fails
       }
     };
 
-    // Set overall page timeout as fallback
-    pageTimeout = setTimeout(() => {
+    // Overall page timeout as fallback - reduced for faster loading
+    const pageTimeout = setTimeout(() => {
       console.log("⚠️ Page initialization timeout - forcing page load");
       setPageReady(true);
-    }, 5000);
+    }, 2000); // Reduced from 5000ms
 
     initializePage();
 
@@ -75,7 +69,6 @@ const Index = () => {
     });
 
     return () => {
-      clearTimeout(authTimeout);
       clearTimeout(pageTimeout);
       subscription.unsubscribe();
     };
@@ -88,7 +81,7 @@ const Index = () => {
     }
   };
 
-  // Show loading spinner only for the initial page load
+  // Show loading spinner only briefly for initial page load
   if (!pageReady) {
     return <MobileLoadingSpinner />;
   }
@@ -114,10 +107,10 @@ const Index = () => {
             Each ornament represents a child waiting for Christmas magic. Click on any ornament to meet them and help make their holiday dreams come true!
           </p>
           
-          {/* Show error message if there's an error and it's not using fallback */}
+          {/* Simplified error handling */}
           {error && !isUsingFallback && (
             <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700">{error}</p>
+              <p className="text-red-700">Unable to load children data. Please try again.</p>
               <button 
                 onClick={refetch}
                 className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
@@ -127,15 +120,15 @@ const Index = () => {
             </div>
           )}
 
-          {/* Show fallback notice */}
+          {/* Simplified fallback notice */}
           {isUsingFallback && (
             <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-blue-700">Showing sample data while we work to restore the connection.</p>
+              <p className="text-blue-700">Showing sample data.</p>
               <button 
                 onClick={refetch}
                 className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
-                Try to refresh data
+                Refresh
               </button>
             </div>
           )}

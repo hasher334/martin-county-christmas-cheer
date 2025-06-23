@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
@@ -6,9 +7,7 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { ChildCard } from "@/components/ChildCard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Snowflake, Wifi, WifiOff, RefreshCw } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { Snowflake, RefreshCw } from "lucide-react";
 import { useChildrenData } from "@/hooks/useChildrenData";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -16,76 +15,33 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 const Wishlists = () => {
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const { toast } = useToast();
-  const networkStatus = useNetworkStatus();
-  const { children, loading, error, refetch, retryCount, isUsingFallback, networkDiagnostics } = useChildrenData();
+  const { children, loading, error, refetch, retryCount, isUsingFallback } = useChildrenData();
 
-  // Generate snowflakes with the same logic as Hero component
+  // Optimized snowflakes with fewer count
   const snowflakePositions = useMemo(() => {
     const positions = [];
     const isMobile = window.innerWidth < 768;
-    const snowflakeSize = 16; // 4 * 4 (h-4 w-4 in pixels)
-    const minDistance = snowflakeSize * 2; // Minimum distance between snowflakes
-    const maxAttempts = 500; // Reduced attempts for better performance
-    const targetCount = isMobile ? 100 : 200; // Fewer snowflakes on mobile
+    const targetCount = isMobile ? 25 : 50; // Significantly reduced
 
-    // Helper function to check if a position overlaps with existing positions
-    const isValidPosition = (x: number, y: number) => {
-      return positions.every(pos => {
-        const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
-        return distance >= minDistance;
-      });
-    };
-
-    // Generate positions
+    // Simplified positioning for better performance
     for (let i = 0; i < targetCount; i++) {
-      let attempts = 0;
-      let validPosition = false;
-      let x, y;
-
-      while (!validPosition && attempts < maxAttempts) {
-        x = Math.random() * 100;
-        y = Math.random() * 100;
-        
-        if (isValidPosition(x, y)) {
-          validPosition = true;
-          positions.push({
-            x,
-            y,
-            animationDelay: Math.random() * 2,
-            animationDuration: 2 + Math.random() * 2,
-          });
-        }
-        attempts++;
-      }
-
-      // If we can't find a valid position after max attempts, stop adding more
-      if (!validPosition) {
-        break;
-      }
+      positions.push({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        animationDelay: Math.random() * 2,
+        animationDuration: 2 + Math.random() * 2,
+      });
     }
 
     return positions;
   }, []);
 
   useEffect(() => {
-    console.log("Wishlists page - Mobile scroll test");
-    console.log("Page can scroll:", document.body.scrollHeight > window.innerHeight);
-    console.log("Network status on mount:", networkStatus);
-    
-    // Log enhanced data loading status
-    if (networkDiagnostics) {
-      console.log("Network diagnostics:", networkDiagnostics);
-    }
-  }, [networkStatus, networkDiagnostics]);
-
-  useEffect(() => {
-    // Check auth state
+    // Simplified auth check
     const checkAuth = async () => {
       console.log("🔐 Checking authentication status...");
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        console.log("🔐 Auth check result:", { user: !!user, userId: user?.id });
         setUser(user);
       } catch (error) {
         console.error("🔐 Auth check failed:", error);
@@ -106,11 +62,9 @@ const Wishlists = () => {
   const handleAdopt = (childId: string) => {
     console.log("🎁 Adoption initiated for child:", childId);
     if (!user) {
-      console.log("🔐 User not authenticated, showing auth dialog");
       setShowAuthDialog(true);
       return;
     }
-    // Adoption flow will be handled by the child card/modal
   };
 
   const handleRetry = async () => {
@@ -118,33 +72,14 @@ const Wishlists = () => {
     await refetch();
   };
 
-  const handleRunDiagnostics = () => {
-    console.log("🔧 User requested network diagnostics");
-    toast({
-      title: "Running Diagnostics",
-      description: "Check the browser console for detailed network information.",
-    });
-  };
-
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
         <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
         
-        {/* Network Status Alert */}
-        {!networkStatus.isOnline && (
-          <Alert className="mx-4 mb-4 border-orange-500 bg-orange-50">
-            <WifiOff className="h-4 w-4" />
-            <AlertDescription>
-              You appear to be offline. Some features may not work properly.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Fallback Data Alert */}
+        {/* Simplified Fallback Data Alert */}
         {isUsingFallback && (
           <Alert className="mx-4 mb-4 border-blue-500 bg-blue-50">
-            <Wifi className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
               <span>Showing sample data while restoring connection...</span>
               <Button 
@@ -160,11 +95,11 @@ const Wishlists = () => {
           </Alert>
         )}
 
-        {/* Hero Section */}
+        {/* Optimized Hero Section */}
         <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden mobile-optimized">
-          {/* Candy Cane Stripe Pattern Overlay */}
+          {/* Simplified Candy Cane Stripe Pattern */}
           <div 
-            className="absolute inset-0 opacity-15"
+            className="absolute inset-0 opacity-10"
             style={{
               backgroundImage: `repeating-linear-gradient(
                 45deg,
@@ -180,7 +115,7 @@ const Wishlists = () => {
             }}
           ></div>
 
-          {/* Floating Christmas Elements - Same as Hero component */}
+          {/* Optimized Floating Christmas Elements */}
           <div className="absolute inset-0 overflow-hidden">
             {snowflakePositions.map((position, i) => (
               <div
@@ -193,7 +128,7 @@ const Wishlists = () => {
                   animationDuration: `${position.animationDuration}s`,
                 }}
               >
-                <Snowflake className="h-4 w-4 text-white/30" />
+                <Snowflake className="h-3 w-3 text-white/20" />
               </div>
             ))}
           </div>
@@ -223,47 +158,25 @@ const Wishlists = () => {
 
             {/* Loading State */}
             {loading && (
-              <LoadingSpinner 
+              <LoadingSp‌inner 
                 message={retryCount > 0 ? `Loading... (attempt ${retryCount + 1})` : "Loading children's wishlists..."} 
               />
             )}
 
-            {/* Error State */}
+            {/* Simplified Error State */}
             {!loading && error && !isUsingFallback && (
               <div className="text-center py-20">
                 <div className="max-w-md mx-auto">
                   <Alert variant="destructive" className="mb-4">
-                    <WifiOff className="h-4 w-4" />
                     <AlertDescription>
-                      {error.includes('fetch') 
-                        ? 'Unable to connect to our servers. Please check your internet connection and try again.'
-                        : error
-                      }
+                      Unable to connect to our servers. Please check your internet connection and try again.
                     </AlertDescription>
                   </Alert>
                   
-                  <div className="space-y-2">
-                    <Button onClick={handleRetry} disabled={loading}>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Try Again
-                    </Button>
-                    
-                    <Button 
-                      variant="outline" 
-                      onClick={handleRunDiagnostics}
-                      className="ml-2"
-                    >
-                      Run Diagnostics
-                    </Button>
-                    
-                    <div className="flex items-center justify-center text-sm text-gray-500 mt-2">
-                      {networkStatus.isOnline ? (
-                        <><Wifi className="h-4 w-4 mr-1" /> Online</>
-                      ) : (
-                        <><WifiOff className="h-4 w-4 mr-1" /> Offline</>
-                      )}
-                    </div>
-                  </div>
+                  <Button onClick={handleRetry} disabled={loading}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Try Again
+                  </Button>
                 </div>
               </div>
             )}

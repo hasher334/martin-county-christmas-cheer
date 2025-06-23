@@ -31,15 +31,14 @@ export const ChildManagement = () => {
   const [editMode, setEditMode] = useState(false);
   const { toast } = useToast();
 
-  // Use the optimized useChildrenData hook instead of useQuery
+  // Use the optimized useChildrenData hook
   const { 
     children, 
     loading: isLoading, 
     error, 
     refetch, 
     retryCount, 
-    isUsingFallback,
-    networkDiagnostics 
+    isUsingFallback
   } = useChildrenData();
 
   const handleDelete = async (childId: string) => {
@@ -115,18 +114,9 @@ export const ChildManagement = () => {
             </p>
             {isUsingFallback && (
               <div className="bg-yellow-50 p-3 rounded text-xs text-left mb-4">
-                <strong>Using Fallback Data:</strong>
-                <br />Sample data is being shown while we work to restore the connection.
-                <br />Retry count: {retryCount}
+                <strong>Using Sample Data:</strong> Showing sample data while we restore the connection.
               </div>
             )}
-            <div className="bg-gray-50 p-3 rounded text-xs text-left mb-4">
-              <strong>Debug Info:</strong>
-              <br />Error Type: {error?.constructor?.name || 'Unknown'}
-              <br />Time: {new Date().toISOString()}
-              <br />Route: /admin
-              <br />Using Fallback: {isUsingFallback ? 'Yes' : 'No'}
-            </div>
             <Button onClick={() => refetch()} variant="outline" className="w-full">
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
@@ -144,9 +134,6 @@ export const ChildManagement = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading children profiles...</p>
-          <p className="text-sm text-gray-400 mt-2">
-            {isUsingFallback ? 'Loading sample data...' : 'Connecting to database...'}
-          </p>
           {retryCount > 0 && (
             <p className="text-xs text-gray-400 mt-1">Retry attempt: {retryCount}</p>
           )}
@@ -157,8 +144,7 @@ export const ChildManagement = () => {
 
   console.log('✅ ChildManagement rendering with data:', { 
     childrenCount: children?.length,
-    isUsingFallback,
-    children: children 
+    isUsingFallback
   });
 
   return (
@@ -188,8 +174,7 @@ export const ChildManagement = () => {
             <div className="flex items-center space-x-2">
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <p className="text-sm text-yellow-700">
-                Currently showing sample data while we restore the database connection. 
-                Changes may not persist until connection is restored.
+                Currently showing sample data. Changes may not persist until connection is restored.
               </p>
               <Button 
                 variant="outline" 
