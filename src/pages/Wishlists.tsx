@@ -5,17 +5,23 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
 import { OptimizedChildCard } from "@/components/OptimizedChildCard";
-import { OptimizedLoadingSpinner } from "@/components/OptimizedLoadingSpinner";
+import { SimpleLoadingSpinner } from "@/components/SimpleLoadingSpinner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Snowflake, RefreshCw } from "lucide-react";
-import { useChildrenData } from "@/hooks/useChildrenData";
+import { useSimpleChildrenData } from "@/hooks/useSimpleChildrenData";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Wishlists = () => {
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const { children, loading, error, refetch, retryCount, isUsingFallback } = useChildrenData();
+  const { children, loading, error, refetch } = useSimpleChildrenData();
+
+  console.log('📝 Wishlists page render:', { 
+    childrenCount: children.length, 
+    loading, 
+    error: !!error 
+  });
 
   // Reduced snowflakes for performance
   const snowflakePositions = useMemo(() => {
@@ -70,24 +76,6 @@ const Wishlists = () => {
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
         <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
-        
-        {/* Fallback Data Alert */}
-        {isUsingFallback && (
-          <Alert className="mx-4 mb-4 border-blue-500 bg-blue-50">
-            <AlertDescription className="flex items-center justify-between">
-              <span>Showing sample data while restoring connection...</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleRetry}
-                disabled={loading}
-              >
-                <RefreshCw className="h-3 w-3 mr-1" />
-                Retry
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
 
         {/* Optimized Hero Section */}
         <section className="relative py-16 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
@@ -147,18 +135,16 @@ const Wishlists = () => {
 
             {/* Loading State */}
             {loading && (
-              <OptimizedLoadingSpinner 
-                message={retryCount > 0 ? `Loading... (attempt ${retryCount + 1})` : "Loading children's wishlists..."} 
-              />
+              <SimpleLoadingSpinner message="Loading children's wishlists..." />
             )}
 
             {/* Error State */}
-            {!loading && error && !isUsingFallback && (
+            {!loading && error && (
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Alert variant="destructive" className="mb-4">
                     <AlertDescription>
-                      Unable to connect to our servers. Please check your internet connection and try again.
+                      {error}
                     </AlertDescription>
                   </Alert>
                   
@@ -171,7 +157,7 @@ const Wishlists = () => {
             )}
 
             {/* Success State */}
-            {!loading && (children.length > 0) && (
+            {!loading && !error && children.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {children.map((child) => (
                   <OptimizedChildCard
@@ -185,7 +171,7 @@ const Wishlists = () => {
             )}
 
             {/* Empty State */}
-            {!loading && !error && children.length === 0 && !isUsingFallback && (
+            {!loading && !error && children.length === 0 && (
               <div className="text-center py-12">
                 <Snowflake className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
                 <h3 className="text-2xl font-semibold text-christmas-green-800 mb-2">

@@ -6,14 +6,20 @@ import { Hero } from "@/components/Hero";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { OptimizedInteractiveTree } from "@/components/OptimizedInteractiveTree";
-import { OptimizedLoadingSpinner } from "@/components/OptimizedLoadingSpinner";
-import { useChildrenData } from "@/hooks/useChildrenData";
+import { SimpleInteractiveTree } from "@/components/SimpleInteractiveTree";
+import { SimpleLoadingSpinner } from "@/components/SimpleLoadingSpinner";
+import { useSimpleChildrenData } from "@/hooks/useSimpleChildrenData";
 
 const Index = () => {
   const [user, setUser] = useState(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const { children, loading, error, refetch } = useChildrenData();
+  const { children, loading, error, refetch } = useSimpleChildrenData();
+
+  console.log('🏠 Index page render:', { 
+    childrenCount: children.length, 
+    loading, 
+    error: !!error 
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -51,10 +57,11 @@ const Index = () => {
         {/* Interactive Christmas Tree Section */}
         <section className="py-16">
           {loading ? (
-            <OptimizedLoadingSpinner message="Loading Christmas magic..." />
-          ) : error && children.length === 0 ? (
+            <SimpleLoadingSpinner message="Loading Christmas magic..." />
+          ) : error ? (
             <div className="text-center py-12">
               <p className="text-lg text-red-600 mb-4">Unable to load children profiles</p>
+              <p className="text-sm text-gray-600 mb-4">{error}</p>
               <button 
                 onClick={refetch}
                 className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
@@ -63,7 +70,7 @@ const Index = () => {
               </button>
             </div>
           ) : (
-            <OptimizedInteractiveTree
+            <SimpleInteractiveTree
               children={children}
               onAdopt={handleAdopt}
               user={user}
