@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
@@ -158,7 +157,7 @@ const Wishlists = () => {
 
             {/* Loading State */}
             {loading && (
-              <LoadingSp‌inner 
+              <LoadingSpinner 
                 message={retryCount > 0 ? `Loading... (attempt ${retryCount + 1})` : "Loading children's wishlists..."} 
               />
             )}
