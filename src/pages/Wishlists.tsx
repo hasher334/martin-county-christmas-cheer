@@ -1,10 +1,11 @@
+
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthDialog } from "@/components/AuthDialog";
-import { ChildCard } from "@/components/ChildCard";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { OptimizedChildCard } from "@/components/OptimizedChildCard";
+import { OptimizedLoadingSpinner } from "@/components/OptimizedLoadingSpinner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Snowflake, RefreshCw } from "lucide-react";
 import { useChildrenData } from "@/hooks/useChildrenData";
@@ -16,19 +17,17 @@ const Wishlists = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { children, loading, error, refetch, retryCount, isUsingFallback } = useChildrenData();
 
-  // Optimized snowflakes with fewer count
+  // Reduced snowflakes for performance
   const snowflakePositions = useMemo(() => {
     const positions = [];
     const isMobile = window.innerWidth < 768;
-    const targetCount = isMobile ? 25 : 50; // Significantly reduced
+    const targetCount = isMobile ? 15 : 30;
 
-    // Simplified positioning for better performance
     for (let i = 0; i < targetCount; i++) {
       positions.push({
         x: Math.random() * 100,
         y: Math.random() * 100,
-        animationDelay: Math.random() * 2,
-        animationDuration: 2 + Math.random() * 2,
+        delay: Math.random() * 2,
       });
     }
 
@@ -36,22 +35,18 @@ const Wishlists = () => {
   }, []);
 
   useEffect(() => {
-    // Simplified auth check
     const checkAuth = async () => {
-      console.log("🔐 Checking authentication status...");
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
       } catch (error) {
-        console.error("🔐 Auth check failed:", error);
+        console.error("Auth check failed:", error);
       }
     };
     
     checkAuth();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("🔐 Auth state changed:", { event, user: !!session?.user });
       setUser(session?.user ?? null);
     });
 
@@ -59,7 +54,7 @@ const Wishlists = () => {
   }, []);
 
   const handleAdopt = (childId: string) => {
-    console.log("🎁 Adoption initiated for child:", childId);
+    console.log("Adoption initiated for child:", childId);
     if (!user) {
       setShowAuthDialog(true);
       return;
@@ -67,16 +62,16 @@ const Wishlists = () => {
   };
 
   const handleRetry = async () => {
-    console.log("🔄 User triggered manual retry");
+    console.log("User triggered manual retry");
     await refetch();
   };
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background mobile-optimized no-horizontal-scroll">
+      <div className="min-h-screen bg-gradient-to-b from-christmas-cream to-background">
         <Header user={user} onAuthClick={() => setShowAuthDialog(true)} />
         
-        {/* Simplified Fallback Data Alert */}
+        {/* Fallback Data Alert */}
         {isUsingFallback && (
           <Alert className="mx-4 mb-4 border-blue-500 bg-blue-50">
             <AlertDescription className="flex items-center justify-between">
@@ -95,8 +90,8 @@ const Wishlists = () => {
         )}
 
         {/* Optimized Hero Section */}
-        <section className="relative py-20 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden mobile-optimized">
-          {/* Simplified Candy Cane Stripe Pattern */}
+        <section className="relative py-16 bg-gradient-to-b from-[#c51212] via-[#a20a0a] to-[#4d0000] text-white overflow-hidden">
+          {/* Simplified background pattern */}
           <div 
             className="absolute inset-0 opacity-10"
             style={{
@@ -105,16 +100,12 @@ const Wishlists = () => {
                 transparent 0px,
                 transparent 10px,
                 rgba(255, 255, 255, 0.8) 10px,
-                rgba(255, 255, 255, 0.8) 20px,
-                transparent 20px,
-                transparent 30px,
-                #dc2626 30px,
-                #dc2626 40px
+                rgba(255, 255, 255, 0.8) 20px
               )`
             }}
           ></div>
 
-          {/* Optimized Floating Christmas Elements */}
+          {/* Optimized snowflakes */}
           <div className="absolute inset-0 overflow-hidden">
             {snowflakePositions.map((position, i) => (
               <div
@@ -123,8 +114,7 @@ const Wishlists = () => {
                 style={{
                   left: `${position.x}%`,
                   top: `${position.y}%`,
-                  animationDelay: `${position.animationDelay}s`,
-                  animationDuration: `${position.animationDuration}s`,
+                  animationDelay: `${position.delay}s`,
                 }}
               >
                 <Snowflake className="h-3 w-3 text-white/20" />
@@ -132,8 +122,8 @@ const Wishlists = () => {
             ))}
           </div>
 
-          <div className="container mx-auto px-4 text-center relative z-10 mobile-optimized">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 animate-fade-in">
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-in">
               Christmas Wishlists
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90">
@@ -144,27 +134,27 @@ const Wishlists = () => {
         </section>
 
         {/* Wishlists Section */}
-        <section className="py-20 mobile-optimized" data-section="wishlists">
-          <div className="container mx-auto px-4 mobile-optimized no-horizontal-scroll">
+        <section className="py-16">
+          <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-christmas-green-800 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-christmas-green-800 mb-4">
                 Children's Wishlists
               </h2>
-              <p className="text-base md:text-lg text-christmas-brown-700 max-w-2xl mx-auto">
+              <p className="text-lg text-christmas-brown-700 max-w-2xl mx-auto">
                 Each child below has created a special wishlist for Christmas. Click on their profile to see what would make their holiday magical.
               </p>
             </div>
 
             {/* Loading State */}
             {loading && (
-              <LoadingSpinner 
+              <OptimizedLoadingSpinner 
                 message={retryCount > 0 ? `Loading... (attempt ${retryCount + 1})` : "Loading children's wishlists..."} 
               />
             )}
 
-            {/* Simplified Error State */}
+            {/* Error State */}
             {!loading && error && !isUsingFallback && (
-              <div className="text-center py-20">
+              <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Alert variant="destructive" className="mb-4">
                     <AlertDescription>
@@ -182,9 +172,9 @@ const Wishlists = () => {
 
             {/* Success State */}
             {!loading && (children.length > 0) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mobile-optimized">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {children.map((child) => (
-                  <ChildCard
+                  <OptimizedChildCard
                     key={child.id}
                     child={child}
                     onAdopt={handleAdopt}
@@ -196,9 +186,9 @@ const Wishlists = () => {
 
             {/* Empty State */}
             {!loading && !error && children.length === 0 && !isUsingFallback && (
-              <div className="text-center py-20">
+              <div className="text-center py-12">
                 <Snowflake className="h-16 w-16 text-christmas-green-400 mx-auto mb-4" />
-                <h3 className="text-xl md:text-2xl font-semibold text-christmas-green-800 mb-2">
+                <h3 className="text-2xl font-semibold text-christmas-green-800 mb-2">
                   No Wishlists Available
                 </h3>
                 <p className="text-christmas-brown-600">
