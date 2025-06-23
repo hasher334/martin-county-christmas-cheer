@@ -1,11 +1,12 @@
+
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Eye, AlertCircle } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, AlertCircle, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useChildrenData } from "@/hooks/useChildrenData";
 import { ChildProfileForm } from "./ChildProfileForm";
 import { ChildProfileModal } from "./ChildProfileModal";
 
@@ -30,79 +31,16 @@ export const ChildManagement = () => {
   const [editMode, setEditMode] = useState(false);
   const { toast } = useToast();
 
-  const { data: children, isLoading, error, refetch } = useQuery({
-    queryKey: ['admin-children'],
-    queryFn: async () => {
-      console.log('🔄 Fetching children for admin management - START');
-      console.log('📊 Supabase client config:', {
-        url: 'https://urbpoknwecnkhnukzxcb.supabase.co',
-        hasClient: !!supabase
-      });
-      
-      try {
-        // First, let's test basic connection
-        console.log('🔍 Testing basic Supabase connection...');
-        const { data: testData, error: testError } = await supabase
-          .from('children')
-          .select('count(*)', { count: 'exact', head: true });
-        
-        console.log('📈 Connection test result:', { testData, testError, count: testData });
-
-        if (testError) {
-          console.error('❌ Basic connection test failed:', testError);
-          throw new Error(`Connection test failed: ${testError.message}`);
-        }
-
-        // Now try to fetch actual data
-        console.log('📋 Fetching all children data...');
-        const { data, error, count } = await supabase
-          .from('children')
-          .select('*', { count: 'exact' })
-          .order('created_at', { ascending: false });
-
-        console.log('📊 Query result:', { 
-          data: data, 
-          dataLength: data?.length,
-          count: count,
-          error: error 
-        });
-
-        if (error) {
-          console.error('❌ Error fetching children:', error);
-          throw new Error(`Database error: ${error.message} (Code: ${error.code}, Details: ${error.details})`);
-        }
-
-        if (!data) {
-          console.warn('⚠️ No data returned from query');
-          return [];
-        }
-
-        console.log('✅ Successfully fetched children:', {
-          count: data.length,
-          firstChild: data[0] ? { id: data[0].id, name: data[0].name } : 'None',
-          allStatuses: data.map(child => child.status)
-        });
-
-        return data as Child[];
-      } catch (fetchError) {
-        console.error('❌ Complete fetch failure in ChildManagement:', fetchError);
-        console.error('📝 Error details:', {
-          message: fetchError instanceof Error ? fetchError.message : 'Unknown error',
-          stack: fetchError instanceof Error ? fetchError.stack : 'No stack trace'
-        });
-        throw fetchError;
-      }
-    },
-    retry: (failureCount, error) => {
-      console.log(`🔄 Retry attempt ${failureCount} for error:`, error);
-      return failureCount < 3;
-    },
-    retryDelay: (attemptIndex) => {
-      const delay = Math.min(1000 * 2 ** attemptIndex, 5000);
-      console.log(`⏱️ Retry delay: ${delay}ms`);
-      return delay;
-    },
-  });
+  // Use the optimized useChildrenData hook instead of useQuery
+  const { 
+    children, 
+    loading: isLoading, 
+    error, 
+    refetch, 
+    retryCount, 
+    isUsingFallback,
+    networkDiagnostics 
+  } = useChildrenData();
 
   const handleDelete = async (childId: string) => {
     try {
@@ -173,15 +111,24 @@ export const ChildManagement = () => {
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-red-600 mb-2">Error Loading Children</h3>
             <p className="text-gray-600 mb-4 text-sm">
-              {error instanceof Error ? error.message : 'Failed to load children data'}
+              {error || 'Failed to load children data'}
             </p>
+            {isUsingFallback && (
+              <div className="bg-yellow-50 p-3 rounded text-xs text-left mb-4">
+                <strong>Using Fallback Data:</strong>
+                <br />Sample data is being shown while we work to restore the connection.
+                <br />Retry count: {retryCount}
+              </div>
+            )}
             <div className="bg-gray-50 p-3 rounded text-xs text-left mb-4">
               <strong>Debug Info:</strong>
               <br />Error Type: {error?.constructor?.name || 'Unknown'}
               <br />Time: {new Date().toISOString()}
               <br />Route: /admin
+              <br />Using Fallback: {isUsingFallback ? 'Yes' : 'No'}
             </div>
             <Button onClick={() => refetch()} variant="outline" className="w-full">
+              <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
             </Button>
           </CardContent>
@@ -197,7 +144,12 @@ export const ChildManagement = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading children profiles...</p>
-          <p className="text-sm text-gray-400 mt-2">Connecting to database...</p>
+          <p className="text-sm text-gray-400 mt-2">
+            {isUsingFallback ? 'Loading sample data...' : 'Connecting to database...'}
+          </p>
+          {retryCount > 0 && (
+            <p className="text-xs text-gray-400 mt-1">Retry attempt: {retryCount}</p>
+          )}
         </div>
       </div>
     );
@@ -205,6 +157,7 @@ export const ChildManagement = () => {
 
   console.log('✅ ChildManagement rendering with data:', { 
     childrenCount: children?.length,
+    isUsingFallback,
     children: children 
   });
 
@@ -216,6 +169,11 @@ export const ChildManagement = () => {
           <p className="text-gray-600">
             Manage child profiles and their information 
             {children && ` (${children.length} profiles)`}
+            {isUsingFallback && (
+              <Badge variant="outline" className="ml-2 text-yellow-700 bg-yellow-50">
+                Sample Data
+              </Badge>
+            )}
           </p>
         </div>
         <Button onClick={handleAddNew} className="bg-green-600 hover:bg-green-700">
@@ -223,6 +181,29 @@ export const ChildManagement = () => {
           Add New Child
         </Button>
       </div>
+
+      {isUsingFallback && (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-4 w-4 text-yellow-600" />
+              <p className="text-sm text-yellow-700">
+                Currently showing sample data while we restore the database connection. 
+                Changes may not persist until connection is restored.
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => refetch()}
+                className="ml-auto"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {children && children.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
