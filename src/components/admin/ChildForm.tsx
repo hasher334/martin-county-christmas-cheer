@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -28,6 +29,9 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
     photo_url: '',
     status: 'available',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { toast } = useToast();
 
   useEffect(() => {
     if (child) {
@@ -41,14 +45,54 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
         photo_url: child.photo_url || '',
         status: child.status || 'available',
       });
+    } else {
+      // Reset form for new child
+      setFormData({
+        name: '',
+        age: '',
+        gender: '',
+        location: '',
+        story: '',
+        wishes: ['', '', ''],
+        photo_url: '',
+        status: 'available',
+      });
     }
+    setErrors({});
   }, [child]);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+
+    if (!formData.age || parseInt(formData.age) < 1 || parseInt(formData.age) > 18) {
+      newErrors.age = 'Age must be between 1 and 18';
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = 'Gender is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
   };
 
   const handleWishChange = (index: number, value: string) => {
@@ -60,21 +104,62 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const childData: Partial<Child> = {
-      name: formData.name,
-      age: parseInt(formData.age),
-      gender: formData.gender,
-      location: formData.location,
-      story: formData.story,
-      wishes: formData.wishes.filter(wish => wish.trim() !== ''),
-      photo_url: formData.photo_url || null,
-      status: formData.status as any,
-    };
+    console.log('Form submission started', { formData });
+    
+    if (!validateForm()) {
+      console.log('Form validation failed', { errors });
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    onSubmit(childData);
+    setIsSubmitting(true);
+    
+    try {
+      const childData: Partial<Child> = {
+        name: formData.name.trim(),
+        age: parseInt(formData.age),
+        gender: formData.gender,
+        location: formData.location.trim() || null,
+        story: formData.story.trim() || null,
+        wishes: formData.wishes.filter(wish => wish.trim() !== ''),
+        photo_url: formData.photo_url.trim() || null,
+        status: formData.status as any,
+      };
+
+      console.log('Submitting child data:', childData);
+      await onSubmit(childData);
+      
+      // Reset form after successful submission for new children
+      if (!child) {
+        setFormData({
+          name: '',
+          age: '',
+          gender: '',
+          location: '',
+          story: '',
+          wishes: ['', '', ''],
+          photo_url: '',
+          status: 'available',
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error in form submission:', error);
+      toast({
+        title: "Submission Error",
+        description: "Failed to save child profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -103,8 +188,10 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                required
+                className={errors.name ? 'border-red-500' : ''}
+                placeholder="Enter child's name"
               />
+              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
             </div>
             
             <div className="space-y-2">
@@ -116,8 +203,10 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                 max="18"
                 value={formData.age}
                 onChange={(e) => handleInputChange('age', e.target.value)}
-                required
+                className={errors.age ? 'border-red-500' : ''}
+                placeholder="Enter age"
               />
+              {errors.age && <p className="text-sm text-red-500">{errors.age}</p>}
             </div>
             
             <div className="space-y-2">
@@ -126,7 +215,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                 value={formData.gender}
                 onValueChange={(value) => handleInputChange('gender', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className={errors.gender ? 'border-red-500' : ''}>
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -135,6 +224,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.gender && <p className="text-sm text-red-500">{errors.gender}</p>}
             </div>
             
             <div className="space-y-2">
@@ -205,11 +295,20 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
           </div>
           
           <div className="flex items-center space-x-4 pt-6">
-            <Button type="submit" className="bg-christmas-green-600 hover:bg-christmas-green-700">
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="bg-christmas-green-600 hover:bg-christmas-green-700"
+            >
               <Save className="w-4 h-4 mr-2" />
-              {child ? 'Update Child' : 'Create Child'}
+              {isSubmitting ? 'Saving...' : (child ? 'Update Child' : 'Create Child')}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>

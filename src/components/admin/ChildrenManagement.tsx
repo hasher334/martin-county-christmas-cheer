@@ -59,21 +59,28 @@ export const ChildrenManagement = () => {
   };
 
   const handleFormSubmit = async (childData: Partial<Child>) => {
+    console.log('ChildrenManagement: Form submit called with:', childData);
+    
     try {
       if (editingChild) {
+        console.log('Updating existing child:', editingChild.id);
         // Update existing child
         const { error } = await supabase
           .from('children')
           .update(childData)
           .eq('id', editingChild.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
         toast({
           title: "Success",
           description: "Child profile updated successfully",
         });
       } else {
+        console.log('Creating new child with data:', childData);
         // Create new child - ensure required fields are present
         const insertData: ChildInsert = {
           name: childData.name || '',
@@ -86,11 +93,19 @@ export const ChildrenManagement = () => {
           status: (childData.status as any) || 'available',
         };
 
-        const { error } = await supabase
-          .from('children')
-          .insert([insertData]);
+        console.log('Insert data prepared:', insertData);
 
-        if (error) throw error;
+        const { data: insertedData, error } = await supabase
+          .from('children')
+          .insert([insertData])
+          .select();
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+
+        console.log('Insert successful:', insertedData);
 
         toast({
           title: "Success",
@@ -100,12 +115,24 @@ export const ChildrenManagement = () => {
 
       setShowForm(false);
       setEditingChild(null);
-      fetchChildren();
+      await fetchChildren(); // Refresh the list
     } catch (error: any) {
       console.error('Error saving child:', error);
+      
+      let errorMessage = "Failed to save child profile";
+      
+      // Provide more specific error messages based on the error
+      if (error.code === '23505') {
+        errorMessage = "A child with this information already exists";
+      } else if (error.code === '23502') {
+        errorMessage = "Please fill in all required fields";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to save child profile",
+        description: errorMessage,
         variant: "destructive",
       });
     }
