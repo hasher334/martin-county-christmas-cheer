@@ -14,7 +14,7 @@ type Child = Tables<'children'>;
 
 interface ChildFormProps {
   child: Child | null;
-  onSubmit: (childData: Partial<Child>) => void;
+  onSubmit: (childData: Partial<Child>) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -107,10 +107,10 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submission started', { formData });
+    console.log('ChildForm: Form submission started', { formData });
     
     if (!validateForm()) {
-      console.log('Form validation failed', { errors });
+      console.log('ChildForm: Form validation failed', { errors });
       toast({
         title: "Validation Error",
         description: "Please fix the errors in the form",
@@ -133,8 +133,12 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
         status: formData.status as any,
       };
 
-      console.log('Submitting child data:', childData);
+      console.log('ChildForm: Submitting child data:', childData);
+      
+      // Ensure we properly await the onSubmit promise
       await onSubmit(childData);
+      
+      console.log('ChildForm: Submission successful');
       
       // Reset form after successful submission for new children
       if (!child) {
@@ -151,13 +155,14 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
       }
       
     } catch (error) {
-      console.error('Error in form submission:', error);
-      toast({
-        title: "Submission Error",
-        description: "Failed to save child profile. Please try again.",
-        variant: "destructive",
-      });
+      console.error('ChildForm: Error in form submission:', error);
+      
+      // Don't show duplicate error toasts since ChildrenManagement already shows them
+      // The error handling is done in the parent component
+      
     } finally {
+      // Always reset the submitting state
+      console.log('ChildForm: Resetting isSubmitting state');
       setIsSubmitting(false);
     }
   };
@@ -172,6 +177,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
               size="sm"
               onClick={onCancel}
               className="mr-2 p-1"
+              disabled={isSubmitting}
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
@@ -190,6 +196,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className={errors.name ? 'border-red-500' : ''}
                 placeholder="Enter child's name"
+                disabled={isSubmitting}
               />
               {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
             </div>
@@ -205,6 +212,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                 onChange={(e) => handleInputChange('age', e.target.value)}
                 className={errors.age ? 'border-red-500' : ''}
                 placeholder="Enter age"
+                disabled={isSubmitting}
               />
               {errors.age && <p className="text-sm text-red-500">{errors.age}</p>}
             </div>
@@ -214,6 +222,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
               <Select
                 value={formData.gender}
                 onValueChange={(value) => handleInputChange('gender', value)}
+                disabled={isSubmitting}
               >
                 <SelectTrigger className={errors.gender ? 'border-red-500' : ''}>
                   <SelectValue placeholder="Select gender" />
@@ -234,6 +243,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                 value={formData.location}
                 onChange={(e) => handleInputChange('location', e.target.value)}
                 placeholder="e.g., Martin County, FL"
+                disabled={isSubmitting}
               />
             </div>
             
@@ -242,6 +252,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
               <Select
                 value={formData.status}
                 onValueChange={(value) => handleInputChange('status', value)}
+                disabled={isSubmitting}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -264,6 +275,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                 value={formData.photo_url}
                 onChange={(e) => handleInputChange('photo_url', e.target.value)}
                 placeholder="https://example.com/photo.jpg"
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -276,6 +288,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
               onChange={(e) => handleInputChange('story', e.target.value)}
               rows={4}
               placeholder="Tell us about this child..."
+              disabled={isSubmitting}
             />
           </div>
           
@@ -289,6 +302,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
                   value={wish}
                   onChange={(e) => handleWishChange(index, e.target.value)}
                   placeholder={`Enter wish ${index + 1}...`}
+                  disabled={isSubmitting}
                 />
               </div>
             ))}
