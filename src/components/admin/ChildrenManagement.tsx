@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChildrenTable } from './ChildrenTable';
 import { ChildForm } from './ChildForm';
 import { Plus, Users } from 'lucide-react';
-import type { Tables } from '@/integrations/supabase/types';
+import type { Tables, TablesInsert } from '@/integrations/supabase/types';
 
 type Child = Tables<'children'>;
+type ChildInsert = TablesInsert<'children'>;
 
 export const ChildrenManagement = () => {
   const [children, setChildren] = useState<Child[]>([]);
@@ -73,10 +74,21 @@ export const ChildrenManagement = () => {
           description: "Child profile updated successfully",
         });
       } else {
-        // Create new child
+        // Create new child - ensure required fields are present
+        const insertData: ChildInsert = {
+          name: childData.name || '',
+          age: childData.age || 0,
+          gender: childData.gender || '',
+          location: childData.location || null,
+          story: childData.story || null,
+          wishes: childData.wishes || null,
+          photo_url: childData.photo_url || null,
+          status: (childData.status as any) || 'available',
+        };
+
         const { error } = await supabase
           .from('children')
-          .insert([childData]);
+          .insert([insertData]);
 
         if (error) throw error;
 

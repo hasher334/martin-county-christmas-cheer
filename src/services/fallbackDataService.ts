@@ -20,7 +20,10 @@ const mockChildren: Child[] = [
       contact: 'Available through social services'
     },
     created_at: '2024-11-01T10:00:00Z',
-    updated_at: '2024-11-01T10:00:00Z'
+    updated_at: '2024-11-01T10:00:00Z',
+    approved_at: null,
+    approved_by: null,
+    created_by: null
   },
   {
     id: 'mock-2', 
@@ -37,7 +40,10 @@ const mockChildren: Child[] = [
       contact: 'Available through local church'
     },
     created_at: '2024-11-02T14:30:00Z',
-    updated_at: '2024-11-02T14:30:00Z'
+    updated_at: '2024-11-02T14:30:00Z',
+    approved_at: null,
+    approved_by: null,
+    created_by: null
   },
   {
     id: 'mock-3',
@@ -54,7 +60,10 @@ const mockChildren: Child[] = [
       contact: 'Available through school counselor'
     },
     created_at: '2024-11-03T09:15:00Z',
-    updated_at: '2024-11-03T09:15:00Z'
+    updated_at: '2024-11-03T09:15:00Z',
+    approved_at: null,
+    approved_by: null,
+    created_by: null
   }
 ];
 
