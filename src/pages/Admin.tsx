@@ -17,6 +17,8 @@ const Admin = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, 'User:', session?.user?.email);
+        
         if (session?.user) {
           setUser(session.user);
           await verifyAdminRole(session.user.id);
@@ -33,11 +35,15 @@ const Admin = () => {
 
   const checkAdminAccess = async () => {
     try {
+      console.log('Checking admin access...');
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
+        console.log('User found:', session.user.email);
         setUser(session.user);
         await verifyAdminRole(session.user.id);
+      } else {
+        console.log('No user session found');
       }
     } catch (error) {
       console.error('Error checking admin access:', error);
@@ -53,20 +59,27 @@ const Admin = () => {
 
   const verifyAdminRole = async (userId: string) => {
     try {
+      console.log('Verifying admin role for user:', userId);
+      
+      // Use maybeSingle() instead of single() to handle cases where no role is found
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .eq('role', 'admin')
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
+        console.error('Error querying user roles:', error);
         throw error;
       }
 
-      setIsAdmin(!!data);
+      const hasAdminRole = !!data;
+      console.log('Admin role found:', hasAdminRole);
+      setIsAdmin(hasAdminRole);
       
-      if (!data) {
+      if (!hasAdminRole) {
+        console.log('User does not have admin role');
         toast({
           title: "Access Denied",
           description: "You don't have admin privileges",
@@ -76,6 +89,11 @@ const Admin = () => {
     } catch (error) {
       console.error('Error verifying admin role:', error);
       setIsAdmin(false);
+      toast({
+        title: "Error",
+        description: "Failed to verify admin role",
+        variant: "destructive",
+      });
     }
   };
 
