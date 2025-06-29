@@ -120,11 +120,6 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
 
     setIsSubmitting(true);
     
-    // Add timeout protection
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Operation timed out after 30 seconds')), 30000);
-    });
-    
     try {
       const childData: Partial<Child> = {
         name: formData.name.trim(),
@@ -139,8 +134,7 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
 
       console.log('ChildForm: Submitting child data:', childData);
       
-      // Race between the operation and timeout
-      await Promise.race([onSubmit(childData), timeoutPromise]);
+      await onSubmit(childData);
       
       console.log('ChildForm: Submission successful');
       
@@ -161,8 +155,14 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
     } catch (error: any) {
       console.error('ChildForm: Error in form submission:', error);
       
-      // Handle timeout error specifically
-      if (error.message === 'Operation timed out after 30 seconds') {
+      // Handle specific error types
+      if (error.code === '42501') {
+        toast({
+          title: "Permission Error",
+          description: "You don't have permission to perform this action. Please contact an administrator.",
+          variant: "destructive",
+        });
+      } else if (error.message?.includes('timeout')) {
         toast({
           title: "Timeout Error",
           description: "The operation timed out. Please check your connection and try again.",

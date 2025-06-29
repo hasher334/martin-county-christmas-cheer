@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -130,7 +131,9 @@ export const ChildrenManagement = () => {
       let errorMessage = "Failed to save child profile";
       
       // Provide more specific error messages based on the error
-      if (error.code === '23505') {
+      if (error.code === '42501') {
+        errorMessage = "Permission denied. Please ensure you have admin privileges.";
+      } else if (error.code === '23505') {
         errorMessage = "A child with this information already exists";
       } else if (error.code === '23502') {
         errorMessage = "Please fill in all required fields";
@@ -138,6 +141,8 @@ export const ChildrenManagement = () => {
         errorMessage = "Invalid data format. Please check your input.";
       } else if (error.message?.includes('permission')) {
         errorMessage = "You don't have permission to perform this action";
+      } else if (error.message?.includes('policy')) {
+        errorMessage = "Access denied. Please contact an administrator.";
       } else if (error.message) {
         errorMessage = error.message;
       }
