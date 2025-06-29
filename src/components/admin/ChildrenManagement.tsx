@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -61,80 +60,69 @@ export const ChildrenManagement = () => {
   const handleFormSubmit = async (childData: Partial<Child>): Promise<void> => {
     console.log('ChildrenManagement: Form submit called with:', childData);
     
-    // Add timeout to prevent infinite hanging
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Operation timed out after 30 seconds')), 30000);
-    });
-
     try {
-      const operationPromise = async () => {
-        if (editingChild) {
-          console.log('Updating existing child:', editingChild.id);
-          // Update existing child
-          const { error } = await supabase
-            .from('children')
-            .update(childData)
-            .eq('id', editingChild.id);
+      if (editingChild) {
+        console.log('Updating existing child:', editingChild.id);
+        const { error } = await supabase
+          .from('children')
+          .update(childData)
+          .eq('id', editingChild.id);
 
-          if (error) {
-            console.error('Update error:', error);
-            throw error;
-          }
-
-          toast({
-            title: "Success",
-            description: "Child profile updated successfully",
-          });
-        } else {
-          console.log('Creating new child with data:', childData);
-          
-          // Validate required fields before sending to database
-          if (!childData.name || !childData.age || !childData.gender) {
-            throw new Error('Name, age, and gender are required fields');
-          }
-
-          // Create new child - ensure required fields are present
-          const insertData: ChildInsert = {
-            name: childData.name.trim(),
-            age: childData.age,
-            gender: childData.gender,
-            location: childData.location?.trim() || null,
-            story: childData.story?.trim() || null,
-            wishes: childData.wishes || null,
-            photo_url: childData.photo_url?.trim() || null,
-            status: (childData.status as any) || 'available',
-          };
-
-          console.log('Insert data prepared:', insertData);
-
-          const { data: insertedData, error } = await supabase
-            .from('children')
-            .insert([insertData])
-            .select();
-
-          if (error) {
-            console.error('Insert error:', error);
-            throw error;
-          }
-
-          console.log('Insert successful:', insertedData);
-
-          toast({
-            title: "Success",
-            description: "Child profile created successfully",
-          });
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
         }
 
-        // Clean up form state
-        setShowForm(false);
-        setEditingChild(null);
+        toast({
+          title: "Success",
+          description: "Child profile updated successfully",
+        });
+      } else {
+        console.log('Creating new child with data:', childData);
         
-        // Refresh the list
-        await fetchChildren();
-      };
+        // Validate required fields before sending to database
+        if (!childData.name || !childData.age || !childData.gender) {
+          throw new Error('Name, age, and gender are required fields');
+        }
 
-      // Race between the operation and timeout
-      await Promise.race([operationPromise(), timeoutPromise]);
+        // Create new child - ensure required fields are present
+        const insertData: ChildInsert = {
+          name: childData.name.trim(),
+          age: childData.age,
+          gender: childData.gender,
+          location: childData.location?.trim() || null,
+          story: childData.story?.trim() || null,
+          wishes: childData.wishes || null,
+          photo_url: childData.photo_url?.trim() || null,
+          status: (childData.status as any) || 'available',
+        };
+
+        console.log('Insert data prepared:', insertData);
+
+        const { data: insertedData, error } = await supabase
+          .from('children')
+          .insert([insertData])
+          .select();
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+
+        console.log('Insert successful:', insertedData);
+
+        toast({
+          title: "Success",
+          description: "Child profile created successfully",
+        });
+      }
+
+      // Clean up form state
+      setShowForm(false);
+      setEditingChild(null);
+      
+      // Refresh the list
+      await fetchChildren();
 
     } catch (error: any) {
       console.error('Error saving child:', error);
@@ -142,9 +130,7 @@ export const ChildrenManagement = () => {
       let errorMessage = "Failed to save child profile";
       
       // Provide more specific error messages based on the error
-      if (error.message === 'Operation timed out after 30 seconds') {
-        errorMessage = "The operation timed out. Please check your connection and try again.";
-      } else if (error.code === '23505') {
+      if (error.code === '23505') {
         errorMessage = "A child with this information already exists";
       } else if (error.code === '23502') {
         errorMessage = "Please fill in all required fields";

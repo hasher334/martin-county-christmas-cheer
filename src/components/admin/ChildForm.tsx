@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -121,6 +120,11 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
 
     setIsSubmitting(true);
     
+    // Add timeout protection
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Operation timed out after 30 seconds')), 30000);
+    });
+    
     try {
       const childData: Partial<Child> = {
         name: formData.name.trim(),
@@ -135,8 +139,8 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
 
       console.log('ChildForm: Submitting child data:', childData);
       
-      // Ensure we properly await the onSubmit promise
-      await onSubmit(childData);
+      // Race between the operation and timeout
+      await Promise.race([onSubmit(childData), timeoutPromise]);
       
       console.log('ChildForm: Submission successful');
       
@@ -154,11 +158,18 @@ export const ChildForm = ({ child, onSubmit, onCancel }: ChildFormProps) => {
         });
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('ChildForm: Error in form submission:', error);
       
-      // Don't show duplicate error toasts since ChildrenManagement already shows them
-      // The error handling is done in the parent component
+      // Handle timeout error specifically
+      if (error.message === 'Operation timed out after 30 seconds') {
+        toast({
+          title: "Timeout Error",
+          description: "The operation timed out. Please check your connection and try again.",
+          variant: "destructive",
+        });
+      }
+      // Other errors are handled by the parent component
       
     } finally {
       // Always reset the submitting state
