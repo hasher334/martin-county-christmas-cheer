@@ -64,11 +64,10 @@ const Index = () => {
       }
     };
 
-    // Set overall page timeout as fallback
+    // Set overall page timeout as fallback - only sets pageReady, lets fetchChildren manage its own loading state
     pageTimeout = setTimeout(() => {
       console.log("⚠️ Page initialization timeout - forcing page load");
       setPageReady(true);
-      setChildrenLoading(false);
     }, 5000);
 
     initializePage();
@@ -98,18 +97,25 @@ const Index = () => {
       setChildrenLoading(true);
       console.log("🔄 Fetching children data...");
       
-      const { data, error } = await supabase
+      // Create fetch with timeout protection
+      const fetchPromise = supabase
         .from("children")
         .select("*")
         .eq("status", "available")
         .order("created_at", { ascending: true });
+
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error("Fetch timeout after 10 seconds")), 10000)
+      );
+
+      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
 
       if (error) {
         console.error("❌ Children fetch error:", error);
         throw error;
       }
       
-      console.log("✅ Children fetched successfully:", data?.length || 0);
+      console.log("✅ Children fetched successfully:", data?.length || 0, "children");
       setChildren(data || []);
       setError(null);
       
@@ -122,6 +128,7 @@ const Index = () => {
         variant: "destructive",
       });
     } finally {
+      console.log("🏁 Fetch complete, setting childrenLoading to false");
       setChildrenLoading(false);
     }
   };
