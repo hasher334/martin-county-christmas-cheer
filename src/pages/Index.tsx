@@ -95,20 +95,15 @@ const Index = () => {
   const fetchChildren = async () => {
     try {
       setChildrenLoading(true);
-      console.log("🔄 Fetching children data...");
+      console.log("🔄 Fetching children data from Supabase...");
       
-      // Create fetch with timeout protection
-      const fetchPromise = supabase
+      const { data, error } = await supabase
         .from("children")
         .select("*")
         .eq("status", "available")
         .order("created_at", { ascending: true });
 
-      const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error("Fetch timeout after 10 seconds")), 10000)
-      );
-
-      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
+      console.log("📦 Supabase response received:", { data: data?.length, error });
 
       if (error) {
         console.error("❌ Children fetch error:", error);
